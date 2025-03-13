@@ -1,7 +1,7 @@
 
 # 🧠 BrainAlpha - Mental Training
 
-<img src="logo.PNG" width="100">
+<img src="logo.PNG" width="500">
 
 ## 🟦 Project Overview
 
