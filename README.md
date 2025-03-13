@@ -124,6 +124,11 @@ If you want to contribute, follow these steps:
 
  4. **Open a Merge Request on GitLab.**
 
+
+
+
+------------------------------
+
 This is a Kotlin Multiplatform project targeting Android, Web, Desktop.
 
 * `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
