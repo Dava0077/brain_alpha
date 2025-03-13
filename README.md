@@ -1,6 +1,8 @@
 
 # 🧠 BrainAlpha - Mental Training
 
+<img src="logo.PNG" width="100">
+
 ## 🟦 Project Overview
 
 **BrainAlpha** is an open-source application designed to enhance memory, concentration, logic, and mental agility through interactive games. The app is completely free, with no ads or in-app purchases, and is inclusive for people with cognitive difficulties.  
