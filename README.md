@@ -105,7 +105,7 @@ If you want to contribute, follow these steps:
 
  1. **Clone the repository:**
  ```bash
- git clone https://gitlab.com/your_username/brain-alpha.git
+ git clone https://gitlab.com/provencat/dam/brain-alpha.git
  ```
 
  2. **Create a new branch:**
