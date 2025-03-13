@@ -3,10 +3,10 @@
 
 BrainAlpha is a brain training mobile app that offers a series of games and exercises designed to improve cognitive skills such as memory, attention, and concentration.
 
-BrainAlpha ofrece a sus usuarios funcionalidades como por ejemplo:
- -Entrenar la mente con desafíos divididos por categorías y niveles.
- -Medir su progreso con estadísticas.
- -Personalizar la app a gusto del usuario (categorías favoritas, interfaz, niveles, etc).
+BrainAlpha offers its users features such as:
+-Train your mind with challenges divided into categories and levels.
+-Measure your progress with statistics.
+-Customize the app to your liking (favorite categories, interface, levels, etc.).
 
 
 This is a Kotlin Multiplatform project targeting Android, Web, Desktop.
