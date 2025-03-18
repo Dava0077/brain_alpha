@@ -6,8 +6,7 @@ This document presents the **Entity-Relationship Diagram (ERD)** for BrainAlpha.
 ---
 
 ## 🟦 Entity-Relationship Diagram (ERD)
- **[Insert ERD diagram here]**  
-*(Generated from Supabase schema)*
+ ![ERD Diagram](docs/ERD.png)
 
 ---
 
