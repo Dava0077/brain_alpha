@@ -8,7 +8,7 @@ This document presents the UML **Use Case Diagram** for the MVP version of Brain
 ## 🟦 Use Case Diagram
 Below is a graphical representation of the main interactions between the user and the system.
 
- **[Insert UML diagram here]**
+ ![Use Case Diagram](https://gitlab.com/provencat/dam/brain-alpha/-/blob/main/docs/UML.png?ref_type=heads)
 
 ---
 
