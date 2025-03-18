@@ -16,6 +16,24 @@ All project documentation is available in the ▶ [`docs/`](docs/) folder.
 
 ---
 
+## 🟦 Project Status
+
+ **Current Version:** v0.1   
+ **Latest Update:** March 2025  
+ **Development Stage:** MVP - First iteration completed  
+ **Demo:** The initial APK has been built and is available for testing.  
+
+For a list of upcoming features and improvements, check ▶ [Development Roadmap](docs/roadmap.md).
+
+---
+
+## 🟦 Download the APK
+
+You can download the latest version of BrainAlpha here:  
+▶ **[BrainAlpha v0.1 APK](https://brain-alpha.netlify.app/)**  
+
+---
+
 ## 🟦 Project Objectives
 
 - Develop a **cross-platform** application with cognitive training game.
@@ -61,6 +79,18 @@ The app is built using a modern architecture with well-structured technologies:
 | **Notifications** | WorkManager |
 
 For a detailed architecture overview, see ▶ [Project Architecture](docs/architecture.md).
+
+---
+
+## 🟦 Development Roadmap
+
+BrainAlpha is continuously evolving. Here’s what’s planned for future updates:
+
+-  **Sprint 1:** Database setup, authentication system, first game prototype.
+-  **Sprint 2:** Improved UI/UX, more cognitive training games, statistics system.
+-  **Sprint 3:** Achievements, leaderboard, and advanced customization.
+
+For a full roadmap, check ▶ [Development Roadmap](docs/roadmap.md).
 
 ---
 
