@@ -6,7 +6,7 @@ This document outlines the key use cases of the BrainAlpha application for the M
 ---
 
 ## 🟦 Use Case 1: User Registration & Authentication  
-** Description:** The user registers and logs in to the app using Supabase Auth.  
+**Description:** The user registers and logs in to the app using Supabase Auth.  
 
 ### **Actors**
 - **Primary Actor:** User  
@@ -29,7 +29,7 @@ This document outlines the key use cases of the BrainAlpha application for the M
 ---
 
 ## 🟦 Use Case 2: Playing a Cognitive Training Game  
-** Description:** The user selects a game and plays a training session.  
+**Description:** The user selects a game and plays a training session.  
 
 ### **Actors**
 - **Primary Actor:** User  
@@ -53,7 +53,7 @@ This document outlines the key use cases of the BrainAlpha application for the M
 ---
 
 ## 🟦 Use Case 3: Viewing Progress & Statistics  
-** Description:** The user checks their cognitive progress through statistics.
+**Description:** The user checks their cognitive progress through statistics.
 
 ### **Actors**
 - **Primary Actor:** User  
@@ -77,7 +77,7 @@ This document outlines the key use cases of the BrainAlpha application for the M
 ---
 
 ## 🟦 Use Case 4: Customizing User Preferences  
-** Description:** The user modifies their app settings (dark mode).
+**Description:** The user modifies their app settings (dark mode).
 
 ### **Actors**
 - **Primary Actor:** User  
