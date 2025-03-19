@@ -1,0 +1,7 @@
+---js
+const title = "Home"
+---
+
+<h1>Home</h1>
+
+<p>Multiplatform is a KMP demo application</p>
