@@ -1,0 +1,10 @@
+pages:
+  image: node:21
+  stage: deploy
+  pages: true
+  rules:
+    - if: $CI_COMMIT_MESSAGE =~ /@pages/
+  script:
+    - cd site
+    - npm install
+    - npx @11ty/eleventy --output=../public
