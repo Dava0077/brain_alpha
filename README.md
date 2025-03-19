@@ -3,6 +3,19 @@
 
 <img src="logo.PNG" width="400">
 
+<https://g8-c23437.gitlab.io>
+
+## Development
+
+scoop install nodejs
+
+```pwsh
+cd site
+npm start
+```
+
+para ci   commit con @pages
+
 ## 🟦 Project Overview
 
 **BrainAlpha** is an open-source application designed to enhance memory, concentration, logic, and mental agility through interactive games. The app is completely free, with no ads or in-app purchases, and is inclusive for people with cognitive difficulties.  
