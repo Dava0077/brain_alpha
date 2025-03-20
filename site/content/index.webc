@@ -66,7 +66,7 @@ const title = "Home"
         </div>
     </div>
 
-<p>logo carousel nuevo 4</p>
+<p>logo carousel nuevo 5</p>
 
 <div id="logoCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="2000">
             <div class="carousel-inner">
