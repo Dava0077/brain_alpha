@@ -17,29 +17,37 @@ const title = "Home"
                     <a class="nav-link" href="#">Sobre nosotros</a>
                 </li>
             </ul>
-            <a href="#" class="btn btn-custom ms-3">Descargar app</a>
+            <a href="site/Downloads/composeApp-debug.apk" download class="btn btn-custom ms-3 bg-primary">Descargar app</a>
         </div>
     </div>
 </nav>
 
+<br><br><br><br><br><br><br>
 
 <!-- Sección principal -->
     <div class="container text-center py-5">
         <!-- Título -->
-        <h1 class="display-4 text-primary fw-bold mb-3">Entrena tu mente, recompensa tu vida</h1>
+        <h1 class="display-3 text-primary fw-bold mb-3">Entrena tu mente, <br> recompensa tu vida</h1>
+
+        <br>
+
         <!-- Descripción -->
         <p class="fs-5 text-dark mb-4">Ejercita la memoria, la flexibilidad y mucho más con el programa de entrenamiento cerebral más popular del mundo</p>
+
+        <br>
+
         <!-- Botón -->
         <button class="btn btn-primary bg-purple text-white px-4 py-2">Empezar</button>
     </div>
 
+<br><br><br><br><br><br><br>
 
 <!-- Sección principal -->
     <div class="container text-center py-5">
         <!-- Título principal -->
-        <h1 class="display-4 fw-bold mb-3">Le das importancia a tu cerebro y nosotros también.</h1>
+        <h1 class="display-5 fw-bold mb-3">Le das importancia a tu cerebro y nosotros también.</h1>
         <!-- Subtítulo -->
-        <p class="fs-5 text-dark mb-5">Entrena las habilidades cognitivas que más te importan. Memoria. Atención. Resolución de problemas. Lumosity se enfoca en estas habilidades cognitivas y más.</p>
+        <p class="fs-5 text-dark mb-5">Entrena las habilidades cognitivas que más te impcd sitortan, <br> memoria, atención y resolución de problemas. <br> Lumosity se enfoca en estas habilidades cognitivas y más.</p>
 
         <!-- Sección de columnas -->
         <div class="row g-4">
@@ -64,7 +72,7 @@ const title = "Home"
         </div>
     </div>
 
-<p>logo carousel nuevo 5.9</p>
+<p>logo carousel nuevo 5.5</p>
 
 <div id="logoCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="2000">
             <div class="carousel-inner">
@@ -72,7 +80,7 @@ const title = "Home"
                 <div class="carousel-item active">
                     <div class="row justify-content-center align-items-center">
                         <div class="col-auto">
-                            <img src="IntelliJ_IDEA_Icon.svg.png" alt="Intellij IDEA" class="img-fluid" style="height: 50px;">
+                            {% image "content/IntelliJ_IDEA_Icon.svg.png", "IntelliJ IDEA", "img-fluid", "50px" %}
                         </div>
                         <div class="col-auto">
                             <img src="https://via.placeholder.com/100x50?text=SQLite" alt="SQLite" class="img-fluid" style="height: 50px;">
