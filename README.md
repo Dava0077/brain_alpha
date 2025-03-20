@@ -3,7 +3,7 @@
 
 <img src="logo.PNG" width="400">
 
-<https://g8-c23437.gitlab.io>
+
 
 ## Development
 
@@ -43,7 +43,7 @@ For a list of upcoming features and improvements, check ▶ [Development Roadmap
 ## 🟦 Download the APK
 
 You can download the latest version of BrainAlpha here:  
-▶ **[BrainAlpha v0.1 APK](https://brain-alpha.netlify.app/)**  
+▶ **[BrainAlpha v0.1 APK](https://g8-c23437.gitlab.io)**  
 
 ---
 
