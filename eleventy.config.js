@@ -2,34 +2,37 @@ import EleventyImage from "@11ty/eleventy-img";
 import path from "path";
 
 export default function(eleventyConfig) {
-  // Agregar soporte para imágenes optimizadas
-  eleventyConfig.addShortcode("image", async (src, alt, className = "", sizes = "100vw") => {
-    let metadata = await EleventyImage(path.join("site", src), {
-      widths: [300, 600, "auto"], // Diferentes tamaños para responsive
-      formats: ["avif", "webp", "jpeg"], // Formatos optimizados
-      outputDir: "./_site/img/", // Carpeta de salida
-      urlPath: "/img/", // Ruta de acceso en la web
+  // Configurar Nunjucks para poder usar `{% image ... %}`
+  eleventyConfig.setLibrary("njk", require("nunjucks"));
+  eleventyConfig.setLibrary("liquid", require("liquidjs"));
+
+  // Definir un shortcode global para imágenes
+  eleventyConfig.addShortcode("image", async (src, alt, className = "img-fluid", width = "100%") => {
+    let metadata = await EleventyImage(src, {
+      widths: [300, 600, "auto"],
+      formats: ["avif", "webp", "jpeg"],
+      outputDir: "./_site/img/",
+      urlPath: "/img/",
     });
 
     let imageAttributes = {
       alt,
-      sizes,
+      class: className,
       loading: "lazy",
       decoding: "async",
-      class: className,
+      width,
     };
 
     return EleventyImage.generateHTML(metadata, imageAttributes);
   });
 
-  // Copiar archivos estáticos (Ejemplo: CSS, JS, imágenes sin procesar)
-  eleventyConfig.addPassthroughCopy({ "site/assets/": "assets" });
+  // Asegurar que copia imágenes estáticas correctamente
+  eleventyConfig.addPassthroughCopy("site/content");
 
   return {
     dir: {
-      input: "site/content",  // Entrada de los archivos de contenido
-      includes: "includes",   // Incluir plantillas parciales
-      output: "_site"         // Carpeta de salida
+      input: "site/content",
+      output: "_site",
     }
   };
 }
