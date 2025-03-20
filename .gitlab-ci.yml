@@ -1,3 +1,41 @@
+variables:
+  NAME: "BrainAlpha"
+  VERSION: "1.0.0"
+
+android:
+  stage: build
+  image: fabernovel/android:api-33-v1.7.0
+  rules:
+    - if: $CI_COMMIT_MESSAGE =~ /@build|@android/
+  script:
+    - fastlane build
+
+windows:
+  stage: build
+  tags: [saas-windows-medium-amd64]
+  rules:
+    - if: $CI_COMMIT_MESSAGE =~ /@build|@desktop/
+  script:
+    - .\gradlew --no-daemon packageDistributionForCurrentOS
+  artifacts:
+    paths:
+      - composeApp/build/compose/binaries/main/msi/
+    expire_in: 1 day
+
+
+registry:
+  stage: deploy
+  image: alpine/curl
+  rules:
+    - if: $CI_COMMIT_MESSAGE =~ /@build|@desktop/
+  dependencies:
+    #- macos
+    - windows
+  script:
+    #- ls -lR composeApp/build/compose/binaries/
+    #- 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file composeApp/build/compose/binaries/main/dmg/${NAME}-${VERSION}.dmg  ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/desktop/${VERSION}/${NAME}.dmg'
+    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file composeApp/build/compose/binaries/main/msi/${NAME}-${VERSION}.msi  ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/desktop/${VERSION}/${NAME}.msi'
+
 pages:
   image: node:21
   stage: deploy
