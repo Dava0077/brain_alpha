@@ -22,11 +22,11 @@ para ci   commit con @pages
 The app is completely **free**, with **no ads or in-app purchases**, and is inclusive for people with **cognitive difficulties**.
 
 BrainAlpha offers its users features such as:
-- 🎯 **Challenges divided into categories and levels.**
-- 📊 **Measure your progress with statistics.**
-- 🎨 **Customize the app (favorite categories, interface, difficulty levels, etc.).**
-- ☁ **Cloud-based user progress tracking.**
-- 🏆 **Achievements system to encourage continuous improvement.**
+-  **Challenges divided into categories and levels.**
+-  **Measure your progress with statistics.**
+-  **Customize the app (favorite categories, interface, difficulty levels, etc.).**
+-  **Cloud-based user progress tracking.**
+-  **Achievements system to encourage continuous improvement.**
 
 All project documentation is available in the ▶ [`docs/`](docs/) folder.
 
@@ -143,7 +143,7 @@ BrainAlpha is an **open-source project** under the **GPL license**, allowing:
 - ✏ Code modification to fit different needs.
 - 🛠 Contributions to improve and expand the project.
 
-More details ▶ [License](docs/license.md).
+More details ▶ [License](LICENSE).
 
 ---
 
