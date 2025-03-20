@@ -26,7 +26,7 @@ This document contains the **Sprint Backlog** for Sprint 0 of the BrainAlpha pro
 
 ---
 
-## 📌 Status Breakdown  
+## Status Breakdown  
 - ✅ **Done** → Completed and reviewed.  
 - 🚧 **In Progress** → Task currently being worked on.  
 - 🔲 **To Do** → Not started yet, pending execution.  
