@@ -1,4 +1,6 @@
 export default {
-	// Set a global layout for all templates in this folder.
 	layout: "base.webc",
+	image: (src, alt = "", className = "") => {
+		return `<img src="/img/${src}" alt="${alt}" class="${className}" loading="lazy" decoding="async">`;
+	}
 };
