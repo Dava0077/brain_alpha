@@ -1,6 +1,6 @@
 # 🟦 BrainAlpha - Test Cases
 
-## 📌 Overview
+## Overview
 This document contains the **test cases** for the MVP version of BrainAlpha.
 
 ---
