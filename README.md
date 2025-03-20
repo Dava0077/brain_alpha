@@ -139,9 +139,9 @@ Full list of non-functional requirements in ▶ [Non-Functional Requirements](do
 
 BrainAlpha is an **open-source project** under the **GPL license**, allowing:
 
-- 📂 Free usage of the application.
-- ✏ Code modification to fit different needs.
-- 🛠 Contributions to improve and expand the project.
+-  Free usage of the application.
+-  Code modification to fit different needs.
+-  Contributions to improve and expand the project.
 
 More details ▶ [License](LICENSE).
 
