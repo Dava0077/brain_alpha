@@ -12,7 +12,7 @@ const title = "Home"
                 <div class="carousel-item active">
                     <div class="row justify-content-center align-items-center">
                         <div class="col-auto">
-                            <img src="https://via.placeholder.com/100x50?text=Supabase" alt="Supabase" class="img-fluid" style="height: 50px;">
+                            <img src="IntelliJ_IDEA_Icon.svg.png" alt="Intellij IDEA" class="img-fluid" style="height: 50px;">
                         </div>
                         <div class="col-auto">
                             <img src="https://via.placeholder.com/100x50?text=SQLite" alt="SQLite" class="img-fluid" style="height: 50px;">
