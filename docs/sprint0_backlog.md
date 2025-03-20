@@ -11,10 +11,10 @@ This document contains the **Sprint Backlog** for Sprint 0 of the BrainAlpha pro
 |--------|---------------------------------------------|--------------|---------------------|---------------|
 | #1     | Project Presentation                       | High         | 4                   | ✅ Done       |
 | #6     | Deploy Infrastructure                      | High         | 6                   | ✅ Done       |
-| #3     | Supabase Configuration                     | High         | 8                   | 🚧 In Progress |
+| #3     | Supabase Configuration                     | High         | 8                   | ✅ Done  |
 | #4     | Create Product Backlog                     | High         | 5                   | ✅ Done       |
 | #5     | UI/UX Design (Mockups & Wireframes)        | High         | 10                  | ✅ Done       |
-| #11    | Develop Wiki Documentation                 | Medium       | 6                   | 🚧 In Progress |
+| #11    | Develop Wiki Documentation                 | Medium       | 6                   | ✅ Done  |
 | #7     | Create README.md File                      | High         | 4                   | ✅ Done       |
 | #8     | Create Class Diagrams                      | High         | 6                   | ✅ Done       |
 | #9     | Design Web Page                            | Medium       | 8                   | 🚧 In Progress |
@@ -22,7 +22,7 @@ This document contains the **Sprint Backlog** for Sprint 0 of the BrainAlpha pro
 | #15    | Create Use Case Diagram                    | High         | 5                   | ✅ Done       |
 | #12    | Create Wireframes & Upload to Wiki        | High         | 8                   | ✅ Done       |
 | #13    | Write Test Cases (`test_cases.md`)         | High         | 7                   | ✅ Done       |
-| #14    | Document Test Evidences (`test_evidences.md`) | Medium       | 5                   | 🔲 To Do       |
+| #14    | Document Test Evidences (`test_evidences.md`) | Medium       | 5                   | ✅ Done        |
 
 ---
 
