@@ -4,6 +4,68 @@ const title = "Home"
 
 <h1>Home</h1>
 
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+            <img src="logo.PNG" alt="Logo" height="140">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Sobre nosotros</a>
+                </li>
+            </ul>
+            <a href="#" class="btn btn-custom ms-3">Descargar app</a>
+        </div>
+    </div>
+</nav>
+
+
+<!-- Sección principal -->
+    <div class="container text-center py-5">
+        <!-- Título -->
+        <h1 class="display-4 text-primary fw-bold mb-3">Entrena tu mente, recompensa tu vida</h1>
+        <!-- Descripción -->
+        <p class="fs-5 text-dark mb-4">Ejercita la memoria, la flexibilidad y mucho más con el programa de entrenamiento cerebral más popular del mundo</p>
+        <!-- Botón -->
+        <button class="btn btn-primary bg-purple text-white px-4 py-2">Empezar</button>
+    </div>
+
+
+<!-- Sección principal -->
+    <div class="container text-center py-5">
+        <!-- Título principal -->
+        <h1 class="display-4 fw-bold mb-3">Le das importancia a tu cerebro y nosotros también.</h1>
+        <!-- Subtítulo -->
+        <p class="fs-5 text-dark mb-5">Entrena las habilidades cognitivas que más te importan. Memoria. Atención. Resolución de problemas. Lumosity se enfoca en estas habilidades cognitivas y más.</p>
+
+        <!-- Sección de columnas -->
+        <div class="row g-4">
+            <!-- Columna 1 -->
+            <div class="col-md-4">
+                <img src="https://via.placeholder.com/50" alt="Icono 1" class="mb-3">
+                <h3 class="fs-4 fw-bold mb-3">Diversión basada en rigor científico</h3>
+                <p class="text-dark">Lumosity convierte las tareas del laboratorio en juegos divertidos. Después, interpretamos los resultados para ofrecerte informes relevantes y análisis detallados de tu cognición.</p>
+            </div>
+            <!-- Columna 2 -->
+            <div class="col-md-4">
+                <img src="https://via.placeholder.com/50" alt="Icono 2" class="mb-3">
+                <h3 class="fs-4 fw-bold mb-3">Ejercicios diarios para tu mente</h3>
+                <p class="text-dark">Entrena con juegos nuevos cada día para no dejar de ponerte a prueba. El seguimiento de tus avances te ayudará a mantener tus hábitos de entrenamiento cognitivo.</p>
+            </div>
+            <!-- Columna 3 -->
+            <div class="col-md-4">
+                <img src="https://via.placeholder.com/50" alt="Icono 3" class="mb-3">
+                <h3 class="fs-4 fw-bold mb-3">Entrenamiento cognitivo a tu medida</h3>
+                <p class="text-dark">No importa ni tu edad ni tu nivel de habilidad: Lumosity sabe que todos los cerebros son diferentes, por lo que nuestro programa se adapta a tus puntos fuertes y débiles.</p>
+            </div>
+        </div>
+    </div>
+
 <p>logo carousel nuevo 3</p>
 
 <div id="logoCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="2000">
