@@ -2,8 +2,6 @@
 const title = "Home"
 ---
 
-<h1>Home</h1>
-
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-white">
     <div class="container-fluid">
@@ -66,7 +64,7 @@ const title = "Home"
         </div>
     </div>
 
-<p>logo carousel nuevo 5.1</p>
+<p>logo carousel nuevo 5.9</p>
 
 <div id="logoCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="2000">
             <div class="carousel-inner">
