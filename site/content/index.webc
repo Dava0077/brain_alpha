@@ -1,122 +1,21 @@
 ---js
-const title = "Home"
+const title = "BrainAlpha - Entrena tu mente";
 ---
+<layout webc:is="layouts/base.webc">
+    <div class="text-center py-5">
+        <h1 class="display-3 text-primary fw-bold">Entrena tu mente, <br> recompensa tu vida</h1>
+        <p class="fs-5 text-dark">Ejercita tu memoria, lógica y concentración con BrainAlpha.</p>
+        <a href="/about" class="btn btn-primary">Conoce más</a>
+    </div>
 
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-white">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">
-            <img src="logo.PNG" alt="Logo" height="140">
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Sobre nosotros</a>
-                </li>
-            </ul>
-            <a href="site/Downloads/composeApp-debug.apk" download class="btn btn-custom ms-3 bg-primary">Descargar app</a>
+    <div webc:is="components/carousel"></div>
+
+    <div class="row mt-5">
+        <div class="col-md-6">
+            <div webc:is="components/download-card" platform="Desktop" file="/downloads/brainalpha.msi"></div>
+        </div>
+        <div class="col-md-6">
+            <div webc:is="components/download-card" platform="Android" file="/downloads/brainalpha.apk"></div>
         </div>
     </div>
-</nav>
-
-<br><br><br><br><br><br><br>
-
-<!-- Sección principal -->
-    <div class="container text-center py-5">
-        <!-- Título -->
-        <h1 class="display-3 text-primary fw-bold mb-3">Entrena tu mente, <br> recompensa tu vida</h1>
-
-        <br>
-
-        <!-- Descripción -->
-        <p class="fs-5 text-dark mb-4">Ejercita la memoria, la flexibilidad y mucho más con el programa de entrenamiento cerebral más popular del mundo</p>
-
-        <br>
-
-        <!-- Botón -->
-        <button class="btn btn-primary bg-purple text-white px-4 py-2">Empezar</button>
-    </div>
-
-<br><br><br><br><br><br><br>
-
-<!-- Sección principal -->
-    <div class="container text-center py-5">
-        <!-- Título principal -->
-        <h1 class="display-5 fw-bold mb-3">Le das importancia a tu cerebro y nosotros también.</h1>
-        <!-- Subtítulo -->
-        <p class="fs-5 text-dark mb-5">Entrena las habilidades cognitivas que más te impcd sitortan, <br> memoria, atención y resolución de problemas. <br> Lumosity se enfoca en estas habilidades cognitivas y más.</p>
-
-        <!-- Sección de columnas -->
-        <div class="row g-4">
-            <!-- Columna 1 -->
-            <div class="col-md-4">
-                <img src="https://via.placeholder.com/50" alt="Icono 1" class="mb-3">
-                <h3 class="fs-4 fw-bold mb-3">Diversión basada en rigor científico</h3>
-                <p class="text-dark">Lumosity convierte las tareas del laboratorio en juegos divertidos. Después, interpretamos los resultados para ofrecerte informes relevantes y análisis detallados de tu cognición.</p>
-            </div>
-            <!-- Columna 2 -->
-            <div class="col-md-4">
-                <img src="https://via.placeholder.com/50" alt="Icono 2" class="mb-3">
-                <h3 class="fs-4 fw-bold mb-3">Ejercicios diarios para tu mente</h3>
-                <p class="text-dark">Entrena con juegos nuevos cada día para no dejar de ponerte a prueba. El seguimiento de tus avances te ayudará a mantener tus hábitos de entrenamiento cognitivo.</p>
-            </div>
-            <!-- Columna 3 -->
-            <div class="col-md-4">
-                <img src="https://via.placeholder.com/50" alt="Icono 3" class="mb-3">
-                <h3 class="fs-4 fw-bold mb-3">Entrenamiento cognitivo a tu medida</h3>
-                <p class="text-dark">No importa ni tu edad ni tu nivel de habilidad: Lumosity sabe que todos los cerebros son diferentes, por lo que nuestro programa se adapta a tus puntos fuertes y débiles.</p>
-            </div>
-        </div>
-    </div>
-
-<p>logo carousel nuevo 5.5</p>
-
-<div id="logoCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="2000">
-            <div class="carousel-inner">
-                <!-- First Slide: First 4 logos -->
-                <div class="carousel-item active">
-                    <div class="row justify-content-center align-items-center">
-                        <div class="col-auto">
-                            {% image "content/IntelliJ_IDEA_Icon.svg.png", "IntelliJ IDEA", "img-fluid", "50px" %}
-                        </div>
-                        <div class="col-auto">
-                            <img src="https://via.placeholder.com/100x50?text=SQLite" alt="SQLite" class="img-fluid" style="height: 50px;">
-                        </div>
-                        <div class="col-auto">
-                            <img src="https://via.placeholder.com/100x50?text=Logo3" alt="Logo3" class="img-fluid" style="height: 50px;">
-                        </div>
-                        <div class="col-auto">
-                            <img src="https://via.placeholder.com/100x50?text=Logo4" alt="Logo4" class="img-fluid" style="height: 50px;">
-                        </div>
-                    </div>
-                </div>
-                <!-- Second Slide: Last 3 logos -->
-                <div class="carousel-item">
-                    <div class="row justify-content-center align-items-center">
-                        <div class="col-auto">
-                            <img src="https://via.placeholder.com/100x50?text=Kotlin" alt="Kotlin" class="img-fluid" style="height: 50px;">
-                        </div>
-                        <div class="col-auto">
-                            <img src="https://via.placeholder.com/100x50?text=Java" alt="Java" class="img-fluid" style="height: 50px;">
-                        </div>
-                        <div class="col-auto">
-                            <img src="https://via.placeholder.com/100x50?text=Supak" alt="Supak" class="img-fluid" style="height: 50px;">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Optional: Carousel Controls -->
-            <button class="carousel-control-prev" type="button" data-bs-target="#logoCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#logoCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
-        </div>
-    </div>
+</layout>
