@@ -1,12 +1,20 @@
+import pluginWebc from "@11ty/eleventy-plugin-webc";
 import EleventyImage from "@11ty/eleventy-img";
 import path from "path";
 
 export default function(eleventyConfig) {
-  // Configurar Nunjucks para poder usar `{% image ... %}`
+  // Habilitar WebC para componentes y layouts
+  eleventyConfig.addPlugin(pluginWebc, {
+    components: [
+      "./site/_includes/components/**/*.webc",
+    ]
+  });
+
+  // Configurar Nunjucks y Liquid
   eleventyConfig.setLibrary("njk", require("nunjucks"));
   eleventyConfig.setLibrary("liquid", require("liquidjs"));
 
-  // Definir un shortcode global para imágenes
+  // Shortcode para imágenes optimizadas
   eleventyConfig.addShortcode("image", async (src, alt, className = "img-fluid", width = "100%") => {
     let metadata = await EleventyImage(src, {
       widths: [300, 600, "auto"],
@@ -26,13 +34,16 @@ export default function(eleventyConfig) {
     return EleventyImage.generateHTML(metadata, imageAttributes);
   });
 
-  // Asegurar que copia imágenes estáticas correctamente
-  eleventyConfig.addPassthroughCopy("site/content");
+  // Copiar archivos estáticos (imágenes y descargas)
+  eleventyConfig.addPassthroughCopy({ "site/assets/images": "img" });
+  eleventyConfig.addPassthroughCopy({ "site/downloads": "downloads" });
 
   return {
     dir: {
-      input: "site/content",
-      output: "_site",
+      input: "site/content",       // Carpeta donde están las páginas
+      includes: "../_includes",    // Donde están los layouts y componentes
+      layouts: "../_includes/layouts", // Donde están los layouts
+      output: "_site",             // Carpeta de salida
     }
   };
 }
