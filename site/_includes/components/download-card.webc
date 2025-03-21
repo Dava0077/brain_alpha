@@ -1,0 +1,7 @@
+<div class="card text-center shadow-sm">
+    <div class="card-body">
+        <h3 class="card-title">@text:platform</h3>
+        <p>Descarga BrainAlpha en @text:platform.</p>
+        <a href="@text:file" download class="btn btn-primary">Descargar</a>
+    </div>
+</div>

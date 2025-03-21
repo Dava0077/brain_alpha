@@ -1,0 +1,7 @@
+---js
+const title = "Quiénes somos";
+---
+<layout webc:is="layouts/base.webc">
+    <h1>Sobre BrainAlpha</h1>
+    <p>Somos un equipo apasionado por el desarrollo de herramientas para entrenar la mente...</p>
+</layout>
