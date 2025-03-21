@@ -40,10 +40,10 @@ export default function(eleventyConfig) {
 
   return {
     dir: {
-      input: "site/content",       // Carpeta donde están las páginas
-      includes: "../_includes",    // Donde están los layouts y componentes
-      layouts: "../_includes/layouts", // Donde están los layouts
-      output: "_site",             // Carpeta de salida
+      input: "site/content",         // Carpeta donde están las páginas
+      includes: "../site/_includes", // Donde están los layouts y componentes
+      layouts: "../site/_includes/layouts", // Donde están los layouts
+      output: "_site",               // Carpeta de salida
     }
   };
 }

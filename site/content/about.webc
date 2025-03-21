@@ -1,5 +1,6 @@
 ---js
 const title = "Quiénes somos";
+const layout = "layouts/base.webc";
 ---
 <layout webc:is="layouts/base.webc">
     <h1>Sobre BrainAlpha</h1>
