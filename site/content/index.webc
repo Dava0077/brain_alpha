@@ -1,21 +1,8 @@
 ---js
-const title = "BrainAlpha - Entrena tu mente";
+const title = "Home"
 ---
-<layout webc:is="layouts/base.webc">
-    <div class="text-center py-5">
-        <h1 class="display-3 text-primary fw-bold">Entrena tu mente, <br> recompensa tu vida</h1>
-        <p class="fs-5 text-dark">Ejercita tu memoria, lógica y concentración con BrainAlpha.</p>
-        <a href="/about" class="btn btn-primary">Conoce más</a>
-    </div>
 
-    <div webc:is="components/carousel"></div>
+<h1>Home</h1>
 
-    <div class="row mt-5">
-        <div class="col-md-6">
-            <div webc:is="components/download-card" platform="Desktop" file="/downloads/brainalpha.msi"></div>
-        </div>
-        <div class="col-md-6">
-            <div webc:is="components/download-card" platform="Android" file="/downloads/brainalpha.apk"></div>
-        </div>
-    </div>
-</layout>
+<p>Multiplatform is a KMP demo application</p>
+
