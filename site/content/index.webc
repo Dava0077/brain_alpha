@@ -2,26 +2,11 @@
 const title = "Home"
 ---
 
- <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-            <a href="/" class="navbar-brand">
-                <i class="bi-house"></i>
-            </a>
-            <button type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div id="navbarSupportedContent" class="collapse navbar-collapse">
-                <ul class="navbar-nav">
-                    <li class="nav-item"><a href="/" class="nav-link">Home</a></li>,<li class="nav-item"><a href="/desktop" class="nav-link">Desktop</a></li>,<li class="nav-item"><a href="/mobile" class="nav-link">Mobile</a></li>,<li class="nav-item"><a href="/web" class="nav-link">Web</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
     <p></p>
     <main class="container mt-3"><!-- Navbar --><nav class="navbar navbar-expand-lg navbar-light bg-white">
     <div class="container-fluid">
         <a href="#" class="navbar-brand">
-            <img src="logo.PNG" alt="Logo" height="140">
+            <img src="logo.PNG" alt="Logo" height="140">cds
         </a>
         <button type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler">
             <span class="navbar-toggler-icon"></span>
@@ -37,24 +22,31 @@ const title = "Home"
     </div>
 </nav>
 
+<br><br><br><br><br><br><br><br>
 
 <!-- Sección principal -->
     <div class="container text-center py-5">
         <!-- Título -->
         <h1 class="display-4 text-primary fw-bold mb-3">Entrena tu mente, recompensa tu vida</h1>
+        <br>
         <!-- Descripción -->
         <p class="fs-5 text-dark mb-4">Ejercita la memoria, la flexibilidad y mucho más con el programa de entrenamiento cerebral más popular del mundo</p>
+        <br>
         <!-- Botón -->
         <button class="btn btn-primary bg-purple text-white px-4 py-2">Empezar</button>
     </div>
 
+<br><br><br><br><br><br><br><br>
 
 <!-- Sección principal -->
     <div class="container text-center py-5">
         <!-- Título principal -->
-        <h1 class="display-4 fw-bold mb-3">Le das importancia a tu cerebro y nosotros también.</h1>
+        <h1 class="display-6 fw-bold mb-3">Le das importancia a tu cerebro y nosotros también.</h1>
+        <br>
         <!-- Subtítulo -->
-        <p class="fs-5 text-dark mb-5">Entrena las habilidades cognitivas que más te importan. Memoria. Atención. Resolución de problemas. Lumosity se enfoca en estas habilidades cognitivas y más.</p>
+        <p class="fs-5 text-dark mb-5">Entrena las habilidades cognitivas que más te importan. <br> Memoria, atención y resolución de problemas. <br> Lumosity se enfoca en estas habilidades cognitivas y más.</p>
+
+        <br><br><br><br>
 
         <!-- Sección de columnas -->
         <div class="row g-4">
@@ -78,6 +70,8 @@ const title = "Home"
             </div>
         </div>
     </div>
+
+<br><br><br><br>
 
 <p>logo carousel nuevo 5.9</p>
 
@@ -127,9 +121,5 @@ const title = "Home"
             </button>
         </div>
     </main>
-    <hr>
-    <footer class="container mt-2 mb-4 text-center">
-        <p class="fw-light">©2025 xtec.dev</p>
-    </footer>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" webc:keep integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
