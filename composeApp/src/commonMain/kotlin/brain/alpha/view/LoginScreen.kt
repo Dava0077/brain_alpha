@@ -1,4 +1,4 @@
-package brain.alpha.View
+package brain.alpha.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -9,15 +9,13 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import brain.alpha.Controller.LoginController
+import brain.alpha.controller.LoginController
 import brainalpha.composeapp.generated.resources.Res
 import brainalpha.composeapp.generated.resources.*
-import brainalpha.composeapp.generated.resources.login
 import org.jetbrains.compose.resources.painterResource
 
 @Composable

@@ -1,4 +1,4 @@
-package brain.alpha.Controller
+package brain.alpha.controller
 
 class LoginController {
     fun onLoginClick(username: String, password: String) {
