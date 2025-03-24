@@ -23,6 +23,20 @@ windows:
     expire_in: 1 day
 
 
+web:
+  stage: build
+  image: eclipse-temurin:21
+  rules:
+    - if: $CI_COMMIT_MESSAGE =~ /@build|@web/
+  script:
+    - chmod u+x gradlew
+    - ./gradlew wasmJsBrowserDistribution
+    - ls -lR composeApp/build/dist/wasmJs/productionExecutable
+    - tar cfz web.tar.gz -C composeApp/build/dist/wasmJs/productionExecutable .
+    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file web.tar.gz ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/web/${VERSION}/web.tar.gz'
+
+
+
 registry:
   stage: deploy
   image: alpine/curl
