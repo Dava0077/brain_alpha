@@ -106,8 +106,16 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "brain.alpha"
+            packageName = "BrainAlpha"
             packageVersion = "1.0.0"
+            copyright = "© 2025 xtec.dev. All rights reserved."
+            vendor = "xtec.dev"
+            windows {
+                console = true
+                perUserInstall = true
+                menuGroup = "start-menu-group"
+            }
+
         }
     }
 }
