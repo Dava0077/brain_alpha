@@ -1,5 +1,6 @@
 package brain.alpha.view
 
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -18,17 +19,16 @@ import brainalpha.composeapp.generated.resources.Res
 import brainalpha.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 
-@Composable
-fun LoginScreen(controller: LoginController) {
-    var username by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
 
-    /*Image(
-        painter = painterResource(Res.drawable.loginFondo), // Usa tu recurso aquí
-        contentDescription = "Fondo",
-        modifier = Modifier.fillMaxWidth(),
-        contentScale = ContentScale.Crop
-    )*/
+@Composable
+fun LoginScreen(
+    controller: LoginController,
+    onNavigateToSignUp: () -> Unit
+) {
+    val email by remember { mutableStateOf(controller.email) }
+    val password by remember { mutableStateOf(controller.password) }
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -38,38 +38,52 @@ fun LoginScreen(controller: LoginController) {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Spacer(modifier = Modifier.height(44.dp))
+
+
             Image(
                 painter = painterResource(Res.drawable.logo),
                 contentDescription = "App Logo",
                 modifier = Modifier.size(210.dp, 78.dp)
             )
+
+
             Spacer(modifier = Modifier.height(50.dp))
+
+
             Image(
                 painter = painterResource(Res.drawable.avatar),
                 contentDescription = "Avatar",
                 modifier = Modifier.size(87.dp, 88.dp)
             )
+
+
             Spacer(modifier = Modifier.height(16.dp))
-            Text("LOGIN", color = Color.White, fontSize = 16.sp,)
+            Text("LOGIN", color = Color.Black, fontSize = 16.sp)
+
 
             Spacer(modifier = Modifier.height(40.dp))
 
+
             OutlinedTextField(
-                value = username,
-                onValueChange = { username = it },
-                label = { Text("Username") },
+                value = controller.email,
+                onValueChange = { controller.email = it },
+                label = { Text("Email") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     backgroundColor = Color.White,
-                    focusedBorderColor = Color.White,
-                    unfocusedBorderColor = Color.White
+                    focusedBorderColor = Color.Gray,
+                    unfocusedBorderColor = Color.LightGray
                 )
             )
+
+
             Spacer(modifier = Modifier.height(16.dp))
+
+
             OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
+                value = controller.password,
+                onValueChange = { controller.password = it },
                 label = { Text("Password") },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -77,20 +91,26 @@ fun LoginScreen(controller: LoginController) {
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     backgroundColor = Color.White,
-                    focusedBorderColor = Color.White,
-                    unfocusedBorderColor = Color.White
+                    focusedBorderColor = Color.Gray,
+                    unfocusedBorderColor = Color.LightGray
                 )
             )
+
+
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 "Forgot your password?",
-                color = Color.White,
+                color = Color.Gray,
                 fontSize = 14.sp,
                 modifier = Modifier.align(Alignment.End)
             )
+
+
             Spacer(modifier = Modifier.height(24.dp))
+
+
             Button(
-                onClick = { controller.onLoginClick(username, password) },
+                onClick = { controller.onLoginClicked() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(40.dp),
@@ -100,7 +120,9 @@ fun LoginScreen(controller: LoginController) {
                 Text("CONTINUE", color = Color.White)
             }
 
+
             Spacer(modifier = Modifier.height(24.dp))
+
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -111,9 +133,12 @@ fun LoginScreen(controller: LoginController) {
                 Divider(modifier = Modifier.weight(1f), color = Color.LightGray)
             }
 
+
             Spacer(modifier = Modifier.height(16.dp))
+
+
             Button(
-                onClick = { controller.onSignUpClick() },
+                onClick = onNavigateToSignUp,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(40.dp),
@@ -123,6 +148,7 @@ fun LoginScreen(controller: LoginController) {
                 Text("SIGN UP", color = Color.White)
             }
 
+
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "By clicking continue, you agree to our Terms of Service and Privacy Policy",
@@ -131,6 +157,7 @@ fun LoginScreen(controller: LoginController) {
                 textAlign = TextAlign.Center
             )
         }
+
 
         Spacer(modifier = Modifier.height(8.dp))
         Box(
