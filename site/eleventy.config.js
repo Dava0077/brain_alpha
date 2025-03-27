@@ -27,4 +27,3 @@ export const config = {
 		data: "../_data",          // default: "_data"
 	}
 }
-

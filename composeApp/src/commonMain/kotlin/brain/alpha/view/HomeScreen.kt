@@ -191,3 +191,22 @@ fun CategoryItem(title: String, image: DrawableResource, borderColor: Color) {
         )
     }
 }
+
+
+@Composable
+fun HomeScreen() {
+    val controller = MentalMathController(MentalMathModel())
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text("Bienvenido a Brain Alpha")
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = { /* Navegar a MentalMathView */ }) {
+            Text("Jugar Matemáticas Mentales")
+        }
+    }
+    // Si usas navegación, puedes integrar MentalMathView aquí
+    MentalMathView(controller)
+}
