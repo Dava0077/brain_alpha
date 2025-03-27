@@ -26,8 +26,8 @@ import brainalpha.composeapp.generated.resources.logo
 
 
 
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+
+
 import brain.alpha.view.LoginScreen
 import brain.alpha.controller.LoginController
 import brain.alpha.view.HomeScreen
@@ -46,13 +46,13 @@ fun App() {
         when (currentScreen) {
             "login" -> LoginScreen(
                 controller = LoginController,
-                onNavigateToSignUp = { currentScreen = "home" }
+                onNavigateToSignUp = { currentScreen = "signup" }
             )
 
 
             "signup" -> SignUpScreen(
                 onSuccess = {currentScreen = "signup"},
-                onFailure = {errorMessage -> println("Sign up error: $errorMessage")},
+                onFailure = {errorMessage -> println("Error de registro: $errorMessage")},
                 onGoToLogin = {currentScreen = "login"}
             )
 
@@ -61,6 +61,13 @@ fun App() {
                 controller = LoginController,
                 onNavigateToMemory = { currentScreen = "memory" }
             )
+
+            // TEMPORARY ROUTES – to be replaced by actual game screens
+            // ----------------------------------------------------------
+            // These are placeholders so HomeScreen navigation doesn't break.
+            // Replace with actual Composable screens when they're ready.
+            "memory" -> Text("🧠 Pantalla temporal del juego de Memoria (TODO: reemplazar)")
+            "mental_agility" -> Text("⚡ Pantalla temporal del juego Mental Agility (TODO: reemplazar)")
         }
     }
 }
