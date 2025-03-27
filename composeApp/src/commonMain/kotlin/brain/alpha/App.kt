@@ -30,6 +30,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import brain.alpha.view.LoginScreen
 import brain.alpha.controller.LoginController
+import brain.alpha.view.HomeScreen
 import brain.alpha.view.SignUpScreen
 
 
@@ -45,18 +46,18 @@ fun App() {
         when (currentScreen) {
             "login" -> LoginScreen(
                 controller = LoginController,
-                onNavigateToSignUp = { currentScreen = "signup" }
+                onNavigateToSignUp = { currentScreen = "home" }
             )
 
 
             "signup" -> SignUpScreen(
-                onSuccess = {currentScreen = "home"},
+                onSuccess = {currentScreen = "signup"},
                 onFailure = {errorMessage -> println("Sign up error: $errorMessage")},
                 onGoToLogin = {currentScreen = "login"}
             )
 
 
-            "home" -> Text("Pantalla principal (Home)")
+            "home" -> HomeScreen(controller = LoginController)
         }
     }
 }

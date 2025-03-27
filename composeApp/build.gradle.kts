@@ -4,12 +4,18 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
+
+repositories {
+    google()
+    mavenCentral()
+}
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     kotlin("plugin.serialization") version "2.1.0"
+
 
 }
 
@@ -66,7 +72,10 @@ kotlin {
             implementation("io.github.jan-tennert.supabase:postgrest-kt")
             implementation("io.github.jan-tennert.supabase:auth-kt")
             implementation("io.github.jan-tennert.supabase:realtime-kt")
-            implementation("io.ktor:ktor-client-cio:3.0.3")
+            implementation("io.ktor:ktor-client-cio:${libs.versions.ktor.get()}")
+
+            implementation(compose.desktop.currentOs) // 👈 esto incluye Skiko para tu sistema operativo
+
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

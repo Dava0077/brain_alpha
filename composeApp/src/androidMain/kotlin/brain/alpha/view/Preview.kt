@@ -11,7 +11,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.material3.*
+import androidx.compose.material.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -171,7 +171,7 @@ fun CouplesScreen() {
                                 .padding(4.dp)
                                 .size(64.dp)
                                 .background(
-                                    color = if (isVisible) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
+                                    color = if (isVisible) MaterialTheme.colors.primary else MaterialTheme.colors.secondary,
                                     shape = RoundedCornerShape(12.dp)
                                 )
                                 .clickable(enabled = !isVisible && selectedIndices.size < 2) {
@@ -185,7 +185,7 @@ fun CouplesScreen() {
                                     text = shuffledCards[index],
                                     fontSize = 24.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onPrimary
+                                    color = MaterialTheme.colors.onPrimary
                                 )
                             }
                         }
@@ -208,7 +208,7 @@ fun CouplesScreen() {
 
             if (matched.all { it }) {
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("¡Has ganado!", style = MaterialTheme.typography.headlineSmall)
+                Text("¡Has ganado!", style = MaterialTheme.typography.h5)
             }
         }
         Image(

@@ -7,10 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
+import androidx.compose.material.*
+import brain.alpha.utils.currentTimeMillis
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import controller.MentalMathController
 import model.Question
-import kotlin.system.measureTimeMillis
 
 @Composable
 fun mentalMathView(controller: MentalMathController) { // Cambiado a minúscula para seguir las convenciones
@@ -45,7 +42,7 @@ fun mentalMathView(controller: MentalMathController) { // Cambiado a minúscula 
                 controller.resetGame()
                 controller.startGame { question ->
                     currentQuestion = question
-                    startTime = System.currentTimeMillis()
+                    startTime = currentTimeMillis()
                 }
             }) {
                 Text("Iniciar Juego")
@@ -85,7 +82,7 @@ fun mentalMathView(controller: MentalMathController) { // Cambiado a minúscula 
                 Button(onClick = {
                     val answer = userAnswer.toIntOrNull()
                     if (answer != null) {
-                        val timeTaken = (System.currentTimeMillis() - startTime) / 1000.0
+                        val timeTaken = (currentTimeMillis() - startTime) / 1000.0
                         controller.submitAnswer(answer, timeTaken) { correct, score, message ->
                             isCorrect = correct
                             feedback = if (correct) "¡Correcto! Puntuación: $score" else message
@@ -93,7 +90,7 @@ fun mentalMathView(controller: MentalMathController) { // Cambiado a minúscula 
                             if (!controller.isGameOver()) {
                                 controller.startGame { newQuestion ->
                                     currentQuestion = newQuestion
-                                    startTime = System.currentTimeMillis()
+                                    startTime = currentTimeMillis()
                                 }
                             }
                         }
@@ -108,7 +105,7 @@ fun mentalMathView(controller: MentalMathController) { // Cambiado a minúscula 
                 feedback?.let {
                     Text(
                         text = it,
-                        color = if (isCorrect == true) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                        color = if (isCorrect == true) MaterialTheme.colors.primary else MaterialTheme.colors.error,
                         textAlign = TextAlign.Center
                     )
                 }

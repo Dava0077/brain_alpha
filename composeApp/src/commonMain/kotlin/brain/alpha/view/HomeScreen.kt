@@ -96,7 +96,7 @@ fun HomeScreen(controller: LoginController) {
                 text = "CATEGORIES",
                 fontSize = 40.sp,
                 color = Color.Black,
-                fontFamily = FontFamily.Cursive,
+                fontFamily = FontFamily.SansSerif,
                 textAlign = TextAlign.Center
             )
 
@@ -161,6 +161,7 @@ fun CategoryItem(title: String, image: DrawableResource, borderColor: Color) {
             .background(Color.White, shape = RoundedCornerShape(8.dp)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -183,7 +184,7 @@ fun CategoryItem(title: String, image: DrawableResource, borderColor: Color) {
             text = title,
             fontSize = 14.sp,
             color = Color.Black,
-            fontFamily = FontFamily.Cursive,
+            fontFamily = FontFamily.SansSerif,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()
@@ -192,7 +193,7 @@ fun CategoryItem(title: String, image: DrawableResource, borderColor: Color) {
     }
 }
 
-
+/*
 @Composable
 fun HomeScreen() {
     val controller = MentalMathController(MentalMathModel())
@@ -209,4 +210,6 @@ fun HomeScreen() {
     }
     // Si usas navegación, puedes integrar MentalMathView aquí
     MentalMathView(controller)
-}
+    }
+ */
+
