@@ -67,10 +67,6 @@ kotlin {
             implementation("io.github.jan-tennert.supabase:auth-kt")
             implementation("io.github.jan-tennert.supabase:realtime-kt")
             implementation("io.ktor:ktor-client-cio:3.0.3")
-            implementation("org.jetbrains.compose.runtime:runtime:1.5.0")
-            implementation("org.jetbrains.compose.foundation:foundation:1.5.0")
-            implementation("org.jetbrains.compose.material3:material3:1.5.0")
-            implementation("org.jetbrains.compose.ui:ui:1.5.0")
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -126,20 +122,6 @@ compose.desktop {
                 menuGroup = "start-menu-group"
             }
 
-        }
-    }
-}
-
-
-kotlin {
-    sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation(compose.runtime)
-                implementation(compose.foundation)
-                implementation(compose.material3)
-                implementation(compose.ui)
-            }
         }
     }
 }

@@ -24,40 +24,41 @@ import brainalpha.composeapp.generated.resources.Res
 import brainalpha.composeapp.generated.resources.logo
 
 
+
+
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import brain.alpha.view.LoginScreen
+import brain.alpha.controller.LoginController
+import brain.alpha.view.SignUpScreen
+
+
 @Composable
-@Preview
 fun App() {
     MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
+        var currentScreen by remember { mutableStateOf("login") }
 
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center){
-            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally,
 
-                verticalArrangement = Arrangement.Top
-            ) {
-                Image(
-                    painter = painterResource(Res.drawable.logo),
-                    contentDescription = null,
-                    modifier = Modifier.size(150.dp)
-                )
-                Text(
-                    text = "Bienvenido a nuestra aplicación",
-                    style = TextStyle(
-                        fontSize = 50.sp,
-                        color = androidx.compose.ui.graphics.Color.Blue,
-                        fontFamily = FontFamily.Serif
-                    ),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
+        LoginController.navigateTo = { route -> currentScreen = route }
 
+
+        when (currentScreen) {
+            "login" -> LoginScreen(
+                controller = LoginController,
+                onNavigateToSignUp = { currentScreen = "signup" }
+            )
+
+
+            "signup" -> SignUpScreen(
+                onSuccess = {currentScreen = "home"},
+                onFailure = {errorMessage -> println("Sign up error: $errorMessage")},
+                onGoToLogin = {currentScreen = "login"}
+            )
+
+
+            "home" -> Text("Pantalla principal (Home)")
         }
-
-
-
     }
 }
+
 

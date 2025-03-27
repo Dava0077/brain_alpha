@@ -10,7 +10,6 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         title = "BrainAlpha",
     ) {
-        val controller = LoginController()
-        LoginScreen(controller)
+        App()
     }
 }
