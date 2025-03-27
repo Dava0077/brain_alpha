@@ -57,7 +57,10 @@ fun App() {
             )
 
 
-            "home" -> HomeScreen(controller = LoginController)
+            "home" -> HomeScreen(
+                controller = LoginController,
+                onNavigateToMemory = { currentScreen = "memory" }
+            )
         }
     }
 }

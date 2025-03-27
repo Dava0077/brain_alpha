@@ -42,6 +42,15 @@ object LoginController {
     }
 
 
+    fun setNavigationCallback(callback: (String) -> Unit) {
+        navigateTo = callback
+    }
+
+    fun navigateMemory() {
+        navigateTo("memory")
+    }
+
+
     fun clear() {
         email = ""
         password = ""

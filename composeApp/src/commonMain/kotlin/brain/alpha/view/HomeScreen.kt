@@ -1,10 +1,7 @@
 package brain.alpha.view
 
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.IconButton
@@ -32,7 +29,7 @@ object HomeRoute
 
 
 @Composable
-fun HomeScreen(controller: LoginController) {
+fun HomeScreen(controller: LoginController,onNavigateToMemory: () -> Unit) {
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         // Fondo general
         Image(
@@ -110,12 +107,12 @@ fun HomeScreen(controller: LoginController) {
                 verticalArrangement = Arrangement.spacedBy(32.dp)
             ) {
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    CategoryItem("MEMORY", Res.drawable.memoria, Color(0xFF0647D7))
-                    CategoryItem("LOGIC", Res.drawable.logica, Color(0xFF0647D7))
+                    CategoryItem("MEMORY", Res.drawable.memoria, Color(0xFF0647D7), onClick = { onNavigateToMemory () })
+                    CategoryItem("LOGIC", Res.drawable.logica, Color(0xFF0647D7), onClick = {/*Navegar a logicGames*/})
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    CategoryItem("CONCENTRATION", Res.drawable.concentracion, Color(0xFF0647D7))
-                    CategoryItem("MENTAL AGILITY", Res.drawable.mentalA, Color(0xFF0647D7))
+                    CategoryItem("CONCENTRATION", Res.drawable.concentracion, Color(0xFF0647D7), onClick = {/*Navegar a concentrationGames*/})
+                    CategoryItem("MENTAL AGILITY", Res.drawable.mentalA, Color(0xFF0647D7), onClick = {/*Navegar a mentalAGames*/})
                 }
             }
         }
@@ -151,16 +148,18 @@ fun HomeScreen(controller: LoginController) {
 
 
 @Composable
-fun CategoryItem(title: String, image: DrawableResource, borderColor: Color) {
+fun CategoryItem(title: String, image: DrawableResource, borderColor: Color, onClick: () -> Unit) {
     Column(
         modifier = Modifier
             .width(160.dp)
             .height(180.dp)
+            .clickable{onClick()}
             .background(borderColor, shape = RoundedCornerShape(8.dp))
             .padding(4.dp)
             .background(Color.White, shape = RoundedCornerShape(8.dp)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
 
         Box(
             modifier = Modifier
