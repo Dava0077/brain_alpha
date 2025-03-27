@@ -1,6 +1,5 @@
 package brain.alpha.view
 
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -18,7 +17,6 @@ import brainalpha.composeapp.generated.resources.*
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 
-
 @Composable
 fun SignUpScreen(
     onSuccess: () -> Unit,
@@ -26,12 +24,13 @@ fun SignUpScreen(
     onGoToLogin: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var repeatPassword by remember { mutableStateOf("") }
     var loading by remember { mutableStateOf(false) }
-
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     val scope = rememberCoroutineScope()
-
 
     Column(
         modifier = Modifier
@@ -49,10 +48,8 @@ fun SignUpScreen(
             )
             Spacer(modifier = Modifier.height(40.dp))
 
-
             Text("SIGN UP", color = Color.Black, fontSize = 20.sp)
             Spacer(modifier = Modifier.height(24.dp))
-
 
             OutlinedTextField(
                 value = email,
@@ -62,33 +59,70 @@ fun SignUpScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            Spacer(modifier = Modifier.height(12.dp))
 
-            Spacer(modifier = Modifier.height(16.dp))
+            OutlinedTextField(
+                value = username,
+                onValueChange = { username = it },
+                label = { Text("Usuario") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
 
+            Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Password") },
+                label = { Text("Contraseña") },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
 
+            Spacer(modifier = Modifier.height(12.dp))
 
-            Spacer(modifier = Modifier.height(24.dp))
+            OutlinedTextField(
+                value = repeatPassword,
+                onValueChange = { repeatPassword = it },
+                label = { Text("Repite contraseña") },
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
 
+            Spacer(modifier = Modifier.height(12.dp))
+
+            if (errorMessage != null) {
+                Text(
+                    text = errorMessage!!,
+                    color = Color.Red,
+                    fontSize = 14.sp
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
 
             Button(
                 onClick = {
                     loading = true
-                    // Ejecutar registro
+                    errorMessage = null
+
                     scope.launch {
-                        val result = AuthController.signUp(email, password)
+                        val result = AuthController.signUp(
+                            email = email.trim(),
+                            username = username.trim(),
+                            password = password,
+                            repeatPassword = repeatPassword
+                        )
                         loading = false
-                        result.onSuccess { onSuccess() }
-                            .onFailure { onFailure(it.message ?: "Error desconocido") }
+                        result.onSuccess {
+                            onSuccess()
+                        }.onFailure {
+                            errorMessage = it.message ?: "Error inesperado"
+                            onFailure(errorMessage!!)
+                        }
                     }
                 },
                 enabled = !loading,
@@ -98,16 +132,15 @@ fun SignUpScreen(
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
                 shape = RoundedCornerShape(8.dp)
             ) {
-                Text(if (loading) "Creating..." else "SIGN UP", color = Color.White)
+                Text(if (loading) "Creando..." else "SIGN UP", color = Color.White)
             }
-
 
             Spacer(modifier = Modifier.height(16.dp))
 
-
             TextButton(onClick = onGoToLogin) {
-                Text("Already have an account? Log in", color = Color.Blue)
+                Text("¿Ya tienes cuenta? Inicia sesión!", color = Color.Blue)
             }
         }
     }
 }
+
