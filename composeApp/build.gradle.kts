@@ -4,6 +4,11 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
+repositories {
+    google()
+    mavenCentral()
+}
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
@@ -67,6 +72,8 @@ kotlin {
             implementation("io.github.jan-tennert.supabase:auth-kt")
             implementation("io.github.jan-tennert.supabase:realtime-kt")
             implementation("io.ktor:ktor-client-cio:3.0.3")
+            implementation("androidx.compose.material3:material3:1.2.0")
+
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
