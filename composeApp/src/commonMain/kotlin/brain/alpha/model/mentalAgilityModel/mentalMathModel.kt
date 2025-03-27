@@ -1,3 +1,5 @@
+//Mathmodel//
+
 package model
 
 import kotlin.random.Random
