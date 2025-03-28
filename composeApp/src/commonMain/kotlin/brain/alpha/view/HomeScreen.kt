@@ -125,12 +125,12 @@ fun HomeScreen(controller: LoginController,onNavigateToMemory: () -> Unit) {
                     CategoryItem(
                         "MEMORIA", Res.drawable.memoria,
                         Color(0xFF0647D7),
-                        onClick = { onNavigateToMemory () }
+                        onClick = { LoginController.navigateMemory() }
                     )
                     CategoryItem(
                         "LOGICA", Res.drawable.logica,
                         Color(0xFF0647D7),
-                        onClick = {/*Navegar a logicGames*/}
+                        onClick = {LoginController.navigateLogic()}
                     )
                 }
 
@@ -138,12 +138,12 @@ fun HomeScreen(controller: LoginController,onNavigateToMemory: () -> Unit) {
                     CategoryItem(
                         "CONCENTRACIÓN", Res.drawable.concentracion,
                         Color(0xFF0647D7),
-                        onClick = {/*Navegar a concentrationGames*/}
+                        onClick = { LoginController.navigateConcentration()}
                     )
                     CategoryItem(
                         "AGILIDAD MENTAL", Res.drawable.mentalA,
                         Color(0xFF0647D7),
-                        onClick = { LoginController.navigateTo("mental_agility") }
+                        onClick = { LoginController.navigateAgility() }
                     )
                 }
             }

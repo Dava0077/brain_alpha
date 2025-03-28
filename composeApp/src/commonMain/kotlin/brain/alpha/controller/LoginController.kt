@@ -77,6 +77,18 @@ object LoginController {
         navigateTo("memory")
     }
 
+    fun navigateLogic() {
+        navigateTo("logic")
+    }
+
+    fun navigateConcentration() {
+        navigateTo("concentration")
+    }
+
+    fun navigateAgility() {
+        navigateTo("agility")
+    }
+
     fun clear() {
         email = ""
         password = ""
