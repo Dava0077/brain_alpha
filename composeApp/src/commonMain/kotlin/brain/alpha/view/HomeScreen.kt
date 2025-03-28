@@ -14,7 +14,6 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,7 +30,13 @@ object HomeRoute
 
 
 @Composable
-fun HomeScreen(controller: LoginController,onNavigateToMemory: () -> Unit) {
+fun HomeScreen(
+    controller: LoginController,
+    onNavigateToMemory: () -> Unit,
+    onNavigateToLogic: () -> Unit,
+    onNavigateToConcentration: () -> Unit,
+    onNavigateToAgility: () -> Unit
+) {
 
     val username by UserSession.username
 
@@ -125,12 +130,12 @@ fun HomeScreen(controller: LoginController,onNavigateToMemory: () -> Unit) {
                     CategoryItem(
                         "MEMORIA", Res.drawable.memoria,
                         Color(0xFF0647D7),
-                        onClick = { LoginController.navigateMemory() }
+                        onClick = { onNavigateToMemory() }
                     )
                     CategoryItem(
                         "LOGICA", Res.drawable.logica,
                         Color(0xFF0647D7),
-                        onClick = {LoginController.navigateLogic()}
+                        onClick = { onNavigateToLogic() }
                     )
                 }
 
@@ -138,12 +143,12 @@ fun HomeScreen(controller: LoginController,onNavigateToMemory: () -> Unit) {
                     CategoryItem(
                         "CONCENTRACIÓN", Res.drawable.concentracion,
                         Color(0xFF0647D7),
-                        onClick = { LoginController.navigateConcentration()}
+                        onClick = { onNavigateToConcentration() }
                     )
                     CategoryItem(
                         "AGILIDAD MENTAL", Res.drawable.mentalA,
                         Color(0xFF0647D7),
-                        onClick = { LoginController.navigateAgility() }
+                        onClick = { onNavigateToAgility() }
                     )
                 }
             }
