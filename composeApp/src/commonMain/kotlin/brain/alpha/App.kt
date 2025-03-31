@@ -5,7 +5,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import brain.alpha.view.LoginScreen
 import brain.alpha.controller.LoginController
-import brain.alpha.controller.memoryControllers.CouplesController
+import brain.alpha.controller.memoryControllers.couplesController
 import brain.alpha.view.HomeScreen
 import brain.alpha.view.SignUpScreen
 import brain.alpha.view.memoryViews.CouplesScreen
@@ -70,7 +70,7 @@ fun App() {
             )
 
             "memory" -> CouplesScreen(
-                controller = CouplesController
+                controller = couplesController
 
             )
 
