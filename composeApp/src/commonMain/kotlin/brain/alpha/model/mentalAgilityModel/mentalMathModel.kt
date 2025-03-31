@@ -1,5 +1,3 @@
-//Mathmodel//
-
 package model
 
 import kotlin.random.Random
@@ -52,4 +50,7 @@ class MentalMathModel {
     }
 
     fun isGameOver(): Boolean = currentQuestion >= totalQuestions
+
+    // Nueva función para obtener la respuesta correcta actual
+    fun getCurrentCorrectAnswer(): Int? = currentQuestionObj?.correctAnswer
 }

@@ -18,7 +18,7 @@ class MentalMathController(private val model: MentalMathModel) {
     ) {
         val isCorrect = model.checkAnswer(userAnswer, timeTaken)
         val correctAnswer = if (!isCorrect) {
-            "La respuesta correcta era ${model.generateQuestion().correctAnswer}"
+            "La respuesta correcta era ${model.getCurrentCorrectAnswer()}"
         } else {
             null
         }
@@ -32,4 +32,5 @@ class MentalMathController(private val model: MentalMathModel) {
     fun isGameOver(): Boolean = model.isGameOver()
     fun getScore(): Int = model.score
     fun getTotalQuestions(): Int = model.totalQuestions
+    fun getCurrentQuestionNumber(): Int = model.currentQuestion + 1 // Para mostrar el número correcto
 }
