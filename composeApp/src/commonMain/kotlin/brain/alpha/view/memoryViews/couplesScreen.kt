@@ -15,30 +15,26 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
-import androidx.compose.foundation.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.material.*
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
-import kotlin.random.Random
 import androidx.compose.foundation.clickable
 import androidx.compose.material.Button
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.font.FontWeight
-import brain.alpha.controller.memoryControllers.CouplesController
+import brain.alpha.controller.memoryControllers.couplesController
 import brainalpha.composeapp.generated.resources.*
 
 
 
 @Composable
-fun CouplesScreen(controller: CouplesController) {
+fun CouplesScreen(controller: couplesController) {
     val revealed = remember { mutableStateListOf<Boolean>().apply { addAll(controller.getRevealedStates()) } }
     val matched = remember { mutableStateListOf<Boolean>().apply { addAll(controller.getMatchedStates()) } }
     var selectedIndices by remember { mutableStateOf(controller.getSelectedIndices()) }

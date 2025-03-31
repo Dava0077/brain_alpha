@@ -1,11 +1,10 @@
 package brain.alpha.controller.memoryControllers
 
 
-import brain.alpha.model.memoryModels.CouplesModel
-import kotlin.random.Random
+import brain.alpha.model.memoryModels.couplesModel
 
-object CouplesController {
-    private val model = CouplesModel
+object couplesController {
+    private val model = couplesModel
 
     fun startGame() {
         model.shuffledCards = (model.allCards + model.allCards).shuffled().toMutableList()

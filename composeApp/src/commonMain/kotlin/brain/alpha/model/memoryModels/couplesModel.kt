@@ -1,6 +1,6 @@
 package brain.alpha.model.memoryModels
 
-object CouplesModel {
+object couplesModel {
     val allCards: List<String> = listOf("P", "Q", "R", "S", "T", "U", "V", "W")
     var shuffledCards: MutableList<String> = mutableListOf()
     var revealed: MutableList<Boolean> = MutableList(16) { false }
