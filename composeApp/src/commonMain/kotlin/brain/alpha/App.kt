@@ -56,7 +56,7 @@ fun App() {
             )
 
             "memory" -> CouplesScreen(
-                controller = CouplesController(),
+                controller = CouplesController
 
             )
 
