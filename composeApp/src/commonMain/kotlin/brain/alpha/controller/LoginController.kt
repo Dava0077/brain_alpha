@@ -3,6 +3,7 @@ package brain.alpha.controller
 import androidx.compose.runtime.*
 import brain.alpha.controller.AuthController
 import brain.alpha.model.UserSession
+import brain.alpha.model.UserSession.clear
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -10,31 +11,35 @@ import kotlinx.coroutines.launch
 /**
  * LoginController.kt
  *
- * Handles login-related logic, including user login, guest access,
- * error handling and navigation redirection.
- *
- * Fields:
- * - email, password: Bound to UI inputs.
- * - errorMessage: Holds any login error to be shown on screen.
- * - isLoading: Indicates loading state during authentication.
- *
- * Functions:
- * - onLoginClicked: Attempts login via AuthController.
- * - loginAsGuest: Initializes guest session.
- * - onSignUpClick: Navigates to sign-up screen.
- * - clear: Resets all state fields.
+ * Handles login-related logic in a stateful singleton, including:
+ * - Managing input states for login fields.
+ * - Handling user authentication (login and guest).
+ * - Propagating navigation between screens.
+ * - Managing error and loading states.
  */
 
 object LoginController {
 
+    // Stores the current email input
     var email by mutableStateOf("")
+
+    // Stores the current password input
     var password by mutableStateOf("")
+
+    // Holds error message to be shown on screen (if any)
     var errorMessage by mutableStateOf<String?>(null)
+
+    // Indicates if the login operation is in progress
     var isLoading by mutableStateOf(false)
 
-    // Navigation callback, assigned in App.kt
+    // Navigation lambda set in App.kt
     lateinit var navigateTo: (String) -> Unit
 
+
+    /**
+     * Called when the login button is clicked.
+     * Validates input, attempts login, updates state and navigates.
+     */
     fun onLoginClicked() {
         if (email.isBlank() || password.isBlank()) {
             errorMessage = "Todos los campos son obligatorios."
@@ -51,11 +56,29 @@ object LoginController {
                 clear()
                 navigateTo("home")
             }.onFailure { error ->
-                errorMessage = error.message ?: "Inicio de sesión fallido"
+                val message = when {
+                    error.message?.contains("Invalid login credentials", ignoreCase = true) == true -> {
+                        "Email o contraseña incorrectos."
+                    }
+
+                    error.message?.contains("Email not confirmed", ignoreCase = true) == true -> {
+                        "Debes confirmar tu email antes de iniciar sesión."
+                    }
+
+                    error.message?.contains("rate limit", ignoreCase = true) == true -> {
+                        "Demasiados intentos. Intenta más tarde."
+                    }
+
+                    else -> error.message ?: "Error desconocido durante el login."
+                }
+                errorMessage = message
             }
         }
     }
 
+    /**
+     * Starts a guest session and navigates to home.
+     */
     fun loginAsGuest() {
         // Set guest session manually
         UserSession.setGuestSession("Invitado")
@@ -63,32 +86,31 @@ object LoginController {
         navigateTo("home")
     }
 
+    /**
+     * Navigates to sign-up screen and clears form state.
+     */
     fun onSignUpClick() {
         clear()
         navigateTo("signup")
     }
 
 
+    /**
+     * Sets navigation lambda from App.kt to decouple navigation logic.
+     */
     fun setNavigationCallback(callback: (String) -> Unit) {
         navigateTo = callback
     }
 
-    fun navigateMemory() {
-        navigateTo("memory")
-    }
+    // Shortcut navigation helpers
+    fun navigateMemory() = navigateTo("memory")
+    fun navigateLogic() = navigateTo("logic")
+    fun navigateConcentration() = navigateTo("concentration")
+    fun navigateAgility() = navigateTo("agility")
 
-    fun navigateLogic() {
-        navigateTo("logic")
-    }
-
-    fun navigateConcentration() {
-        navigateTo("concentration")
-    }
-
-    fun navigateAgility() {
-        navigateTo("agility")
-    }
-
+    /**
+     * Clears login state and error messages.
+     */
     fun clear() {
         email = ""
         password = ""
@@ -96,7 +118,7 @@ object LoginController {
         isLoading = false
     }
 
-    // Reserved for future button logic
+    // Reserved callbacks for user/settings buttons
     fun buttonSettings() {}
     fun buttonUsername() {}
 }

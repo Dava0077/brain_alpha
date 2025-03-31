@@ -14,23 +14,25 @@ import kotlinx.serialization.json.put
 /**
  * AuthController.kt
  *
- * Handles user authentication using Supabase, including login, sign-up, and logout logic.
+ * Handles authentication operations using Supabase, including:
+ * - Signing in users with email and password.
+ * - Registering new users and inserting them into a custom "users" table.
+ * - Signing out and clearing user session.
  *
- * Responsibilities:
- * - signIn: Authenticates the user with email and password, and updates the global session state.
- * - signUp: Registers a new user with email, password, and username. Performs local validation and
- *           stores user metadata in Supabase.
- * - signOut: Logs the user out and clears the session data from UserSession.
- *
- * This controller uses coroutines for non-blocking asynchronous operations.
- * Session state is managed via the singleton UserSession object.
+ * The session state is stored globally via the UserSession singleton.
+ * All operations are suspend functions using Dispatchers.Default for async behavior.
  */
 
 
 object AuthController {
 
+    // Access Supabase Auth module
     private val auth get() = SupabaseClientProvider.client.auth
 
+    /**
+     * Signs in a user using email and password.
+     * On success, updates the UserSession with retrieved user data.
+     */
     suspend fun signIn(email: String, password: String): Result<UserInfo> = withContext(Dispatchers.Default) {
         runCatching {
             auth.signInWith(Email) {
@@ -51,6 +53,10 @@ object AuthController {
         }
     }
 
+    /**
+     * Registers a new user with validation, authentication, and insertion into the custom "users" table.
+     * @throws IllegalArgumentException if inputs are invalid.
+     */
     suspend fun signUp(
         email: String,
         username: String,
@@ -58,16 +64,25 @@ object AuthController {
         repeatPassword: String
     ): Result<UserInfo> = withContext(Dispatchers.Default) {
         runCatching {
-            // Validación básica
+
+            // Input validations
             if (email.isBlank() || username.isBlank() || password.isBlank() || repeatPassword.isBlank()) {
                 throw IllegalArgumentException("Todos los campos son obligatorios.")
+            }
+
+            if (!isValidEmail(email)) {
+                throw IllegalArgumentException("El email no es válido.")
+            }
+
+            if (password.length < 6) {
+                throw IllegalArgumentException("La contraseña debe tener al menos 6 caracteres.")
             }
 
             if (password != repeatPassword) {
                 throw IllegalArgumentException("Las contraseñas no coinciden.")
             }
 
-            // Registro con metadata
+            // Register user with metadata
             auth.signUpWith(Email) {
                 this.email = email
                 this.password = password
@@ -76,20 +91,19 @@ object AuthController {
                 }
             }
 
-            //Autenticación manual
+            // Immediately sign in after registration
             auth.signInWith(Email) {
                 this.email = email
                 this.password = password
             }
 
             val user = auth.currentUserOrNull()
-                ?: throw IllegalStateException("No se pudo obtener el usuario tras el registro")
+                ?: throw IllegalStateException("No se pudo obtener el usuario tras el registro.")
 
-
-            //Insertar en la tabla "users"
+            // Insert into custom users table using PostgREST
             SupabaseClientProvider.client.postgrest["users"].insert(
                 buildJsonObject {
-                    put("id", user.id) // usa el mismo ID que el auth.uid()
+                    put("id", user.id)
                     put("email", user.email ?: "")
                     put("name", username)
                 }
@@ -105,9 +119,21 @@ object AuthController {
         }
     }
 
+
+    /**
+     * Signs out the current user and clears session state.
+     */
     suspend fun signOut() {
         auth.signOut()
         UserSession.clear()
+    }
+
+    /**
+     * Validates basic email format with a regular expression.
+     */
+    fun isValidEmail(email: String): Boolean {
+        val regex = "^[A-Za-z](.*)([@]{1})(.{1,})(\\.)(.{1,})"
+        return regex.toRegex().matches(email)
     }
 }
 

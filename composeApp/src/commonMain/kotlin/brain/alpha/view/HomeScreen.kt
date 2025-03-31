@@ -23,6 +23,18 @@ import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
+/**
+ * HomeScreen.kt
+ *
+ * This file defines the main home screen UI after a successful login.
+ * It greets the user, provides navigation to different cognitive categories (Memory, Logic, etc.),
+ * and includes a logout button with a confirmation dialog.
+ * Uses a Scaffold with a Snackbar to show logout feedback.
+ */
+
+
+
+
 @Serializable
 object HomeRoute
 
@@ -34,172 +46,199 @@ fun HomeScreen(
     onNavigateToConcentration: () -> Unit,
     onNavigateToAgility: () -> Unit
 ) {
-    val username by UserSession.username
+    val displayName = UserSession.getDisplayName() // Show guest or username
     val showConfirmDialog = remember { mutableStateOf(false) }
 
-    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+    val scaffoldState = rememberScaffoldState()
+    val coroutineScope = rememberCoroutineScope()
 
-        Image(
-            painter = painterResource(Res.drawable.fondoMain),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
+    Scaffold(
+        scaffoldState = scaffoldState,
+        snackbarHost = { SnackbarHost(scaffoldState.snackbarHostState) }
+    ) {
+        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
 
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
-        ) {
-            // Header superior
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(70.dp)
-                    .background(Color(0xFF222937))
-                    .border(BorderStroke(2.dp, Color(0xFF4CE3E8)))
+            // Background image
+            Image(
+                painter = painterResource(Res.drawable.fondoMain),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top
             ) {
-                // Avatar Izquierda
-                IconButton(
-                    onClick = { controller.buttonUsername() },
+                // Header bar
+                Box(
                     modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .padding(start = 8.dp)
-                        .size(55.dp)
+                        .fillMaxWidth()
+                        .height(70.dp)
                         .background(Color(0xFF222937))
+                        .border(BorderStroke(2.dp, Color(0xFF4CE3E8)))
                 ) {
-                    Image(
-                        painter = painterResource(Res.drawable.user),
-                        contentDescription = "Usuario"
+                    // Left user icon
+                    IconButton(
+                        onClick = { controller.buttonUsername() },
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .padding(start = 8.dp)
+                            .size(55.dp)
+                            .background(Color(0xFF222937))
+                    ) {
+                        Image(
+                            painter = painterResource(Res.drawable.user),
+                            contentDescription = "Usuario"
+                        )
+                    }
+
+                    // Right: logout + settings buttons
+                    Row(
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .padding(end = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(
+                            onClick = { showConfirmDialog.value = true },
+                            modifier = Modifier
+                                .size(55.dp)
+                                .background(Color(0xFF222937))
+                        ) {
+                            Image(
+                                painter = painterResource(Res.drawable.logout),
+                                contentDescription = "Cerrar sesión"
+                            )
+                        }
+
+                        IconButton(
+                            onClick = { controller.buttonSettings() },
+                            modifier = Modifier
+                                .size(55.dp)
+                                .background(Color(0xFF222937))
+                        ) {
+                            Image(
+                                painter = painterResource(Res.drawable.ajustes),
+                                contentDescription = "Settings"
+                            )
+                        }
+                    }
+
+                    // Display greeting with user name
+                    Text(
+                        text = "Hola, $displayName!",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .padding(start = 72.dp)
                     )
                 }
 
-                // Botones a la derecha: Logout + Ajustes
-                Row(
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .padding(end = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(
-                        onClick = { showConfirmDialog.value = true },
-                        modifier = Modifier
-                            .size(55.dp)
-                            .background(Color(0xFF222937))
-                    ) {
-                        Image(
-                            painter = painterResource(Res.drawable.logout),
-                            contentDescription = "Cerrar sesión"
-                        )
-                    }
-
-                    IconButton(
-                        onClick = { controller.buttonSettings() },
-                        modifier = Modifier
-                            .size(55.dp)
-                            .background(Color(0xFF222937))
-                    ) {
-                        Image(
-                            painter = painterResource(Res.drawable.ajustes),
-                            contentDescription = "Settings"
-                        )
-                    }
-                }
+                Spacer(modifier = Modifier.height(70.dp))
 
                 Text(
-                    text = "Hola, ${username ?: "Guest"}!",
-                    color = Color.White,
-                    fontSize = 16.sp,
+                    text = "CATEGORIAS",
+                    fontSize = 40.sp,
+                    color = Color.Black,
+                    fontFamily = FontFamily.SansSerif,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Category grid
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(32.dp)
+                ) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        CategoryItem("MEMORIA",
+                            Res.drawable.memoria,
+                            Color(0xFF0647D7),
+                            onNavigateToMemory)
+
+                        CategoryItem("LOGICA",
+                            Res.drawable.logica,
+                            Color(0xFF0647D7),
+                            onNavigateToLogic)
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        CategoryItem("CONCENTRACIÓN",
+                            Res.drawable.concentracion,
+                            Color(0xFF0647D7),
+                            onNavigateToConcentration)
+
+                        CategoryItem("AGILIDAD MENTAL",
+                            Res.drawable.mentalA,
+                            Color(0xFF0647D7),
+                            onNavigateToAgility)
+                    }
+                }
+            }
+
+            // Floating logo on top center
+            Image(
+                painter = painterResource(Res.drawable.logo),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(150.dp)
+                    .align(Alignment.TopCenter)
+                    .absoluteOffset(y = 30.dp)
+                    .scale(1.5f)
+            )
+
+            // Bottom drag-bar visual
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 18.dp)
+            ) {
+                Box(
                     modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .padding(start = 72.dp)
+                        .width(134.dp)
+                        .height(5.dp)
+                        .background(Color.Black, shape = RoundedCornerShape(100.dp))
                 )
             }
 
-            Spacer(modifier = Modifier.height(70.dp))
-
-            Text(
-                text = "CATEGORIAS",
-                fontSize = 40.sp,
-                color = Color.Black,
-                fontFamily = FontFamily.SansSerif,
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(32.dp)
-            ) {
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    CategoryItem("MEMORIA", Res.drawable.memoria, Color(0xFF0647D7), onNavigateToMemory)
-                    CategoryItem("LOGICA", Res.drawable.logica, Color(0xFF0647D7), onNavigateToLogic)
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    CategoryItem("CONCENTRACIÓN", Res.drawable.concentracion, Color(0xFF0647D7), onNavigateToConcentration)
-                    CategoryItem("AGILIDAD MENTAL", Res.drawable.mentalA, Color(0xFF0647D7), onNavigateToAgility)
-                }
-            }
-        }
-
-        // Logo
-        Image(
-            painter = painterResource(Res.drawable.logo),
-            contentDescription = null,
-            modifier = Modifier
-                .size(150.dp)
-                .align(Alignment.TopCenter)
-                .absoluteOffset(y = 30.dp)
-                .scale(1.5f)
-        )
-
-        // Barra inferior
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 18.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .width(134.dp)
-                    .height(5.dp)
-                    .background(Color.Black, shape = RoundedCornerShape(100.dp))
-            )
-        }
-
-        // 🔒 Confirmación de logout
-        if (showConfirmDialog.value) {
-            AlertDialog(
-                onDismissRequest = { showConfirmDialog.value = false },
-                title = { Text("¿Cerrar sesión?") },
-                text = { Text("¿Estás seguro de que deseas cerrar sesión?") },
-                confirmButton = {
-                    TextButton(onClick = {
-                        showConfirmDialog.value = false
-                        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Default).launch {
-                            brain.alpha.controller.AuthController.signOut()
-                            LoginController.clear()
-                            controller.navigateTo("login")
+            // Logout confirmation dialog
+            if (showConfirmDialog.value) {
+                AlertDialog(
+                    onDismissRequest = { showConfirmDialog.value = false },
+                    title = { Text("Cerrar sesión") },
+                    text = { Text("¿Estás seguro de que deseas cerrar sesión?") },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            showConfirmDialog.value = false
+                            coroutineScope.launch {
+                                brain.alpha.controller.AuthController.signOut()
+                                LoginController.clear()
+                                scaffoldState.snackbarHostState.showSnackbar("Sesión cerrada correctamente.")
+                                controller.navigateTo("login")
+                            }
+                        }) {
+                            Text("Sí")
                         }
-                    }) {
-                        Text("Sí")
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = {
-                        showConfirmDialog.value = false
-                    }) {
-                        Text("Cancelar")
-                    }
-                },
-                properties = DialogProperties()
-            )
+                    },
+                    dismissButton = {
+                        TextButton(onClick = {
+                            showConfirmDialog.value = false
+                        }) {
+                            Text("Cancelar")
+                        }
+                    },
+                    properties = DialogProperties()
+                )
+            }
         }
     }
 }
+
 
 @Composable
 fun CategoryItem(
@@ -218,6 +257,7 @@ fun CategoryItem(
             .background(Color.White, shape = RoundedCornerShape(8.dp)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Image block
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -233,6 +273,7 @@ fun CategoryItem(
 
         Spacer(modifier = Modifier.height(4.dp))
 
+        // Category title
         Text(
             text = title,
             fontSize = 14.sp,
