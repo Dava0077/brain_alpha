@@ -80,76 +80,46 @@ fun CouplesScreen() {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(70.dp),
+                    .height(70.dp)
+                    .background(Color(0xFF222937), shape = RoundedCornerShape(4.dp))
+                    .border(BorderStroke(2.dp, Color(0xFF4CE3E8))))
+            {
 
-            ) {
-                Box(
+                IconButton(
+                    onClick = { /* Dummy action */ },
                     modifier = Modifier
-                        .width(200.dp)
-                        .height(30.dp)
-                        .align(Alignment.TopCenter)
-                        .background(Color(0xFF222937), shape = RoundedCornerShape(4.dp))
-                        .border(BorderStroke(2.dp, Color(0xFF4CE3E8)))){
-
+                        .align(Alignment.CenterStart)
+                        .padding(start = 8.dp)
+                        .size(55.dp)
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.user),
+                        contentDescription = "User"
+                    )
                 }
-
-                Box(
+                Image(
+                    painter = org.jetbrains.compose.resources.painterResource(Res.drawable.logo),
+                    contentDescription = null,
                     modifier = Modifier
-                        .fillMaxHeight()
-                        .width(100.dp)
-                        .background(Color(0xFF222937), shape = RoundedCornerShape(0.dp))
-                        .border(BorderStroke(2.dp, Color(0xFF4CE3E8)))){
-                    IconButton(
-                        onClick = { /* Dummy action */ },
-                        modifier = Modifier
-                            .align(Alignment.CenterStart)
-                            .padding(start = 8.dp)
-                            .size(55.dp)
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.user),
-                            contentDescription = "User"
-                        )
-                    }
-                }
-
-
-
-                Box(
+                        .size(120.dp)
+                        .align(Alignment.Center)
+                        .scale(1.5f)
+                )
+                IconButton(
+                    onClick = { /* Dummy action */ },
                     modifier = Modifier
-                        .fillMaxHeight()
                         .align(Alignment.CenterEnd)
-                        .width(100.dp)
-                        .background(Color(0xFF222937), shape = RoundedCornerShape(0.dp))
-                        .border(BorderStroke(2.dp, Color(0xFF4CE3E8)))){
-
-                    IconButton(
-                        onClick = { /* Dummy action */ },
-                        modifier = Modifier
-                            .align(Alignment.CenterEnd)
-                            .padding(end = 8.dp)
-                            .size(55.dp)
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.ajustes),
-                            contentDescription = "Settings"
-                        )
-                    }
+                        .padding(end = 8.dp)
+                        .size(55.dp)
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.ajustes),
+                        contentDescription = "Settings"
+                    )
                 }
-                Box(
-                    modifier = Modifier
-                        .width(220.dp)
-                        .height(26.dp)
-                        .align(Alignment.TopCenter)
-                        .offset(y = 2.dp)
-                        .background(Color(0xFF222937), shape = RoundedCornerShape(0.dp))
-                ){
-
-                }
-
 
             }
-            Spacer(modifier = Modifier.height(70.dp)) // Espacio tras el logo
+            Spacer(modifier = Modifier.height(40.dp)) // Espacio tras el logo
 
 
             Text(
@@ -160,6 +130,17 @@ fun CouplesScreen() {
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(30.dp))
+
+
+            Text(
+                text = "Time: 60",
+                fontSize = 20.sp,
+                color = Color.Black,
+                fontFamily = FontFamily.SansSerif,
+                textAlign = TextAlign.Center
+
+            )
+            Spacer(modifier = Modifier.height(10.dp))
 
             for (row in 0 until 4) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
@@ -211,15 +192,8 @@ fun CouplesScreen() {
                 Text("¡Has ganado!", style = MaterialTheme.typography.h5)
             }
         }
-        Image(
-            painter = org.jetbrains.compose.resources.painterResource(Res.drawable.logo),
-            contentDescription = null,
-            modifier = Modifier
-                .size(120.dp)
-                .align(Alignment.TopCenter)
-                .absoluteOffset(y = 0.dp) // ajusta para que flote como en el diseño
-                .scale(1.5f)
-        )
+
+
 
     }
 }
