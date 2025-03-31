@@ -44,8 +44,12 @@ fun CouplesScreen(controller: CouplesController) {
     var selectedIndices by remember { mutableStateOf(controller.getSelectedIndices()) }
     var gameStarted by remember { mutableStateOf(controller.hasStarted()) }
     var gameFinished by remember { mutableStateOf(false) }
+    var remainingTime by remember { mutableStateOf(60) }
+    var gameLost by remember { mutableStateOf(false) }
 
-    val shuffledCards = remember(gameStarted) { controller.getRevealedStates().mapIndexed { i, _ -> controller.getCardValue(i) } }
+    val shuffledCards = List(16) { index -> controller.getCardValue(index) }
+    var timerTrigger by remember { mutableStateOf(0) }
+
 
 
     LaunchedEffect(selectedIndices) {
@@ -56,6 +60,20 @@ fun CouplesScreen(controller: CouplesController) {
             matched.clear(); matched.addAll(controller.getMatchedStates())
             selectedIndices = controller.getSelectedIndices()
             if (controller.isGameFinished()) gameFinished = true
+        }
+    }
+    LaunchedEffect(timerTrigger) {
+        if (gameStarted) {
+            remainingTime = 60
+            gameLost = false
+            while (remainingTime > 0 && !gameFinished) {
+                delay(1000)
+                remainingTime--
+            }
+            if (!gameFinished && remainingTime == 0) {
+                gameLost = true
+                gameStarted = false
+            }
         }
     }
     Box(modifier = Modifier.fillMaxSize()) {
@@ -127,7 +145,7 @@ fun CouplesScreen(controller: CouplesController) {
 
 
             Text(
-                text = "Time: 60",
+                text = "Time: $remainingTime",
                 fontSize = 20.sp,
                 color = Color.Black,
                 fontFamily = FontFamily.SansSerif,
@@ -171,20 +189,28 @@ fun CouplesScreen(controller: CouplesController) {
 
             Spacer(modifier = Modifier.height(30.dp))
 
-            Button(onClick = {
-                controller.startGame()
-                revealed.clear(); revealed.addAll(controller.getRevealedStates())
-                matched.clear(); matched.addAll(controller.getMatchedStates())
-                selectedIndices = controller.getSelectedIndices()
-                gameStarted = true
-                gameFinished = false
-            }) {
-                Text(if (!gameStarted || gameFinished) "PLAY" else "RESTART")
+            if (!gameStarted || gameFinished || gameLost) {
+                Button(onClick = {
+                    controller.startGame()
+                    revealed.clear(); revealed.addAll(controller.getRevealedStates())
+                    matched.clear(); matched.addAll(controller.getMatchedStates())
+                    selectedIndices = controller.getSelectedIndices()
+                    gameStarted = true
+                    gameFinished = false
+                    gameLost = false
+                    remainingTime = 60
+                    timerTrigger++ // fuerza reinicio del temporizador
+                }) {
+                    Text("PLAY")
+                }
             }
 
             if (gameFinished) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text("¡Has ganado!", fontSize = 20.sp)
+            } else if (gameLost) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text("¡Has perdido!", fontSize = 20.sp, color = Color.Red)
             }
         }
 
