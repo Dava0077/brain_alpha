@@ -29,6 +29,7 @@ fun SignUpScreen(
     var repeatPassword by remember { mutableStateOf("") }
     var loading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    var showSuccessDialog by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
 
@@ -118,10 +119,18 @@ fun SignUpScreen(
                         )
                         loading = false
                         result.onSuccess {
-                            onSuccess()
-                        }.onFailure {
-                            errorMessage = it.message ?: "Error inesperado"
-                            onFailure(errorMessage!!)
+                            // Clear fields after successful sign up
+                            email = ""
+                            username = ""
+                            password = ""
+                            repeatPassword = ""
+                            showSuccessDialog = true //Enseña mensaje
+                        }.onFailure {exception ->
+                            exception.printStackTrace()
+                            val detailedMessage = exception.message ?: "Error inesperado (sin mensaje)"
+                            println("Registro fallido: $detailedMessage")
+                            errorMessage = detailedMessage
+                            onFailure(detailedMessage)
                         }
                     }
                 },
@@ -137,10 +146,34 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            TextButton(onClick = onGoToLogin) {
+            TextButton(onClick = {
+                // Clean fields before navigating back to login
+                email = ""
+                username = ""
+                password = ""
+                repeatPassword = ""
+                errorMessage = null
+                showSuccessDialog = false
+                onGoToLogin()
+            }) {
                 Text("¿Ya tienes cuenta? Inicia sesión!", color = Color.Blue)
             }
         }
+    }
+    if (showSuccessDialog) {
+        AlertDialog(
+            onDismissRequest = {},
+            title = { Text("¡Registro exitoso!") },
+            text = { Text("Tu cuenta ha sido creada correctamente.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showSuccessDialog = false
+                    onGoToLogin()
+                }) {
+                    Text("OK")
+                }
+            }
+        )
     }
 }
 

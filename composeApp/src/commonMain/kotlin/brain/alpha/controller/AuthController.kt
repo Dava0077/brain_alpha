@@ -5,6 +5,7 @@ import brain.alpha.services.SupabaseClientProvider
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.user.UserInfo
+import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.buildJsonObject
@@ -75,8 +76,24 @@ object AuthController {
                 }
             }
 
+            //Autenticación manual
+            auth.signInWith(Email) {
+                this.email = email
+                this.password = password
+            }
+
             val user = auth.currentUserOrNull()
                 ?: throw IllegalStateException("No se pudo obtener el usuario tras el registro")
+
+
+            //Insertar en la tabla "users"
+            SupabaseClientProvider.client.postgrest["users"].insert(
+                buildJsonObject {
+                    put("id", user.id) // usa el mismo ID que el auth.uid()
+                    put("email", user.email ?: "")
+                    put("name", username)
+                }
+            )
 
             UserSession.setSession(
                 id = user.id,

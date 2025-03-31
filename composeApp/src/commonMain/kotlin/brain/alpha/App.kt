@@ -7,8 +7,13 @@ import androidx.compose.runtime.*
 
 import brain.alpha.view.LoginScreen
 import brain.alpha.controller.LoginController
+import brain.alpha.controller.memoryControllers.CouplesController
 import brain.alpha.view.HomeScreen
 import brain.alpha.view.SignUpScreen
+import brain.alpha.view.memoryViews.CouplesScreen
+import controller.MentalMathController
+import model.MentalMathModel
+import view.mentalMathView
 
 
 @Composable
@@ -28,9 +33,17 @@ fun App() {
 
 
             "signup" -> SignUpScreen(
-                onSuccess = {currentScreen = "signup"},
-                onFailure = {errorMessage -> println("Error de registro: $errorMessage")},
-                onGoToLogin = {currentScreen = "login"}
+                onSuccess = {
+                    LoginController.clear() // Limpiar campos antes de volver
+                    currentScreen = "login"
+                },
+                onFailure = { errorMessage ->
+                    println("Error de registro: $errorMessage")
+                },
+                onGoToLogin = {
+                    LoginController.clear() // También limpiar si vuelve manualmente
+                    currentScreen = "login"
+                }
             )
 
 
@@ -42,16 +55,21 @@ fun App() {
                 onNavigateToAgility = { currentScreen = "agility" }
             )
 
-            "memory" -> Text("🧠 Pantalla de Memoria (TODO)")
+            "memory" -> CouplesScreen(
+                controller = CouplesController(),
+
+            )
 
 
-            "logic" -> Text("🧠 Pantalla de Lógica (TODO)")
+            "agility" -> mentalMathView(
+                controller = MentalMathController(MentalMathModel())
+            )
 
 
             "concentration" -> Text("🧠 Pantalla de Concentración (TODO)")
 
 
-            "agility" -> Text("🧠 Pantalla de Agilidad Mental (TODO)")
+            "logic" -> Text("🧠 Pantalla de Logica (TODO)")
         }
     }
 }

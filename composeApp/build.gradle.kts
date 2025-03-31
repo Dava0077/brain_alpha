@@ -72,6 +72,7 @@ kotlin {
             implementation("io.github.jan-tennert.supabase:postgrest-kt")
             implementation("io.github.jan-tennert.supabase:auth-kt")
             implementation("io.github.jan-tennert.supabase:realtime-kt")
+            implementation("io.ktor:ktor-client-cio:3.0.3")
 
 
 

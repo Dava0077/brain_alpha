@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import brain.alpha.controller.LoginController
 import brain.alpha.model.UserSession
 import brainalpha.composeapp.generated.resources.*
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -81,6 +82,28 @@ fun HomeScreen(
 
 
                 IconButton(
+                    onClick = {
+                        // ⚠️ Ejecutamos en coroutine porque signOut() es suspend
+                        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Default).launch {
+                            brain.alpha.controller.AuthController.signOut()
+                            LoginController.clear()
+                            controller.navigateTo("login")
+                        }
+                    },
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(end = 64.dp)
+                        .size(55.dp)
+                        .background(Color(0xFF222937))
+                ) {
+                    Image(
+                        painter = painterResource(Res.drawable.logout),
+                        contentDescription = "Cerrar sesión"
+                    )
+                }
+
+
+                IconButton(
                     onClick = { controller.buttonSettings() },
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
@@ -93,6 +116,8 @@ fun HomeScreen(
                         contentDescription = "Settings"
                     )
                 }
+
+
 
                 // Mostrar nombre del usuario actual
                 Text(
@@ -232,23 +257,4 @@ fun CategoryItem(
     }
 }
 
-/*
-@Composable
-fun HomeScreen() {
-    val controller = MentalMathController(MentalMathModel())
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text("Bienvenido a Brain Alpha")
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = { /* Navegar a MentalMathView */ }) {
-            Text("Jugar Matemáticas Mentales")
-        }
-    }
-    // Si usas navegación, puedes integrar MentalMathView aquí
-    MentalMathView(controller)
-    }
- */
 
