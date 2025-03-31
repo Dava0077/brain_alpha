@@ -9,6 +9,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -23,10 +24,17 @@ fun LoginScreen(
     controller: LoginController,
     onNavigateToSignUp: () -> Unit
 ) {
+    Image(
+        painter = painterResource(Res.drawable.Login2),
+        contentDescription = null,
+        modifier = Modifier.fillMaxSize(),
+        contentScale = ContentScale.Crop
+    )
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
             .padding(horizontal = 24.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
