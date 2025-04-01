@@ -5,9 +5,11 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import brain.alpha.view.LoginScreen
 import brain.alpha.controller.LoginController
+import brain.alpha.controller.concentrationController.StroopController
 import brain.alpha.controller.memoryControllers.couplesController
 import brain.alpha.view.HomeScreen
 import brain.alpha.view.SignUpScreen
+import brain.alpha.view.concentrationViews.StroopScreen
 import brain.alpha.view.memoryViews.CouplesScreen
 import controller.MentalMathController
 import model.MentalMathModel
@@ -80,7 +82,9 @@ fun App() {
             )
 
 
-            "concentration" -> Text("🧠 Pantalla de Concentración (TODO)")
+            "concentration" -> StroopScreen(
+                controller = StroopController
+            )
 
 
             "logic" -> Text("🧠 Pantalla de Logica (TODO)")
