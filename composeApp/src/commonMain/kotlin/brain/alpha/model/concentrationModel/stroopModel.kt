@@ -68,4 +68,9 @@ class StroopModel {
     fun getColorName(color: Color): String {
         return colorMap.entries.find { it.value == color }?.key ?: "Desconocido"
     }
+    fun generateRandomWord(): WordColorPair {
+        val text = colorNames.random()
+        val color = colorMap.values.random()
+        return WordColorPair(text, color)
+    }
 }
