@@ -44,6 +44,8 @@ fun App() {
 
         stroopController.navigateTo = { route -> currentScreen = route }
 
+        sudokuController.navigateTo = { route -> currentScreen = route }
+
 
         // Controls which screen to display based on currentScreen
         when (currentScreen) {
@@ -99,10 +101,10 @@ fun App() {
                 onNavigateToHome = {currentScreen="home"}
             )
 
-
-            /*"logic" -> sudokuScreen(
-                controller = sudokuController
-            )*/
+            "logic" -> sudokuScreen(
+                controller = sudokuController,
+                onNavigateToHome = {currentScreen = "home"}
+            )
         }
     }
 }

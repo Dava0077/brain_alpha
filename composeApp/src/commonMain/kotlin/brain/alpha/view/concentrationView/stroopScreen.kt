@@ -107,7 +107,7 @@ fun StroopScreen(controller: stroopController = stroopController,onNavigateToHom
 
             Button(
                 onClick = {controller.goHome()},
-
+                modifier = Modifier.align(Alignment.End),
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
             ){
                 Text("BACK", color = Color.White)
