@@ -1,8 +1,7 @@
-package brain.alpha.controller.memoryControllers
+package brain.alpha.controller.memoryController
 
 
-import brain.alpha.controller.LoginController.clear
-import brain.alpha.model.memoryModels.couplesModel
+import brain.alpha.model.memoryModel.couplesModel
 
 object couplesController {
     private val model = couplesModel

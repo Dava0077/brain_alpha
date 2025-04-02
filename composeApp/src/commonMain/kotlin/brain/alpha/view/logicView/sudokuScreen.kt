@@ -27,6 +27,8 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
     var gameStarted by remember { mutableStateOf(false) }
     var selectedRow by remember { mutableStateOf(-1) }
     var selectedCol by remember { mutableStateOf(-1) }
+    var gridVersion by remember { mutableStateOf(0) }
+
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
@@ -78,11 +80,11 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
             Spacer(modifier = Modifier.height(5.dp)) // Espacio tras el logo
 
             Button(
-                onClick = {controller.goHome()},
+                onClick = { controller.goHomeLogic() },
                 modifier = Modifier.align(Alignment.End),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
-            ){
-                Text("BACK", color = Color.White)
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+            ) {
+                Text("BACK", color = Color.Black)
             }
 
             Spacer(modifier = Modifier.height(30.dp))
@@ -98,11 +100,14 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
             Spacer(modifier = Modifier.height(30.dp))
 
             if (!gameStarted) {
-                Button(onClick = {controller.startGame()
-                    gameStarted = true
-                },colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
+                Button(
+                    onClick = {
+                        controller.startGame()
+                        gameStarted = true
+                    },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
                 ) {
-                    Text("PLAY", color = Color.White)
+                    Text("PLAY", color = Color.Black)
                 }
             } else {
                 // Sudoku Grid
@@ -145,9 +150,15 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Button(onClick = {controller.startGame()},
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),) {
-                    Text("RESTART", color = Color.White)
+                Button(
+                    onClick = {
+                        controller.startGame()
+                        selectedRow = -1
+                        selectedCol = -1
+                    },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
+                ) {
+                    Text("RESTART", color = Color.Black)
                 }
                 if (selectedRow in 0..8 && selectedCol in 0..8) {
                     Spacer(modifier = Modifier.height(16.dp))
@@ -177,6 +188,34 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
                             colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
                         ) {
                             Text("🗑", color = Color.White)
+                        }
+                    }
+                }
+                if (controller.isBoardComplete()) {
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    val isValid = controller.isBoardValid()
+                    val message = if (isValid) "✅ Sudoku correcto" else "❌ Sudoku incorrecto"
+                    val color = if (isValid) Color(0xFF4CAF50) else Color(0xFFFF5252)
+
+                    Text(
+                        text = message,
+                        fontSize = 20.sp,
+                        color = color
+                    )
+
+                    if (isValid) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Button(
+                            onClick = {
+                                controller.startGame()
+                                gameStarted = true
+                                selectedRow = -1
+                                selectedCol = -1
+                            },
+                            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
+                        ) {
+                            Text("JUGAR DE NUEVO", color = Color.White)
                         }
                     }
                 }

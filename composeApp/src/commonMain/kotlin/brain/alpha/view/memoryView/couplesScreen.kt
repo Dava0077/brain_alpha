@@ -1,4 +1,4 @@
-package brain.alpha.view.memoryViews
+package brain.alpha.view.memoryView
 
 
 import androidx.compose.foundation.BorderStroke
@@ -29,7 +29,7 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.font.FontWeight
-import brain.alpha.controller.memoryControllers.couplesController
+import brain.alpha.controller.memoryController.couplesController
 import brainalpha.composeapp.generated.resources.*
 
 

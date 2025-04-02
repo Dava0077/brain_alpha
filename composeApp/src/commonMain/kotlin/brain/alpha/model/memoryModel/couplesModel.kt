@@ -1,4 +1,4 @@
-package brain.alpha.model.memoryModels
+package brain.alpha.model.memoryModel
 
 object couplesModel {
     val allCards: List<String> = listOf("P", "Q", "R", "S", "T", "U", "V", "W")

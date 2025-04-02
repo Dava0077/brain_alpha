@@ -1,19 +1,20 @@
 package brain.alpha
 
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import brain.alpha.view.LoginScreen
 import brain.alpha.controller.LoginController
 import brain.alpha.controller.concentrationController.stroopController
+import brain.alpha.controller.logicController.logicHomeController
 import brain.alpha.controller.logicController.sudokuController
-import brain.alpha.controller.memoryControllers.couplesController
+import brain.alpha.controller.memoryController.couplesController
 import brain.alpha.controller.mentalAgilityController.mentalMathController
 import brain.alpha.view.HomeScreen
 import brain.alpha.view.SignUpScreen
 import brain.alpha.view.concentrationViews.StroopScreen
+import brain.alpha.view.logicView.logicHomeScreen
 import brain.alpha.view.logicView.sudokuScreen
-import brain.alpha.view.memoryViews.CouplesScreen
+import brain.alpha.view.memoryView.CouplesScreen
 
 import view.mentalMathView
 
@@ -36,15 +37,21 @@ fun App() {
         var currentScreen by remember { mutableStateOf("login") }
 
         // Assigns a navigation callback for use in controllers
+        //LOGIN
         LoginController.navigateTo = { route -> currentScreen = route }
 
+        //MEMORY GAMES
         couplesController.navigateTo = { route -> currentScreen = route }
 
+        //MENTAL AGILTY
         mentalMathController.navigateTo = { route -> currentScreen = route }
 
+        //CONCENTRATION
         stroopController.navigateTo = { route -> currentScreen = route }
 
+        //LOGIC GAMES
         sudokuController.navigateTo = { route -> currentScreen = route }
+        logicHomeController.navigateTo = { route -> currentScreen = route }
 
 
         // Controls which screen to display based on currentScreen
@@ -72,7 +79,7 @@ fun App() {
                 }
             )
 
-
+            //HOME
             "home" -> HomeScreen(
                 controller = LoginController,
                 onNavigateToMemory = { currentScreen = "memory" },
@@ -101,9 +108,14 @@ fun App() {
                 onNavigateToHome = {currentScreen="home"}
             )
 
-            "logic" -> sudokuScreen(
+            "logic" -> logicHomeScreen(
+                controller = logicHomeController,
+                onNavigateToHome = {currentScreen = "home"},
+                onNavigateToSudoku = {currentScreen = "sudoku"}
+            )
+            "sudoku" -> sudokuScreen(
                 controller = sudokuController,
-                onNavigateToHome = {currentScreen = "home"}
+                onNavigateToHome = {currentScreen = "logic"}
             )
         }
     }

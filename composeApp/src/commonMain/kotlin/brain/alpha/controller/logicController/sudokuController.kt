@@ -1,28 +1,63 @@
 package brain.alpha.controller.logicController
 
 import brain.alpha.model.logicModel.sudokuModel
-import brain.alpha.model.memoryModels.couplesModel
 
 object sudokuController {
     private val model = sudokuModel
     lateinit var navigateTo: (String) -> Unit
 
     fun startGame() {
-        sudokuModel.initBoard()
+        sudokuModel.generateValidBoard()
+    }
+    fun setCellValue(row: Int, col: Int, value: Int) {
+        sudokuModel.setCell(row, col, value)
     }
 
     fun getCellValue(row: Int, col: Int): Int {
-        return sudokuModel.getValue(row, col)
+        return sudokuModel.getGrid()[row][col]
     }
 
     fun isCellInitial(row: Int, col: Int): Boolean {
         return sudokuModel.isInitial(row, col)
     }
-    fun goHome(){
-        navigateTo("home")
+
+    fun isBoardComplete(): Boolean {
+        return sudokuModel.getGrid().all { row -> row.all { it in 1..9 } }
     }
 
-    fun setCellValue(row: Int, col: Int, value: Int) {
-        sudokuModel.setValue(row, col, value)
+    fun isBoardValid(): Boolean {
+        val grid = sudokuModel.getGrid()
+
+        fun isValidGroup(group: List<Int>) =
+            group.filter { it != 0 }.let { it.size == it.toSet().size }
+
+        // Filas
+        for (row in 0..8) {
+            if (!isValidGroup(grid[row].toList())) return false
+        }
+
+        // Columnas
+        for (col in 0..8) {
+            val column = List(9) { row -> grid[row][col] }
+            if (!isValidGroup(column)) return false
+        }
+
+        // Regiones 3x3
+        for (boxRow in 0..2) {
+            for (boxCol in 0..2) {
+                val box = mutableListOf<Int>()
+                for (i in 0..2) {
+                    for (j in 0..2) {
+                        box += grid[boxRow * 3 + i][boxCol * 3 + j]
+                    }
+                }
+                if (!isValidGroup(box)) return false
+            }
+        }
+
+        return true
+    }
+    fun goHomeLogic(){
+        navigateTo("logic")
     }
 }

@@ -1,30 +1,96 @@
 package brain.alpha.model.logicModel
 
 object sudokuModel {
-    data class Cell(var value: Int, val isInitial: Boolean)
+    private val grid = Array(9) { IntArray(9) }
+    private val initialCells = Array(9) { BooleanArray(9) }
 
-    private val board: Array<Array<Cell>> = Array(9) {
-        Array(9) { Cell(0, false) }
+    fun generateValidBoard() {
+        clearBoard()
+        fillDiagonalBlocks()
+        solveBoard()
+        removeCells(40)
+    }
+    fun setCell(row: Int, col: Int, value: Int) {
+        if (!initialCells[row][col]) {
+            grid[row][col] = value
+        }
     }
 
-    fun initBoard() {
-        // Carga simple: Fijamos algunos valores como ejemplo
-        for (row in 0 until 9) {
-            for (col in 0 until 9) {
-                val isFixed = (0..1).random() == 0 && (row + col) % 4 == 0
-                val value = if (isFixed) ((1..9).random()) else 0
-                board[row][col] = Cell(value, isFixed)
+    fun getGrid(): Array<IntArray> = grid.map { it.copyOf() }.toTypedArray()
+    fun isInitial(row: Int, col: Int): Boolean = initialCells[row][col]
+
+    fun clearBoard() {
+        for (row in 0..8) {
+            for (col in 0..8) {
+                grid[row][col] = 0
+                initialCells[row][col] = false
             }
         }
     }
 
-    fun getValue(row: Int, col: Int): Int = board[row][col].value
+    fun fillDiagonalBlocks() {
+        for (i in 0..6 step 3) {
+            fillBlock(i, i)
+        }
+    }
 
-    fun isInitial(row: Int, col: Int): Boolean = board[row][col].isInitial
+    fun fillBlock(row: Int, col: Int) {
+        val nums = (1..9).shuffled()
+        var idx = 0
+        for (i in 0 until 3) {
+            for (j in 0 until 3) {
+                grid[row + i][col + j] = nums[idx++]
+            }
+        }
+    }
 
-    fun setValue(row: Int, col: Int, value: Int) {
-        if (!board[row][col].isInitial) {
-            board[row][col].value = value
+    fun isSafe(row: Int, col: Int, num: Int): Boolean {
+        for (x in 0..8) if (grid[row][x] == num || grid[x][col] == num) return false
+        val startRow = row / 3 * 3
+        val startCol = col / 3 * 3
+        for (i in 0 until 3) {
+            for (j in 0 until 3) {
+                if (grid[startRow + i][startCol + j] == num) return false
+            }
+        }
+        return true
+    }
+
+    fun solveBoard(): Boolean {
+        for (row in 0..8) {
+            for (col in 0..8) {
+                if (grid[row][col] == 0) {
+                    for (num in 1..9) {
+                        if (isSafe(row, col, num)) {
+                            grid[row][col] = num
+                            if (solveBoard()) return true
+                            grid[row][col] = 0
+                        }
+                    }
+                    return false
+                }
+            }
+        }
+        return true
+    }
+
+    fun removeCells(count: Int) {
+        var removed = 0
+        while (removed < count) {
+            val row = (0..8).random()
+            val col = (0..8).random()
+            if (grid[row][col] != 0) {
+                grid[row][col] = 0
+                removed++
+            }
+        }
+        // Marcar las celdas restantes como iniciales
+        for (row in 0..8) {
+            for (col in 0..8) {
+                if (grid[row][col] != 0) {
+                    initialCells[row][col] = true
+                }
+            }
         }
     }
 }
