@@ -1,10 +1,12 @@
 package brain.alpha.controller.memoryControllers
 
 
+import brain.alpha.controller.LoginController.clear
 import brain.alpha.model.memoryModels.couplesModel
 
 object couplesController {
     private val model = couplesModel
+    lateinit var navigateTo: (String) -> Unit
 
     fun startGame() {
         model.shuffledCards = (model.allCards + model.allCards).shuffled().toMutableList()
@@ -41,6 +43,9 @@ object couplesController {
             }
         }
         return true
+    }
+    fun goHome(){
+        navigateTo("home")
     }
 
     fun processTurnEnd() {

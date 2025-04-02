@@ -93,6 +93,16 @@ fun mentalMathView(controller: MentalMathController) { // Cambiado a minúscula 
                 }
 
             }
+            Spacer(modifier = Modifier.height(5.dp)) // Espacio tras el logo
+
+            /*Button(
+                onClick = {controller.goHome()},
+                modifier = Modifier.align(Alignment.End),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
+            ){
+                Text("BACK", color = Color.White)
+            }*/
+
 
             if (!gameStarted) {
                 Button(onClick = {

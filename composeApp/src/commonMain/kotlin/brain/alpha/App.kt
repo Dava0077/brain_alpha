@@ -36,6 +36,8 @@ fun App() {
         // Assigns a navigation callback for use in controllers
         LoginController.navigateTo = { route -> currentScreen = route }
 
+        couplesController.navigateTo = { route -> currentScreen = route }
+
 
         // Controls which screen to display based on currentScreen
         when (currentScreen) {
@@ -72,7 +74,9 @@ fun App() {
             )
 
             "memory" -> CouplesScreen(
-                controller = couplesController
+                controller = couplesController,
+                onNavigateToHome = {currentScreen = "home"}
+
 
             )
 

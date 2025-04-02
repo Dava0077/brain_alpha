@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import androidx.compose.foundation.clickable
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.font.FontWeight
@@ -34,7 +35,10 @@ import brainalpha.composeapp.generated.resources.*
 
 
 @Composable
-fun CouplesScreen(controller: couplesController) {
+fun CouplesScreen(
+    controller: couplesController,
+    onNavigateToHome: () -> Unit,) {
+
     val revealed = remember { mutableStateListOf<Boolean>().apply { addAll(controller.getRevealedStates()) } }
     val matched = remember { mutableStateListOf<Boolean>().apply { addAll(controller.getMatchedStates()) } }
     var selectedIndices by remember { mutableStateOf(controller.getSelectedIndices()) }
@@ -127,8 +131,17 @@ fun CouplesScreen(controller: couplesController) {
                 }
 
             }
-            Spacer(modifier = Modifier.height(40.dp)) // Espacio tras el logo
+            Spacer(modifier = Modifier.height(5.dp)) // Espacio tras el logo
 
+            Button(
+                onClick = {controller.goHome()},
+
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
+                ){
+                Text("BACK", color = Color.White)
+            }
+
+            Spacer(modifier = Modifier.height(30.dp)) // Espacio tras el logo
 
             Text(
                 text = "COUPLES GAMES",
@@ -196,8 +209,9 @@ fun CouplesScreen(controller: couplesController) {
                     gameLost = false
                     remainingTime = 60
                     timerTrigger++ // fuerza reinicio del temporizador
-                }) {
-                    Text("PLAY")
+                },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),) {
+                    Text("PLAY", color = Color.White)
                 }
             }
 

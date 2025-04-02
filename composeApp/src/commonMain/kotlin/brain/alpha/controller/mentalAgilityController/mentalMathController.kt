@@ -3,7 +3,8 @@ package controller
 import model.MentalMathModel
 import model.Question
 
-class MentalMathController(private val model: MentalMathModel) {
+class MentalMathController(private val model: MentalMathModel,
+    ) {
     fun startGame(onQuestionGenerated: (Question) -> Unit) {
         if (!model.isGameOver()) {
             val question = model.generateQuestion()
