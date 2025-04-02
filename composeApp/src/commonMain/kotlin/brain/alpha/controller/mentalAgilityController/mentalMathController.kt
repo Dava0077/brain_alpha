@@ -1,11 +1,14 @@
-package controller
+package brain.alpha.controller.mentalAgilityController
 
-import model.MentalMathModel
-import model.Question
+import model.mentalMathModel
 
-class MentalMathController(private val model: MentalMathModel,
-    ) {
-    fun startGame(onQuestionGenerated: (Question) -> Unit) {
+
+object mentalMathController{
+    private val model= mentalMathModel
+    lateinit var navigateTo: (String) -> Unit
+
+
+    fun startGame(onQuestionGenerated: (mentalMathModel.Question) -> Unit) {
         if (!model.isGameOver()) {
             val question = model.generateQuestion()
             onQuestionGenerated(question)
@@ -28,6 +31,9 @@ class MentalMathController(private val model: MentalMathModel,
 
     fun resetGame() {
         model.resetGame()
+    }
+    fun goHome(){
+        navigateTo("home")
     }
 
     fun isGameOver(): Boolean = model.isGameOver()

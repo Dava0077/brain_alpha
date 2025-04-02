@@ -2,9 +2,9 @@ package model
 
 import kotlin.random.Random
 
-data class Question(val text: String, val correctAnswer: Int)
 
-class MentalMathModel {
+
+object mentalMathModel {
     var score = 0
         private set
     var currentQuestion = 0
@@ -53,4 +53,5 @@ class MentalMathModel {
 
     // Nueva función para obtener la respuesta correcta actual
     fun getCurrentCorrectAnswer(): Int? = currentQuestionObj?.correctAnswer
+    data class Question(val text: String, val correctAnswer: Int)
 }

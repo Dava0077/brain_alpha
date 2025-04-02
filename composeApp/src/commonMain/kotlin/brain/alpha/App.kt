@@ -5,14 +5,16 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import brain.alpha.view.LoginScreen
 import brain.alpha.controller.LoginController
-import brain.alpha.controller.concentrationController.StroopController
+import brain.alpha.controller.concentrationController.stroopController
+import brain.alpha.controller.logicController.sudokuController
 import brain.alpha.controller.memoryControllers.couplesController
+import brain.alpha.controller.mentalAgilityController.mentalMathController
 import brain.alpha.view.HomeScreen
 import brain.alpha.view.SignUpScreen
 import brain.alpha.view.concentrationViews.StroopScreen
+import brain.alpha.view.logicView.sudokuScreen
 import brain.alpha.view.memoryViews.CouplesScreen
-import controller.MentalMathController
-import model.MentalMathModel
+
 import view.mentalMathView
 
 /**
@@ -37,6 +39,10 @@ fun App() {
         LoginController.navigateTo = { route -> currentScreen = route }
 
         couplesController.navigateTo = { route -> currentScreen = route }
+
+        mentalMathController.navigateTo = { route -> currentScreen = route }
+
+        stroopController.navigateTo = { route -> currentScreen = route }
 
 
         // Controls which screen to display based on currentScreen
@@ -82,16 +88,21 @@ fun App() {
 
 
             "agility" -> mentalMathView(
-                controller = MentalMathController(MentalMathModel())
+                controller = mentalMathController,
+                onNavigateToHome = {currentScreen = "home"}
+
             )
 
 
             "concentration" -> StroopScreen(
-                controller = StroopController
+                controller = stroopController,
+                onNavigateToHome = {currentScreen="home"}
             )
 
 
-            "logic" -> Text("🧠 Pantalla de Logica (TODO)")
+            /*"logic" -> sudokuScreen(
+                controller = sudokuController
+            )*/
         }
     }
 }

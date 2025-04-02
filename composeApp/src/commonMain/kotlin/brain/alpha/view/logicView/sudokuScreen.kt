@@ -18,6 +18,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import brain.alpha.controller.logicController.sudokuController
+import brain.alpha.model.logicModel.sudokuModel
 import brainalpha.composeapp.generated.resources.*
 import brainalpha.composeapp.generated.resources.Res
 import brainalpha.composeapp.generated.resources.ajustes
@@ -27,10 +29,10 @@ import brainalpha.composeapp.generated.resources.user
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun sudokuScreen() {
+fun sudokuScreen(controller: sudokuController) {
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
-            painter = painterResource(Res.drawable.memoryFondo),
+            painter = painterResource(Res.drawable.fondoLogic),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
@@ -88,7 +90,7 @@ fun sudokuScreen() {
 
 
             Text(
-                text = "COUPLES GAMES",
+                text = "SUDOKU",
                 fontSize = 40.sp,
                 color = Color.Black,
                 fontFamily = FontFamily.SansSerif,

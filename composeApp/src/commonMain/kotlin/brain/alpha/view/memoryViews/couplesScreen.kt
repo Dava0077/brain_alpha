@@ -37,7 +37,7 @@ import brainalpha.composeapp.generated.resources.*
 @Composable
 fun CouplesScreen(
     controller: couplesController,
-    onNavigateToHome: () -> Unit,) {
+    onNavigateToHome: () -> Unit) {
 
     val revealed = remember { mutableStateListOf<Boolean>().apply { addAll(controller.getRevealedStates()) } }
     val matched = remember { mutableStateListOf<Boolean>().apply { addAll(controller.getMatchedStates()) } }

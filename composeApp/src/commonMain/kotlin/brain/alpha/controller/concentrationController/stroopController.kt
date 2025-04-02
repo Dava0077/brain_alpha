@@ -2,7 +2,7 @@ package brain.alpha.controller.concentrationController
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
-import brain.alpha.model.concentrationModel.StroopModel
+import brain.alpha.model.concentrationModel.stroopModel
 import kotlinx.coroutines.*
 
 /**
@@ -11,10 +11,11 @@ import kotlinx.coroutines.*
  * Orchestrates Stroop game logic, UI states, and round updates.
  */
 
-object StroopController {
+object stroopController {
 
-    private val model = StroopModel()
+    private val model = stroopModel
     private var timerJob: Job? = null
+    lateinit var navigateTo: (String) -> Unit
 
     val currentColorWord: State<String> get() = derivedStateOf { model.currentWord.text }
     val colorToShow: State<Color> get() = derivedStateOf { model.currentWord.color }
@@ -52,7 +53,9 @@ object StroopController {
             }
         }
     }
-
+    fun goHome(){
+        navigateTo("home")
+    }
     fun stopGame() {
         timerJob?.cancel()
     }

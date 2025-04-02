@@ -1,18 +1,29 @@
 package brain.alpha.view.concentrationViews
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import brain.alpha.controller.concentrationController.StroopController
+import brain.alpha.controller.concentrationController.stroopController
+import brainalpha.composeapp.generated.resources.*
+import brainalpha.composeapp.generated.resources.Res
+import brainalpha.composeapp.generated.resources.logo
+import brainalpha.composeapp.generated.resources.memoryFondo
+import brainalpha.composeapp.generated.resources.user
+import org.jetbrains.compose.resources.painterResource
 
 /**
  * StroopScreen.kt
@@ -21,7 +32,7 @@ import brain.alpha.controller.concentrationController.StroopController
  */
 
 @Composable
-fun StroopScreen(controller: StroopController = StroopController) {
+fun StroopScreen(controller: stroopController = stroopController,onNavigateToHome: () -> Unit,) {
 
     val timeLeft by controller.timeLeft
     val colorWord by controller.currentColorWord
@@ -37,77 +48,144 @@ fun StroopScreen(controller: StroopController = StroopController) {
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp)
+        modifier = Modifier.fillMaxSize()
     ) {
-        if (isGameOver) {
-            AlertDialog(
-                onDismissRequest = {},
-                title = { Text("Fin del juego") },
-                text = { Text("¡Obtuviste $score puntos!") },
-                confirmButton = {
-                    TextButton(onClick = { controller.beginGame() }) {
-                        Text("Volver a jugar")
-                    }
-                }
-            )
-        }
-
+        Image(
+            painter = painterResource(Res.drawable.memoryFondo),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
+            verticalArrangement = Arrangement.Top
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(70.dp)
+                    .background(Color(0xFF222937), shape = RoundedCornerShape(4.dp))
+                    .border(BorderStroke(2.dp, Color(0xFF4CE3E8))))
+            {
 
-            Text("Stroop Test", fontSize = 24.sp, fontWeight = FontWeight.Bold)
-
-            Text("Tiempo restante: $timeLeft s", fontSize = 16.sp)
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Text(
-                text = colorWord.uppercase(),
-                fontSize = 48.sp,
-                fontWeight = FontWeight.Bold,
-                color = displayColor
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                options.forEach { colorOption ->
-                    val colorName = controller.getColorName(colorOption)
-
-                    Button(
-                        onClick = { controller.checkAnswer(colorOption) },
-                        modifier = Modifier
-                            .width(200.dp)
-                            .height(50.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = colorOption,
-                            contentColor = Color.White
-                        ),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Text(
-                            text = colorName.uppercase(),
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp,
-                            textAlign = TextAlign.Center
-                        )
-                    }
+                IconButton(
+                    onClick = { /* Dummy action */ },
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = 8.dp)
+                        .size(55.dp)
+                ) {
+                    Image(
+                        painter = painterResource(Res.drawable.user),
+                        contentDescription = "User"
+                    )
                 }
+                Image(
+                    painter = org.jetbrains.compose.resources.painterResource(Res.drawable.logo),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(120.dp)
+                        .align(Alignment.Center)
+                        .scale(1.5f)
+                )
+                IconButton(
+                    onClick = { /* Dummy action */ },
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(end = 8.dp)
+                        .size(55.dp)
+                ) {
+                    Image(
+                        painter = painterResource(Res.drawable.ajustes),
+                        contentDescription = "Settings"
+                    )
+                }
+
+            }
+            Spacer(modifier = Modifier.height(5.dp)) // Espacio tras el logo
+
+            Button(
+                onClick = {controller.goHome()},
+
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
+            ){
+                Text("BACK", color = Color.White)
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(30.dp))
 
-            Text("Puntuación: $score", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+
+            if (isGameOver) {
+                AlertDialog(
+                    onDismissRequest = {},
+                    title = { Text("Fin del juego") },
+                    text = { Text("¡Obtuviste $score puntos!") },
+                    confirmButton = {
+                        TextButton(onClick = { controller.beginGame() }) {
+                            Text("Volver a jugar")
+                        }
+                    }
+                )
+            }
+
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text("Stroop Test", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+
+                Text("Tiempo restante: $timeLeft s", fontSize = 16.sp)
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Text(
+                    text = colorWord.uppercase(),
+                    fontSize = 48.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = displayColor
+                )
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    options.forEach { colorOption ->
+                        val colorName = controller.getColorName(colorOption)
+
+                        Button(
+                            onClick = { controller.checkAnswer(colorOption) },
+                            modifier = Modifier
+                                .width(200.dp)
+                                .height(50.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = colorOption,
+                                contentColor = Color.White
+                            ),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                text = colorName.uppercase(),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Text("Puntuación: $score", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+            }
+
         }
+
     }
 }
 

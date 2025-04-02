@@ -11,7 +11,7 @@ import kotlin.random.Random
  * Tracks score, timing, color logic, and round progression.
  */
 
-class StroopModel {
+object stroopModel {
 
     data class WordColorPair(val text: String, val color: Color)
 

@@ -1,0 +1,5 @@
+Brain Training engloba una serie de ejercicios de distinta dinámica, desde ejercicios de cálculo y retención de datos hasta ejercicios de lectura y ortografía, pasando por los muy conocidos sudoku, todo ello con el fin de ejercitar la mente.
+
+Al principio únicamente se puede realizar unos pocos ejercicios. No obstante, poco a poco se van desbloqueando nuevos ejercicios de forma paulatina según se va jugando con el tiempo. Junto a los ejercicios también es posible realizar un test, el cual está compuesto por varios ejercicios disponibles y será el que determine la edad cerebral del jugador.
+
+También están disponibles unos gráficos donde se puede consultar los datos de los resultados de los distintos ejercicios y de los exámenes realizados, pudiendo el jugador apreciar así su evolución en cada uno de los distintos ejercicios y en los exámenes normales.
