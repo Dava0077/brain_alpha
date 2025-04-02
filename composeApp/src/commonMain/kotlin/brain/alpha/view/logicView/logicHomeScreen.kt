@@ -33,7 +33,8 @@ import org.jetbrains.compose.resources.painterResource
 fun logicHomeScreen(
     controller: logicHomeController,
     onNavigateToHome: () -> Unit,
-    onNavigateToSudoku: () -> Unit
+    onNavigateToSudoku: () -> Unit,
+    onNavigateToWordS: () -> Unit
     ) {
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
@@ -115,6 +116,12 @@ fun logicHomeScreen(
                         Res.drawable.logica,
                         Color.White,
                         onNavigateToSudoku
+                    )
+                    CategoryItem(
+                        "WORD SEARCH",
+                        Res.drawable.logica,
+                        Color.White,
+                        onNavigateToWordS
                     )
                 }
             }

@@ -7,6 +7,7 @@ import brain.alpha.controller.LoginController
 import brain.alpha.controller.concentrationController.stroopController
 import brain.alpha.controller.logicController.logicHomeController
 import brain.alpha.controller.logicController.sudokuController
+import brain.alpha.controller.logicController.wordSearchController
 import brain.alpha.controller.memoryController.couplesController
 import brain.alpha.controller.mentalAgilityController.mentalMathController
 import brain.alpha.view.HomeScreen
@@ -14,6 +15,7 @@ import brain.alpha.view.SignUpScreen
 import brain.alpha.view.concentrationViews.StroopScreen
 import brain.alpha.view.logicView.logicHomeScreen
 import brain.alpha.view.logicView.sudokuScreen
+import brain.alpha.view.logicView.wordSearchScreen
 import brain.alpha.view.memoryView.CouplesScreen
 
 import view.mentalMathView
@@ -52,6 +54,7 @@ fun App() {
         //LOGIC GAMES
         sudokuController.navigateTo = { route -> currentScreen = route }
         logicHomeController.navigateTo = { route -> currentScreen = route }
+        wordSearchController.navigateTo = { route -> currentScreen = route }
 
 
         // Controls which screen to display based on currentScreen
@@ -111,10 +114,15 @@ fun App() {
             "logic" -> logicHomeScreen(
                 controller = logicHomeController,
                 onNavigateToHome = {currentScreen = "home"},
-                onNavigateToSudoku = {currentScreen = "sudoku"}
+                onNavigateToSudoku = {currentScreen = "sudoku"},
+                onNavigateToWordS = {currentScreen = "wordS"}
             )
             "sudoku" -> sudokuScreen(
                 controller = sudokuController,
+                onNavigateToHome = {currentScreen = "logic"}
+            )
+            "wordS" -> wordSearchScreen(
+                controller = wordSearchController,
                 onNavigateToHome = {currentScreen = "logic"}
             )
         }
