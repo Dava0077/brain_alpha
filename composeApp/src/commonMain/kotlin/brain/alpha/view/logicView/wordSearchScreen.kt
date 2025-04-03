@@ -102,12 +102,12 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                 modifier = Modifier.align(Alignment.End),
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
             ) {
-                Text("BACK", color = Color.Black)
+                Text("ATRAS", color = Color.Black)
             }
 
             Spacer(modifier = Modifier.height(30.dp))
             Text(
-                text = "WORD SEARCH",
+                text = "SOPA DE LETRAS",
                 fontSize = 40.sp,
                 color = Color.Black,
                 fontFamily = FontFamily.SansSerif,
@@ -119,8 +119,10 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                     controller.resetSelection()
                     selectedCells.clear()
                     gameStarted = true
-                }) {
-                    Text("PLAY")
+                },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
+                ) {
+                    Text("JUGAR", color = Color.Black)
                 }
             }
 
@@ -176,7 +178,7 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                Text("Palabras a buscar:", fontSize = 20.sp, color = Color.Black)
+                Text("Palabras a encontrar:", fontSize = 20.sp, color = Color.Black)
                 controller.getWordsToFind().forEach { word ->
                     val isFound = word in foundWords
                     Text(
@@ -196,7 +198,7 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                     },
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
                     ) {
-                        Text("RESET", color = Color.Black)
+                        Text("RESETEAR", color = Color.Black)
                     }
 
                     Button(

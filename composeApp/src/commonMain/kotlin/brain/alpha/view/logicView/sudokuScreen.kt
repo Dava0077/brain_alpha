@@ -84,7 +84,7 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
                 modifier = Modifier.align(Alignment.End),
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
             ) {
-                Text("BACK", color = Color.Black)
+                Text("ATRAS", color = Color.Black)
             }
 
             Spacer(modifier = Modifier.height(30.dp))
@@ -107,7 +107,7 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
                     },
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
                 ) {
-                    Text("PLAY", color = Color.Black)
+                    Text("JUGAR", color = Color.Black)
                 }
             } else {
                 // Sudoku Grid
@@ -158,7 +158,7 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
                     },
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
                 ) {
-                    Text("RESTART", color = Color.Black)
+                    Text("REINICIAR", color = Color.Black)
                 }
                 if (selectedRow in 0..8 && selectedCol in 0..8) {
                     Spacer(modifier = Modifier.height(16.dp))

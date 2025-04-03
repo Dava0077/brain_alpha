@@ -115,7 +115,7 @@ fun mentalMathView(controller: mentalMathController, onNavigateToHome: () -> Uni
                 modifier = Modifier.align(Alignment.End),
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
             ){
-                Text("BACK", color = Color.White)
+                Text("ATRAS", color = Color.White)
             }
             val overlayAlpha by animateFloatAsState(
                 targetValue = if (showOverlay) 0.5f else 0f,

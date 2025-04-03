@@ -96,7 +96,7 @@ fun logicHomeScreen(
             Spacer(modifier = Modifier.height(30.dp))
 
             Text(
-                text = "LOGIC GAMES",
+                text = "LOGICA",
                 fontSize = 40.sp,
                 color = Color.Black,
                 fontFamily = FontFamily.SansSerif,
@@ -118,7 +118,7 @@ fun logicHomeScreen(
                         onNavigateToSudoku
                     )
                     CategoryItem(
-                        "WORD SEARCH",
+                        "SOPA DE LETRAS",
                         Res.drawable.logica,
                         Color.White,
                         onNavigateToWordS
