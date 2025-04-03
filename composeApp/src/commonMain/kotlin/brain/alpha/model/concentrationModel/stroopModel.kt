@@ -38,6 +38,9 @@ object stroopModel {
     var options by mutableStateOf(colorMap.values.shuffled())
         private set
 
+    var lastAnswerCorrect by mutableStateOf<Boolean?>(null)
+
+
     fun resetGame() {
         score = 0
         timeLeft = 30
@@ -47,9 +50,8 @@ object stroopModel {
     }
 
     fun submitAnswer(selectedColor: Color) {
-        if (selectedColor == currentWord.color) {
-            score++
-        }
+        lastAnswerCorrect = selectedColor == currentWord.color
+        if (lastAnswerCorrect == true) score++
         currentWord = generateRandomWord()
         options = colorMap.values.shuffled()
     }
