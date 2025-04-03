@@ -10,6 +10,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -133,39 +134,48 @@ fun CategoryItem(
             .width(250.dp)
             .height(270.dp)
             .clickable { onClick() }
-            .background(borderColor, shape = RoundedCornerShape(8.dp))
-            .padding(4.dp)
-            .background(Color(0xFF0647D7), shape = RoundedCornerShape(8.dp)),
+            .background(borderColor, shape = RoundedCornerShape(12.dp))
+            .padding(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Image block
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
+                .fillMaxSize()
+                .clip(RoundedCornerShape(8.dp))
+                .background(borderColor)
         ) {
-            Image(
-                painter = painterResource(image),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize().padding(10.dp),
-                contentScale = ContentScale.Crop
-            )
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                // Image block
+                Image(
+                    painter = painterResource(image),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .padding(10.dp),
+                    contentScale = ContentScale.Crop
+                )
+
+                // Category title fully inside blue box
+                Text(
+                    text = title,
+                    fontSize = 14.sp,
+                    color = Color.White,
+                    fontFamily = FontFamily.SansSerif,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(borderColor)
+                        .padding(vertical = 8.dp)
+                )
+            }
         }
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        // Category title
-        Text(
-            text = title,
-            fontSize = 14.sp,
-            color = Color.White,
-            fontFamily = FontFamily.SansSerif,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-                .background(Color(0xFF0647D7))
-
-        )
     }
 }
+
+
+
