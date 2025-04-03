@@ -38,8 +38,7 @@ object stroopController {
         if (model.isGameOver || isAnswering) return
 
         isAnswering = true
-        model.submitAnswer(color)
-        _answerFeedback.value = color == model.currentWord.color
+        _answerFeedback.value = model.submitAnswer(color)
 
         CoroutineScope(Dispatchers.Main).launch {
             delay(600)

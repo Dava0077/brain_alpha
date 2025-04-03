@@ -227,7 +227,11 @@ fun StroopScreen(controller: stroopController = stroopController,onNavigateToHom
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    answerFeedback?.let { isCorrect ->
+                    AnimatedVisibility(
+                        visible = answerFeedback != null,
+                        enter = fadeIn() + slideInVertically(),
+                        exit = fadeOut() + slideOutVertically()
+                    ) {
                         LaunchedEffect(answerFeedback) {
                             delay(600)
                             controller.clearFeedback()
@@ -240,8 +244,8 @@ fun StroopScreen(controller: stroopController = stroopController,onNavigateToHom
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = if (isCorrect) "¡Correcto!" else "Incorrecto",
-                                color = if (isCorrect) Color.Green else Color.Red,
+                                text = if (answerFeedback == true) "¡Correcto!" else "Incorrecto",
+                                color = if (answerFeedback == true) Color.Green else Color.Red,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 20.sp
                             )
