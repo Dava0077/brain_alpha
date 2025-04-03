@@ -135,16 +135,16 @@ fun CouplesScreen(
 
             Button(
                 onClick = {controller.goHome()},
-
+                modifier = Modifier.align(Alignment.End),
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
                 ){
-                Text("BACK", color = Color.White)
+                Text("ATRAS", color = Color.White)
             }
 
             Spacer(modifier = Modifier.height(30.dp)) // Espacio tras el logo
 
             Text(
-                text = "COUPLES GAMES",
+                text = "JUEGO DE PAREJAS",
                 fontSize = 40.sp,
                 color = Color.Black,
                 fontFamily = FontFamily.SansSerif,
@@ -154,7 +154,7 @@ fun CouplesScreen(
 
 
             Text(
-                text = "Time: $remainingTime",
+                text = "Tiempo: $remainingTime",
                 fontSize = 20.sp,
                 color = Color.Black,
                 fontFamily = FontFamily.SansSerif,
@@ -211,7 +211,7 @@ fun CouplesScreen(
                     timerTrigger++ // fuerza reinicio del temporizador
                 },
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),) {
-                    Text("PLAY", color = Color.White)
+                    Text("JUGAR", color = Color.White)
                 }
             }
 
