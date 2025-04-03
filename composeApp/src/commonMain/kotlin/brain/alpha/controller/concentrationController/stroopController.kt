@@ -23,14 +23,27 @@ object stroopController {
     val timeLeft: State<Int> get() = derivedStateOf { model.timeLeft }
     val showResult: State<Boolean> get() = derivedStateOf { model.isGameOver }
     val isGameRunning: State<Boolean> get() = derivedStateOf { !model.isGameOver }
+    private val _answerFeedback = mutableStateOf<Boolean?>(null)
+    val answerFeedback: State<Boolean?> get() = _answerFeedback
+
+    var isAnswering by mutableStateOf(false)
+        private set
+
 
     val options: List<Color> get() = model.options
 
     val showInstructions = mutableStateOf(true)
 
     fun checkAnswer(color: Color) {
-        if (!model.isGameOver) {
-            model.submitAnswer(color)
+        if (model.isGameOver || isAnswering) return
+
+        isAnswering = true
+        _answerFeedback.value = model.submitAnswer(color)
+
+        CoroutineScope(Dispatchers.Main).launch {
+            delay(600)
+            clearFeedback()
+            isAnswering = false
         }
     }
 
@@ -55,12 +68,18 @@ object stroopController {
     }
     fun goHome(){
         navigateTo("home")
+        showInstructions.value = true
     }
+
     fun stopGame() {
         timerJob?.cancel()
     }
 
     fun getColorName(color: Color): String {
         return model.getColorName(color)
+    }
+
+    fun clearFeedback() {
+        _answerFeedback.value = null
     }
 }

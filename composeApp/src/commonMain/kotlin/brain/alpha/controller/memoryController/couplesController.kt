@@ -44,7 +44,8 @@ object couplesController {
         return true
     }
     fun goHome(){
-        navigateTo("home")
+        navigateTo("memory")
+        model.started = false;
     }
 
     fun processTurnEnd() {

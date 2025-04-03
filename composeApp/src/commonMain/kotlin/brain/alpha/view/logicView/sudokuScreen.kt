@@ -148,18 +148,7 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
 
-                Button(
-                    onClick = {
-                        controller.startGame()
-                        selectedRow = -1
-                        selectedCol = -1
-                    },
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
-                ) {
-                    Text("REINICIAR", color = Color.Black)
-                }
                 if (selectedRow in 0..8 && selectedCol in 0..8) {
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -172,9 +161,9 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
                                     selectedCol = -1
                                 },
                                 modifier = Modifier.size(40.dp),
-                                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
+                                colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
                             ) {
-                                Text("$num", color = Color.White)
+                                Text("$num", color = Color.Black)
                             }
                         }
 
@@ -185,11 +174,23 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
                                 selectedCol = -1
                             },
                             modifier = Modifier.size(40.dp),
-                            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
+                            colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
                         ) {
-                            Text("🗑", color = Color.White)
+                            Text("🗑", color = Color.Black)
                         }
                     }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = {
+                        controller.startGame()
+                        selectedRow = -1
+                        selectedCol = -1
+                    },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
+                ) {
+                    Text("REINICIAR", color = Color.Black)
                 }
                 if (controller.isBoardComplete()) {
                     Spacer(modifier = Modifier.height(16.dp))

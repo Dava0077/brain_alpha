@@ -60,7 +60,7 @@ fun HomeScreen(
 
             // Background image
             Image(
-                painter = painterResource(Res.drawable.fondoMain),
+                painter = painterResource(Res.drawable.Login2),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop

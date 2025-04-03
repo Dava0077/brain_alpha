@@ -9,6 +9,8 @@ import brain.alpha.controller.logicController.logicHomeController
 import brain.alpha.controller.logicController.sudokuController
 import brain.alpha.controller.logicController.wordSearchController
 import brain.alpha.controller.memoryController.couplesController
+import brain.alpha.controller.memoryController.memoryHomeController
+import brain.alpha.controller.memoryController.simonController
 import brain.alpha.controller.mentalAgilityController.mentalMathController
 import brain.alpha.view.HomeScreen
 import brain.alpha.view.SignUpScreen
@@ -16,7 +18,9 @@ import brain.alpha.view.concentrationViews.StroopScreen
 import brain.alpha.view.logicView.logicHomeScreen
 import brain.alpha.view.logicView.sudokuScreen
 import brain.alpha.view.logicView.wordSearchScreen
-import brain.alpha.view.memoryView.CouplesScreen
+import brain.alpha.view.memoryView.couplesScreen
+import brain.alpha.view.memoryView.memoryHomeScreen
+import brain.alpha.view.memoryView.simonScreen
 
 import view.mentalMathView
 
@@ -43,7 +47,9 @@ fun App() {
         LoginController.navigateTo = { route -> currentScreen = route }
 
         //MEMORY GAMES
+        memoryHomeController.navigateTo = { route -> currentScreen = route }
         couplesController.navigateTo = { route -> currentScreen = route }
+        simonController.navigateTo = { route -> currentScreen = route }
 
         //MENTAL AGILTY
         mentalMathController.navigateTo = { route -> currentScreen = route }
@@ -91,11 +97,20 @@ fun App() {
                 onNavigateToAgility = { currentScreen = "agility" }
             )
 
-            "memory" -> CouplesScreen(
+            "memory" -> memoryHomeScreen(
+                controller = memoryHomeController,
+                onNavigateToHome = {currentScreen = "home"},
+                onNavigateToCouples = {currentScreen = "couples"},
+                onNavigateToSimon = {currentScreen = "simon"}
+            )
+
+            "couples" -> couplesScreen(
                 controller = couplesController,
-                onNavigateToHome = {currentScreen = "home"}
-
-
+                onNavigateToHome = {currentScreen="memory"}
+            )
+            "simon" -> simonScreen(
+                controller = simonController,
+                onNavigateToHome = {currentScreen="memory"}
             )
 
 
