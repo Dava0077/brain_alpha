@@ -35,7 +35,7 @@ import brainalpha.composeapp.generated.resources.*
 
 
 @Composable
-fun CouplesScreen(
+fun couplesScreen(
     controller: couplesController,
     onNavigateToHome: () -> Unit) {
 
@@ -78,7 +78,7 @@ fun CouplesScreen(
     }
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
-            painter = painterResource(Res.drawable.memoryFondo),
+            painter = painterResource(Res.drawable.fondoMemory),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
@@ -173,7 +173,7 @@ fun CouplesScreen(
                             modifier = Modifier
                                 .padding(4.dp)
                                 .size(64.dp)
-                                .background(if (isVisible) Color(0xFF5D3FD3) else Color.Cyan, shape = RoundedCornerShape(8.dp))
+                                .background(if (isVisible) Color.White else Color(0xFF80C6E8), shape = RoundedCornerShape(8.dp))
                                 .clickable(enabled = gameStarted && !isVisible && selectedIndices.size < 2) {
                                     if (controller.selectCard(index)) {
                                         revealed.clear(); revealed.addAll(controller.getRevealedStates())
@@ -188,7 +188,7 @@ fun CouplesScreen(
                                     text = shuffledCards[index],
                                     fontSize = 24.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.White
+                                    color = Color.Black
                                 )
                             }
                         }
@@ -217,10 +217,10 @@ fun CouplesScreen(
 
             if (gameFinished) {
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("¡Has ganado!", fontSize = 20.sp)
+                Text("✅ Parejas correctas", fontSize = 20.sp)
             } else if (gameLost) {
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("¡Has perdido!", fontSize = 20.sp, color = Color.Red)
+                Text("❌ Parejas incorrectas", fontSize = 20.sp, color = Color.Red)
             }
         }
 

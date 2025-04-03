@@ -18,7 +18,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brain.alpha.controller.logicController.logicHomeController
-import brain.alpha.controller.logicController.sudokuController
 import brain.alpha.view.CategoryItem
 import brainalpha.composeapp.generated.resources.*
 import brainalpha.composeapp.generated.resources.Res
@@ -53,9 +52,9 @@ fun logicHomeScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(70.dp)
-                    .background(Color.White, shape = RoundedCornerShape(4.dp))
-                    .border(BorderStroke(2.dp, Color.Black))
-            ) {
+                    .background(Color(0xFF222937), shape = RoundedCornerShape(4.dp))
+                    .border(BorderStroke(2.dp, Color(0xFF4CE3E8))))
+             {
                 IconButton(
                     onClick = { /* Dummy action */ },
                     modifier = Modifier
@@ -90,7 +89,7 @@ fun logicHomeScreen(
                 modifier = Modifier.align(Alignment.End),
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
             ) {
-                Text("BACK", color = Color.Black)
+                Text("ATRAS", color = Color.Black)
             }
 
             Spacer(modifier = Modifier.height(30.dp))
@@ -119,7 +118,7 @@ fun logicHomeScreen(
                     )
                     CategoryItem(
                         "SOPA DE LETRAS",
-                        Res.drawable.logica,
+                        Res.drawable.sopaLetras,
                         Color.White,
                         onNavigateToWordS
                     )
@@ -137,8 +136,8 @@ fun CategoryItem(
 ) {
     Column(
         modifier = Modifier
-            .width(200.dp)
-            .height(220.dp)
+            .width(250.dp)
+            .height(270.dp)
             .clickable { onClick() }
             .background(borderColor, shape = RoundedCornerShape(8.dp))
             .padding(4.dp)

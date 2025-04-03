@@ -56,7 +56,7 @@ fun mentalMathView(controller: mentalMathController, onNavigateToHome: () -> Uni
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
-            painter = painterResource(Res.drawable.fondoMates),
+            painter = painterResource(Res.drawable.fondoMental),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
@@ -113,9 +113,9 @@ fun mentalMathView(controller: mentalMathController, onNavigateToHome: () -> Uni
             Button(
                 onClick = {controller.goHome()},
                 modifier = Modifier.align(Alignment.End),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow)
             ){
-                Text("ATRAS", color = Color.White)
+                Text("ATRAS", color = Color.Black)
             }
             val overlayAlpha by animateFloatAsState(
                 targetValue = if (showOverlay) 0.5f else 0f,
@@ -184,8 +184,10 @@ fun mentalMathView(controller: mentalMathController, onNavigateToHome: () -> Uni
                                 currentQuestion = question
                                 startTime = currentTimeMillis()
                             }
-                        }) {
-                            Text("Iniciar Juego")
+                        },
+                            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow)
+                        ) {
+                            Text("Iniciar Juego", color = Color.Black)
                         }
                     } else if (controller.isGameOver()) {
                         Text(
@@ -226,13 +228,21 @@ fun mentalMathView(controller: mentalMathController, onNavigateToHome: () -> Uni
                                             false
                                         }
                                     },
+                                colors = TextFieldDefaults.outlinedTextFieldColors(
+                                    backgroundColor = Color.White,
+                                    focusedBorderColor = Color.Gray,
+                                    unfocusedBorderColor = Color.LightGray
+                                ),
                                 singleLine = true
                             )
                             Spacer(modifier = Modifier.height(16.dp))
 
 
-                            Button(onClick = { submitAnswer() }) {
-                                Text("Enviar Respuesta")
+                            Button(onClick = { submitAnswer() },
+                                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow)
+
+                            ) {
+                                Text("Enviar Respuesta", color = Color.Black)
                             }
 
 
@@ -253,7 +263,7 @@ fun mentalMathView(controller: mentalMathController, onNavigateToHome: () -> Uni
                 if (showOverlay) {
                     Box(
                         modifier = Modifier
-                            .fillMaxSize()
+                            .height(50.dp)
                             .background(overlayColor.copy(alpha = overlayAlpha))
                     )
                 }

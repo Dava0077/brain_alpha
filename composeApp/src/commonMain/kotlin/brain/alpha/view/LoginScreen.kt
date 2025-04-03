@@ -145,7 +145,7 @@ fun LoginScreen(
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text(if (controller.isLoading) "Cargando..." else "CONTINUAR", color = Color.Black)
+                        Text(if (controller.isLoading) "Cargando..." else "CONTINUAR", color = Color.White)
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
