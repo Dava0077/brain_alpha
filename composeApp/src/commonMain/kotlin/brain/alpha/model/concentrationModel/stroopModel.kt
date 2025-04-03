@@ -49,12 +49,13 @@ object stroopModel {
         options = colorMap.values.shuffled()
     }
 
-    fun submitAnswer(selectedColor: Color): Boolean {
-        val wasCorrect = selectedColor == currentWord.color
-        if (wasCorrect) score++
+    fun submitAnswer(selectedColor: Color) {
+        if (isGameOver) return
+        if (selectedColor == currentWord.color) {
+            score++
+        }
         currentWord = generateRandomWord()
         options = colorMap.values.shuffled()
-        return wasCorrect
     }
 
     fun decreaseTimer() {

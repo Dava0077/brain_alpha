@@ -58,7 +58,7 @@ fun StroopScreen(controller: stroopController = stroopController,onNavigateToHom
         modifier = Modifier.fillMaxSize()
     ) {
         Image(
-            painter = painterResource(Res.drawable.memoryFondo),
+            painter = painterResource(Res.drawable.stroopTestBG),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
@@ -72,8 +72,8 @@ fun StroopScreen(controller: stroopController = stroopController,onNavigateToHom
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(70.dp)
-                    .background(Color(0xFF222937), shape = RoundedCornerShape(4.dp))
-                    .border(BorderStroke(2.dp, Color(0xFF4CE3E8))))
+                    .background(Color(0xFFEFEFEF), shape = RoundedCornerShape(4.dp))
+                    .border(BorderStroke(2.dp, Color(0xFFB0BEC5))))
             {
 
                 IconButton(
@@ -81,31 +81,31 @@ fun StroopScreen(controller: stroopController = stroopController,onNavigateToHom
                     modifier = Modifier
                         .align(Alignment.CenterStart)
                         .padding(start = 8.dp)
-                        .size(55.dp)
+                        .size(48.dp)
                 ) {
                     Image(
                         painter = painterResource(Res.drawable.user),
-                        contentDescription = "User"
+                        contentDescription = "Usuario"
                     )
                 }
                 Image(
-                    painter = org.jetbrains.compose.resources.painterResource(Res.drawable.logo),
+                    painter = painterResource(Res.drawable.logo),
                     contentDescription = null,
                     modifier = Modifier
-                        .size(120.dp)
+                        .size(100.dp)
                         .align(Alignment.Center)
-                        .scale(1.5f)
+                        .scale(1.2f)
                 )
                 IconButton(
                     onClick = { /* Dummy action */ },
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .padding(end = 8.dp)
-                        .size(55.dp)
+                        .size(48.dp)
                 ) {
                     Image(
                         painter = painterResource(Res.drawable.ajustes),
-                        contentDescription = "Settings"
+                        contentDescription = "Ajustes"
                     )
                 }
 
@@ -165,12 +165,17 @@ fun StroopScreen(controller: stroopController = stroopController,onNavigateToHom
                 Button(
                     onClick = { controller.goHome() },
                     modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(vertical = 8.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
-                    shape = RoundedCornerShape(8.dp)
+                        .padding(8.dp)
+                        .height(46.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.White,
+                        contentColor = Color(0xFF455A64)
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.elevation(4.dp),
+                    border = BorderStroke(1.dp, Color(0xFFB0BEC5))
                 ) {
-                    Text("⬅ Volver", color = Color.White)
+                    Text("⬅ Volver", fontSize = 16.sp, fontWeight = FontWeight.Medium)
                 }
 
                 Text("Prueba de Stroop", fontSize = 24.sp, fontWeight = FontWeight.Bold)
@@ -227,11 +232,7 @@ fun StroopScreen(controller: stroopController = stroopController,onNavigateToHom
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    AnimatedVisibility(
-                        visible = answerFeedback != null,
-                        enter = fadeIn() + slideInVertically(),
-                        exit = fadeOut() + slideOutVertically()
-                    ) {
+                    if (answerFeedback != null) {
                         LaunchedEffect(answerFeedback) {
                             delay(600)
                             controller.clearFeedback()
@@ -247,7 +248,10 @@ fun StroopScreen(controller: stroopController = stroopController,onNavigateToHom
                                 text = if (answerFeedback == true) "¡Correcto!" else "Incorrecto",
                                 color = if (answerFeedback == true) Color.Green else Color.Red,
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 20.sp
+                                fontSize = 20.sp,
+                                style = LocalTextStyle.current.copy(
+                                    shadow = Shadow(Color.Black, offset = Offset(1f, 1f), blurRadius = 2f)
+                                )
                             )
                         }
                     }
@@ -285,7 +289,7 @@ fun StroopScreen(controller: stroopController = stroopController,onNavigateToHom
                     }
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(25.dp))
 
                 Text("Puntuación: $score", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
             }
@@ -297,6 +301,12 @@ fun StroopScreen(controller: stroopController = stroopController,onNavigateToHom
 
 @Composable
 fun InstructionsScreen(onStart: () -> Unit, controller: stroopController) {
+    Image(
+        painter = painterResource(Res.drawable.stroopTestBG),
+        contentDescription = null,
+        modifier = Modifier.fillMaxSize(),
+        contentScale = ContentScale.Crop
+    )
     Column(
         modifier = Modifier
             .fillMaxSize()
