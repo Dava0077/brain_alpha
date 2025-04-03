@@ -1,7 +1,6 @@
 package brain.alpha.controller.logicController
 
 import brain.alpha.model.logicModel.wordSearchModel
-import brain.alpha.view.logicView.wordSearchScreen
 
 object wordSearchController {
     private val model = wordSearchModel
@@ -9,13 +8,13 @@ object wordSearchController {
     private val selectedCells = mutableListOf<Pair<Int, Int>>()
     var selectionDirection: Pair<Int, Int>? = null
 
-
-
     fun selectCell(row: Int, col: Int) {
         selectedCells.add(Pair(row, col))
     }
+
     fun resetSelection() {
         selectedCells.clear()
+        selectionDirection = null
     }
 
     fun canSelect(row: Int, col: Int): Boolean {
@@ -44,10 +43,10 @@ object wordSearchController {
     fun getWordsToFind() = model.getWordsToFind()
 
     fun goHomeLogic() {
-        navigateTo("logic")
+        navigateTo("logic") // Solo navegamos, sin reiniciar el modelo
     }
 
     fun startGame() {
-        model.generateGame()
+        model.generateGame() // Genera un nuevo juego con nuevas palabras
     }
 }

@@ -11,46 +11,53 @@ object wordSearchModel {
         "DATA", "STRING", "ARRAY", "LOOP", "CLASS", "METHOD", "OBJECT", "FUN", "TEST", "DEBUG"
     )
 
-
     init {
         generateGame()
     }
 
-
     fun generateGame() {
+        // Limpiar la cuadrícula antes de generar un nuevo juego
+        for (i in 0 until GRID_SIZE) {
+            for (j in 0 until GRID_SIZE) {
+                grid[i][j] = '-'
+            }
+        }
+
         // Seleccionar 5 palabras aleatorias de la lista
         wordsToFind.clear()
         val shuffledWords = allWords.shuffled()
         wordsToFind.addAll(shuffledWords.take(5))
 
-
-        // Colocar las palabras en la cuadrícula
+        // Colocar las palabras en la cuadrícula con límite de intentos
         placeWordsInGrid()
-
 
         // Rellenar los espacios vacíos con letras aleatorias
         fillEmptySpaces()
     }
 
-
     fun placeWordsInGrid() {
         for (word in wordsToFind) {
             var placed = false
-            while (!placed) {
+            var attempts = 0
+            val maxAttempts = 50 // Límite para evitar bucles infinitos
+
+            while (!placed && attempts < maxAttempts) {
                 val direction = Random.nextInt(3) // 0: horizontal, 1: vertical, 2: diagonal
                 val row = Random.nextInt(GRID_SIZE)
                 val col = Random.nextInt(GRID_SIZE)
-
 
                 when (direction) {
                     0 -> placed = tryPlaceHorizontal(word, row, col)
                     1 -> placed = tryPlaceVertical(word, row, col)
                     2 -> placed = tryPlaceDiagonal(word, row, col)
                 }
+                attempts++
+            }
+            if (!placed) {
+                println("No se pudo colocar la palabra: $word")
             }
         }
     }
-
 
     fun tryPlaceHorizontal(word: String, row: Int, col: Int): Boolean {
         if (col + word.length > GRID_SIZE) return false
@@ -63,7 +70,6 @@ object wordSearchModel {
         return true
     }
 
-
     fun tryPlaceVertical(word: String, row: Int, col: Int): Boolean {
         if (row + word.length > GRID_SIZE) return false
         for (i in word.indices) {
@@ -74,7 +80,6 @@ object wordSearchModel {
         }
         return true
     }
-
 
     fun tryPlaceDiagonal(word: String, row: Int, col: Int): Boolean {
         if (row + word.length > GRID_SIZE || col + word.length > GRID_SIZE) return false
@@ -87,7 +92,6 @@ object wordSearchModel {
         return true
     }
 
-
     fun fillEmptySpaces() {
         for (i in 0 until GRID_SIZE) {
             for (j in 0 until GRID_SIZE) {
@@ -98,12 +102,8 @@ object wordSearchModel {
         }
     }
 
-
     fun getGrid(): Array<CharArray> = grid
     fun getWordsToFind(): List<String> = wordsToFind
-
-
-
 
     class WordSearchView {
         fun displayGrid(grid: Array<CharArray>) {
@@ -122,12 +122,10 @@ object wordSearchModel {
             }
         }
 
-
         fun displayWordsToFind(words: List<String>) {
             println("\nPalabras a encontrar:")
             words.forEach { println("- $it") }
         }
-
 
         fun showMessage(message: String) {
             println(message)
