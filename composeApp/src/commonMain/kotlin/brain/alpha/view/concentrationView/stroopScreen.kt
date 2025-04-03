@@ -16,9 +16,14 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brain.alpha.controller.concentrationController.stroopController
@@ -33,13 +38,15 @@ import org.jetbrains.compose.resources.painterResource
 /**
  * StroopScreen.kt
  *
- * Main UI for the Stroop Test. Displays game or instructions.
+ * Main composable for the Stroop Test game.
+ * Manages instruction screen, game UI, color buttons, timer, score, and feedback.
  */
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun StroopScreen(controller: stroopController = stroopController,onNavigateToHome: () -> Unit,) {
 
+    // State bindings from controller
     val timeLeft by controller.timeLeft
     val colorWord by controller.currentColorWord
     val displayColor by controller.colorToShow
@@ -49,6 +56,8 @@ fun StroopScreen(controller: stroopController = stroopController,onNavigateToHom
     val options = controller.options
     val showInstructions by controller.showInstructions
 
+
+    // Show instructions first
     if (showInstructions) {
         InstructionsScreen(onStart = { controller.beginGame() }, controller = stroopController)
         return
@@ -57,8 +66,9 @@ fun StroopScreen(controller: stroopController = stroopController,onNavigateToHom
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
+        // Background image
         Image(
-            painter = painterResource(Res.drawable.memoryFondo),
+            painter = painterResource(Res.drawable.stroopTestBG),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
@@ -68,44 +78,45 @@ fun StroopScreen(controller: stroopController = stroopController,onNavigateToHom
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
+            // Top header bar
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(70.dp)
-                    .background(Color(0xFF222937), shape = RoundedCornerShape(4.dp))
-                    .border(BorderStroke(2.dp, Color(0xFF4CE3E8))))
+                    .background(Color(0xFFEFEFEF), shape = RoundedCornerShape(4.dp))
+                    .border(BorderStroke(2.dp, Color(0xFFB0BEC5))))
             {
 
                 IconButton(
-                    onClick = { /* Dummy action */ },
+                    onClick = { /* future user action */ },
                     modifier = Modifier
                         .align(Alignment.CenterStart)
                         .padding(start = 8.dp)
-                        .size(55.dp)
+                        .size(48.dp)
                 ) {
                     Image(
                         painter = painterResource(Res.drawable.user),
-                        contentDescription = "User"
+                        contentDescription = "Usuario"
                     )
                 }
                 Image(
-                    painter = org.jetbrains.compose.resources.painterResource(Res.drawable.logo),
+                    painter = painterResource(Res.drawable.logo),
                     contentDescription = null,
                     modifier = Modifier
-                        .size(120.dp)
+                        .size(100.dp)
                         .align(Alignment.Center)
-                        .scale(1.5f)
+                        .scale(1.2f)
                 )
                 IconButton(
-                    onClick = { /* Dummy action */ },
+                    onClick = { /* future settings action */ },
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .padding(end = 8.dp)
-                        .size(55.dp)
+                        .size(48.dp)
                 ) {
                     Image(
                         painter = painterResource(Res.drawable.ajustes),
-                        contentDescription = "Settings"
+                        contentDescription = "Ajustes"
                     )
                 }
 
@@ -115,6 +126,7 @@ fun StroopScreen(controller: stroopController = stroopController,onNavigateToHom
             Spacer(modifier = Modifier.height(30.dp))
 
 
+            // End-game dialog
             if (isGameOver) {
                 AlertDialog(
                     onDismissRequest = {},
@@ -162,22 +174,28 @@ fun StroopScreen(controller: stroopController = stroopController,onNavigateToHom
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Back button
                 Button(
                     onClick = { controller.goHome() },
                     modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(vertical = 8.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
-                    shape = RoundedCornerShape(8.dp)
+                        .padding(8.dp)
+                        .height(46.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.White,
+                        contentColor = Color(0xFF455A64)
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.elevation(4.dp),
+                    border = BorderStroke(1.dp, Color(0xFFB0BEC5))
                 ) {
-                    Text("⬅ Volver", color = Color.White)
+                    Text("⬅ Volver", fontSize = 16.sp, fontWeight = FontWeight.Medium)
                 }
 
-                Text("Prueba de Stroop", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                // Game title and timer
+                Text("Prueba de Stroop", fontSize = 24.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Cursive)
+                Text("Tiempo restante: $timeLeft s", fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
-                Text("Tiempo restante: $timeLeft s", fontSize = 16.sp)
-
-                // Calcula progreso (0.0 - 1.0)
+                // Progress bar
                 val totalTime = 30f
                 val progress = timeLeft / totalTime
 
@@ -193,6 +211,7 @@ fun StroopScreen(controller: stroopController = stroopController,onNavigateToHom
 
                 Spacer(modifier = Modifier.height(32.dp))
 
+                // Central word shown in color
                 AnimatedContent(
                     targetState = Pair(colorWord, displayColor),
                     transitionSpec = {
@@ -227,11 +246,8 @@ fun StroopScreen(controller: stroopController = stroopController,onNavigateToHom
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    AnimatedVisibility(
-                        visible = answerFeedback != null,
-                        enter = fadeIn() + slideInVertically(),
-                        exit = fadeOut() + slideOutVertically()
-                    ) {
+                    // Feedback for last answer
+                    if (answerFeedback != null) {
                         LaunchedEffect(answerFeedback) {
                             delay(600)
                             controller.clearFeedback()
@@ -247,10 +263,14 @@ fun StroopScreen(controller: stroopController = stroopController,onNavigateToHom
                                 text = if (answerFeedback == true) "¡Correcto!" else "Incorrecto",
                                 color = if (answerFeedback == true) Color.Green else Color.Red,
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 20.sp
+                                fontSize = 20.sp,
+                                style = LocalTextStyle.current.copy(
+                                    shadow = Shadow(Color.Black, offset = Offset(1f, 1f), blurRadius = 2f)
+                                )
                             )
                         }
                     }
+                    // Color answer options
                     options.forEach { colorOption ->
                         val colorName = controller.getColorName(colorOption)
 
@@ -285,8 +305,9 @@ fun StroopScreen(controller: stroopController = stroopController,onNavigateToHom
                     }
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(25.dp))
 
+                // Score counter
                 Text("Puntuación: $score", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
             }
 
@@ -297,34 +318,140 @@ fun StroopScreen(controller: stroopController = stroopController,onNavigateToHom
 
 @Composable
 fun InstructionsScreen(onStart: () -> Unit, controller: stroopController) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
-    ) {
-        Button(
-            onClick = {controller.goHome()},
-            modifier = Modifier.align(Alignment.End),
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
-        ){
-            Text("INICIO", color = Color.White)
-        }
+    Box(modifier = Modifier.fillMaxSize()) {
 
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Text("Instrucciones", fontSize = 28.sp, fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = "Debes seleccionar el color en que está escrita la palabra, no el nombre que dice. Tienes 30 segundos para acertar el mayor número posible.",
-            fontSize = 16.sp,
-            textAlign = TextAlign.Center
+        // Background image
+        Image(
+            painter = painterResource(Res.drawable.stroopTestBG),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
-        Button(onClick = onStart) {
-            Text("Empezar juego")
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ) {
+            // Same HEADER as game screen (user icon, logo, settings)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(70.dp)
+                    .background(Color(0xFFEFEFEF), shape = RoundedCornerShape(4.dp))
+                    .border(BorderStroke(2.dp, Color(0xFFB0BEC5)))
+            ) {
+                IconButton(
+                    onClick = { /* Dummy user action */ },
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = 8.dp)
+                        .size(48.dp)
+                ) {
+                    Image(
+                        painter = painterResource(Res.drawable.user),
+                        contentDescription = "Usuario"
+                    )
+                }
+
+                Image(
+                    painter = painterResource(Res.drawable.logo),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(100.dp)
+                        .align(Alignment.Center)
+                        .scale(1.2f)
+                )
+
+                IconButton(
+                    onClick = { /* Dummy settings action */ },
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(end = 8.dp)
+                        .size(48.dp)
+                ) {
+                    Image(
+                        painter = painterResource(Res.drawable.ajustes),
+                        contentDescription = "Ajustes"
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(50.dp))
+
+            // Back Button (same design as in game)
+            Button(
+                onClick = { controller.goHome() },
+                modifier = Modifier
+                    .padding(bottom = 24.dp)
+                    .height(46.dp),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color.White,
+                    contentColor = Color(0xFF455A64)
+                ),
+                shape = RoundedCornerShape(12.dp),
+                elevation = ButtonDefaults.elevation(4.dp),
+                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+            ) {
+                Text("⬅ Volver", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+            }
+
+            Spacer(modifier = Modifier.height(100.dp))
+
+            // Title of instruction section
+            Text(
+                "Instrucciones",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF212121)
+            )
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+            // Game explanation using styled text
+            Text(
+                buildAnnotatedString {
+                    append("Debes seleccionar el ")
+                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append("color") }
+                    append(" en el que está escrita la palabra, no el nombre que aparece.\n\n")
+
+                    append("Tienes ")
+                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append("30 segundos") }
+                    append(" para acertar la mayor cantidad posible.\n")
+
+                    append("Concéntrate, ¡y buena suerte!")
+                },
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center,
+                color = Color(0xFF424242),
+                lineHeight = 24.sp,
+                modifier = Modifier.padding(horizontal = 32.dp)
+            )
+
+            Spacer(modifier = Modifier.height(40.dp))
+
+            // Start game button
+            Button(
+                onClick = onStart,
+                modifier = Modifier
+                    .height(48.dp)
+                    .width(200.dp),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color.White,
+                    contentColor = Color(0xFF455A64)
+                ),
+                shape = RoundedCornerShape(12.dp),
+                elevation = ButtonDefaults.elevation(4.dp),
+                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+            ) {
+                Text("Empezar juego", fontWeight = FontWeight.SemiBold)
+            }
         }
     }
 }
+
+
+
+

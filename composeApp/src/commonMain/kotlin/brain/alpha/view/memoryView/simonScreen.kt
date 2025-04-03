@@ -1,13 +1,9 @@
 package brain.alpha.view.memoryView
 
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.IconButton
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,22 +12,20 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.delay
-import androidx.compose.foundation.clickable
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.text.font.FontWeight
-import brain.alpha.controller.memoryController.couplesController
 import brain.alpha.controller.memoryController.simonController
+import brain.alpha.view.memoryView.SimonUiState
 import brainalpha.composeapp.generated.resources.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
 
 
 
@@ -39,6 +33,11 @@ import brainalpha.composeapp.generated.resources.*
 fun simonScreen(
     controller: simonController,
     onNavigateToHome: () -> Unit) {
+
+    val uiState by controller.uiState.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+    val highlightColor by controller.highlightedColor.collectAsState()
+
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
@@ -116,9 +115,83 @@ fun simonScreen(
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(30.dp))
+            Column(
+                modifier = Modifier.fillMaxSize().padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = uiState.message,
+                    style = MaterialTheme.typography.h5
+                )
 
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(120.dp)
+                        .background(colorFromName(highlightColor ?: ""))
+                        )
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        ColorButton( Color.Red, uiState.isUserTurn, highlightColor == "Rojo") {
+                            controller.onColorPressed("Rojo")
+                        }
+                        ColorButton( Color.Green, uiState.isUserTurn, highlightColor == "Verde") {
+                            controller.onColorPressed("Verde")
+                        }
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        ColorButton( Color.Blue, uiState.isUserTurn, highlightColor == "Azul") {
+                            controller.onColorPressed("Azul")
+                        }
+                        ColorButton( Color.Yellow, uiState.isUserTurn, highlightColor == "Amarillo") {
+                            controller.onColorPressed("Amarillo")
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Button(onClick = {
+                    controller.onStartPressed()
+
+                }) {
+                    Text("JUGAR")
+                }
+            }
         }
     }
+
+}
+
+@Composable
+fun ColorButton(
+    color: Color,
+    enabled: Boolean,
+    highlighted: Boolean,
+    onClick: () -> Unit
+) {
+    val displayColor = if (highlighted) Color.White else color
+    Box(
+        modifier = Modifier
+            .size(100.dp)
+            .background(displayColor)
+            .clickable(enabled = enabled, onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+    }
+}
+fun colorFromName(name: String): Color = when (name) {
+    "Rojo" -> Color.Red
+    "Verde" -> Color.Green
+    "Azul" -> Color.Blue
+    "Amarillo" -> Color.Yellow
+    else -> Color.Transparent
 }
 
 
