@@ -6,7 +6,8 @@ import androidx.compose.runtime.setValue
 import brain.alpha.model.mentalAgilityModel.clickNumberModel
 
 object clickNumberController {var numbers by mutableStateOf(listOf<Int>())
-    private set
+
+    lateinit var navigateTo: (String) -> Unit
     var targetNumber by mutableStateOf(0)
         private set
     var message by mutableStateOf("")
@@ -31,5 +32,8 @@ object clickNumberController {var numbers by mutableStateOf(listOf<Int>())
         if (isCorrect) {
             startNewGame() // Reinicia el juego si ganas
         }
+    }
+    fun goHome(){
+        navigateTo("agility")
     }
 }

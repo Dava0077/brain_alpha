@@ -33,7 +33,7 @@ object mentalMathController{
         model.resetGame()
     }
     fun goHome(){
-        navigateTo("home")
+        navigateTo("agility")
     }
 
     fun isGameOver(): Boolean = model.isGameOver()

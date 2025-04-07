@@ -11,6 +11,8 @@ import brain.alpha.controller.logicController.wordSearchController
 import brain.alpha.controller.memoryController.couplesController
 import brain.alpha.controller.memoryController.memoryHomeController
 import brain.alpha.controller.memoryController.simonController
+import brain.alpha.controller.mentalAgilityController.clickNumberController
+import brain.alpha.controller.mentalAgilityController.mentalHomeController
 import brain.alpha.controller.mentalAgilityController.mentalMathController
 import brain.alpha.view.HomeScreen
 import brain.alpha.view.SignUpScreen
@@ -21,6 +23,8 @@ import brain.alpha.view.logicView.wordSearchScreen
 import brain.alpha.view.memoryView.couplesScreen
 import brain.alpha.view.memoryView.memoryHomeScreen
 import brain.alpha.view.memoryView.simonScreen
+import brain.alpha.view.mentalAgilityView.clickNumberScreen
+import brain.alpha.view.mentalAgilityView.mentalHomeScreen
 
 import view.mentalMathView
 
@@ -52,6 +56,8 @@ fun App() {
         simonController.navigateTo = { route -> currentScreen = route }
 
         //MENTAL AGILTY
+        mentalMathController.navigateTo = { route -> currentScreen = route }
+        clickNumberController.navigateTo = { route -> currentScreen = route }
         mentalMathController.navigateTo = { route -> currentScreen = route }
 
         //CONCENTRATION
@@ -96,14 +102,13 @@ fun App() {
                 onNavigateToConcentration = { currentScreen = "concentration" },
                 onNavigateToAgility = { currentScreen = "agility" }
             )
-
+            //MEMORY
             "memory" -> memoryHomeScreen(
                 controller = memoryHomeController,
                 onNavigateToHome = {currentScreen = "home"},
                 onNavigateToCouples = {currentScreen = "couples"},
                 onNavigateToSimon = {currentScreen = "simon"}
             )
-
             "couples" -> couplesScreen(
                 controller = couplesController,
                 onNavigateToHome = {currentScreen="memory"}
@@ -113,11 +118,20 @@ fun App() {
                 onNavigateToHome = {currentScreen="memory"}
             )
 
-
-            "agility" -> mentalMathView(
+            //MENTAL AGILITY
+            "agility" -> mentalHomeScreen(
+                controller = mentalHomeController,
+                onNavigateToHome = {currentScreen = "home"},
+                onNavigateToMath = {currentScreen = "math"},
+                onNavigateToClick = {currentScreen = "click"}
+            )
+            "math" -> mentalMathView(
                 controller = mentalMathController,
-                onNavigateToHome = {currentScreen = "home"}
-
+                onNavigateToHome = {currentScreen = "agility"}
+            )
+            "click" -> clickNumberScreen(
+                controller = clickNumberController,
+                onNavigateToHome = {currentScreen = "agility"}
             )
 
 
@@ -126,6 +140,7 @@ fun App() {
                 onNavigateToHome = {currentScreen="home"}
             )
 
+            //LOGIC
             "logic" -> logicHomeScreen(
                 controller = logicHomeController,
                 onNavigateToHome = {currentScreen = "home"},
