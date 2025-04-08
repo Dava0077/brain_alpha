@@ -35,6 +35,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.input.key.*
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brain.alpha.utils.currentTimeMillis
@@ -112,10 +113,15 @@ fun mentalMathView(controller: mentalMathController, onNavigateToHome: () -> Uni
 
             Button(
                 onClick = {controller.goHome()},
-                modifier = Modifier.align(Alignment.End),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow)
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .height(46.dp),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow),
+                shape = RoundedCornerShape(12.dp),
+                elevation = ButtonDefaults.elevation(4.dp),
+                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
             ){
-                Text("ATRAS", color = Color.Black)
+                Text("⬅ Volver", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
             }
             val overlayAlpha by animateFloatAsState(
                 targetValue = if (showOverlay) 0.5f else 0f,

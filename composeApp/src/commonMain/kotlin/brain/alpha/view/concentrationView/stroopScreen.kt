@@ -330,8 +330,7 @@ fun InstructionsScreen(onStart: () -> Unit, controller: stroopController) {
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(32.dp),
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {

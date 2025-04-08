@@ -159,23 +159,23 @@ fun HomeScreen(
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         CategoryItem("MEMORIA",
                             Res.drawable.memoria,
-                            Color(0xFF0647D7),
+                            Color(0xFF4CE3E8),
                             onNavigateToMemory)
 
                         CategoryItem("LOGICA",
                             Res.drawable.logica,
-                            Color(0xFF0647D7),
+                            Color(0xFF4CE3E8),
                             onNavigateToLogic)
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         CategoryItem("CONCENTRACIÓN",
                             Res.drawable.concentracion,
-                            Color(0xFF0647D7),
+                            Color(0xFF4CE3E8),
                             onNavigateToConcentration)
 
                         CategoryItem("AGILIDAD MENTAL",
                             Res.drawable.mentalA,
-                            Color(0xFF0647D7),
+                            Color(0xFF4CE3E8),
                             onNavigateToAgility)
                     }
                 }

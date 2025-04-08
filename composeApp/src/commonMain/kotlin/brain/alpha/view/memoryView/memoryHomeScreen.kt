@@ -15,6 +15,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,9 +27,7 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun memoryHomeScreen(
     controller: memoryHomeController,
-    onNavigateToHome: () -> Unit,
-    onNavigateToCouples: () -> Unit,
-    onNavigateToSimon: () -> Unit
+
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
@@ -80,11 +79,16 @@ fun memoryHomeScreen(
             Spacer(modifier = Modifier.height(5.dp)) // Espacio tras el logo
 
             Button(
-                onClick = { controller.goHome() },
-                modifier = Modifier.align(Alignment.End),
+                onClick = {controller.goHome()},
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .height(46.dp),
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
-            ) {
-                Text("ATRAS", color = Color.White)
+                shape = RoundedCornerShape(12.dp),
+                elevation = ButtonDefaults.elevation(4.dp),
+                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+            ){
+                Text("⬅ Volver", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
             }
 
             Spacer(modifier = Modifier.height(30.dp))
@@ -109,13 +113,13 @@ fun memoryHomeScreen(
                     "JUEGO DE PAREJAS",
                     Res.drawable.parejas,
                     Color(0xFF0647D7),
-                    onNavigateToCouples
+                    {controller.goCouples()}
                 )
                 brain.alpha.view.CategoryItem(
                     "SIMON DICE",
-                    Res.drawable.parejas,
+                    Res.drawable.simon,
                     Color(0xFF0647D7),
-                    onNavigateToSimon
+                    {controller.goSimon()}
                 )
             }
         }

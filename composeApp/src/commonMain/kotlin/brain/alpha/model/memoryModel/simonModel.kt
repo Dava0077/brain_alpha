@@ -7,6 +7,17 @@ object simonModel {
     private val machineSequence = mutableListOf<String>()
     private val playerSequence = mutableListOf<String>()
     private var state = GameState.START
+    private var score = 0
+
+    fun incrementScore() {
+        score++
+    }
+
+    fun getScore(): Int = score
+
+    fun resetScore() {
+        score = 0
+    }
 
     fun startGame() {
         machineSequence.clear()

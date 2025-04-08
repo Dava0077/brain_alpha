@@ -18,25 +18,25 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
-import androidx.compose.runtime.*
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.text.font.FontWeight
 import brain.alpha.controller.memoryController.simonController
-import brain.alpha.view.memoryView.SimonUiState
 import brainalpha.composeapp.generated.resources.*
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-
-
-
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.draw.shadow
+import androidx.compose.animation.core.animateFloatAsState
 
 @Composable
 fun simonScreen(
     controller: simonController,
-    onNavigateToHome: () -> Unit) {
+    ) {
 
     val uiState by controller.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
-    val highlightColor by controller.highlightedColor.collectAsState()
 
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -98,11 +98,16 @@ fun simonScreen(
             Spacer(modifier = Modifier.height(5.dp)) // Espacio tras el logo
 
             Button(
-                onClick = { controller.goHome() },
-                modifier = Modifier.align(Alignment.End),
+                onClick = {controller.goHome()},
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .height(46.dp),
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
-            ) {
-                Text("ATRAS", color = Color.White)
+                shape = RoundedCornerShape(12.dp),
+                elevation = ButtonDefaults.elevation(4.dp),
+                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+            ){
+                Text("⬅ Volver", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
             }
 
             Spacer(modifier = Modifier.height(30.dp)) // Espacio tras el logo
@@ -114,7 +119,7 @@ fun simonScreen(
                 fontFamily = FontFamily.SansSerif,
                 textAlign = TextAlign.Center
             )
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             Column(
                 modifier = Modifier.fillMaxSize().padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -127,29 +132,34 @@ fun simonScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                val colorAnimado by animateColorAsState(
+                    targetValue = colorFromName(uiState.sequence.lastOrNull() ?: ""),
+                    label = "colorAnimado"
+                )
+
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .width(200.dp)
                         .height(120.dp)
-                        .background(colorFromName(highlightColor ?: ""))
-                        )
+                        .background(colorAnimado)
+                )
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(15.dp))
 
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        ColorButton( Color.Red, uiState.isUserTurn, highlightColor == "Rojo") {
+                        ColorButton( Color.Red, uiState.isUserTurn, ) {
                             controller.onColorPressed("Rojo")
                         }
-                        ColorButton( Color.Green, uiState.isUserTurn, highlightColor == "Verde") {
+                        ColorButton( Color.Green, uiState.isUserTurn, ) {
                             controller.onColorPressed("Verde")
                         }
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        ColorButton( Color.Blue, uiState.isUserTurn, highlightColor == "Azul") {
+                        ColorButton( Color.Blue, uiState.isUserTurn, ) {
                             controller.onColorPressed("Azul")
                         }
-                        ColorButton( Color.Yellow, uiState.isUserTurn, highlightColor == "Amarillo") {
+                        ColorButton( Color.Yellow, uiState.isUserTurn, ) {
                             controller.onColorPressed("Amarillo")
                         }
                     }
@@ -160,8 +170,16 @@ fun simonScreen(
                 Button(onClick = {
                     controller.onStartPressed()
 
-                }) {
-                    Text("JUGAR")
+                },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),) {
+                    Text(if (uiState.gameOver) "REINICIAR" else "JUGAR", color = Color.White)
+                }
+                if (uiState.gameOver) {
+                    Text(
+                        text = "Has conseguido: ${uiState.score} 🍀 Neuronas",
+                        fontSize = 18.sp,
+                        color = Color.Black
+                    )
                 }
             }
         }
@@ -173,19 +191,29 @@ fun simonScreen(
 fun ColorButton(
     color: Color,
     enabled: Boolean,
-    highlighted: Boolean,
     onClick: () -> Unit
 ) {
-    val displayColor = if (highlighted) Color.White else color
+    val scale by animateFloatAsState(
+        targetValue = if (enabled) 1f else 0.95f,
+        label = "buttonScale"
+    )
+
     Box(
         modifier = Modifier
             .size(100.dp)
-            .background(displayColor)
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            }
+            .clip(RoundedCornerShape(16.dp))
+            .background(color)
+            .border(2.dp, Color.White, RoundedCornerShape(16.dp))
+            .shadow(8.dp, RoundedCornerShape(16.dp), clip = false)
             .clickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center
-    ) {
-    }
+    ) { }
 }
+
 fun colorFromName(name: String): Color = when (name) {
     "Rojo" -> Color.Red
     "Verde" -> Color.Green

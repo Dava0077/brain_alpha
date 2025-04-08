@@ -98,12 +98,17 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
             Spacer(modifier = Modifier.height(5.dp))
 
             Button(
-                onClick = { onNavigateToHome() },
-                modifier = Modifier.align(Alignment.End),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
+                onClick = { controller.goHomeLogic() },
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .height(46.dp),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+                shape = RoundedCornerShape(12.dp),
+                elevation = ButtonDefaults.elevation(4.dp),
+                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
             ) {
-                Text("ATRAS", color = Color.Black)
-            }
+                Text("⬅ Volver", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
+            }}
 
             Spacer(modifier = Modifier.height(30.dp))
             Text(
@@ -280,4 +285,3 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
             }
         }
     }
-}

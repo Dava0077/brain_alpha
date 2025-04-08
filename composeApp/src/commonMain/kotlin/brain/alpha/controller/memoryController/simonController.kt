@@ -21,7 +21,9 @@ object simonController {
         SimonUiState(
             message = "Presiona Empezar",
             isUserTurn = false,
-            sequence = emptyList()
+            sequence = emptyList(),
+            gameOver = false,
+            score = 0
         )
     )
     val uiState: StateFlow<SimonUiState> = _uiState
@@ -31,18 +33,29 @@ object simonController {
     fun onStartPressed() {
         if (gameOver) {
             model.resetGame()
+            model.resetScore()
             gameOver = false
         }
 
         model.startGame()
+
         _uiState.value = _uiState.value.copy(
-            message = "Memoriza la secuencia...",
+            message = "Memoriza el color...",
             isUserTurn = false,
-            sequence = model.getMachineSequence()
+            sequence = model.getMachineSequence(),
+            gameOver = false,
+            score = model.getScore()
         )
 
         scope.launch {
-            delay(1000)
+            delay(1000) // mostrar el color 1 segundo
+
+            _uiState.value = _uiState.value.copy(
+                sequence = emptyList() // ocultar el color (Box transparente)
+            )
+
+            delay(300) // pequeña pausa antes del turno
+
             model.beginPlayerTurn()
             _uiState.value = _uiState.value.copy(
                 message = "¡Tu turno!",
@@ -61,45 +74,51 @@ object simonController {
         if (!isValid) {
             _uiState.value = _uiState.value.copy(
                 message = "¡Fallaste! Pulsa Reiniciar.",
-                isUserTurn = false
+                isUserTurn = false,
+                sequence = emptyList(),
+                gameOver = true
             )
             gameOver = true
             return
         }
 
         if (model.isPlayerSequenceComplete()) {
+            model.incrementScore()
+
+            _uiState.value = _uiState.value.copy(
+                score = model.getScore()
+            )
             scope.launch {
                 delay(500)
                 model.setGameState(simonModel.GameState.MACHINE)
                 model.resetPlayerSequence()
                 model.addRandomColor()
 
+                val newSequence = model.getMachineSequence()
+
                 _uiState.value = _uiState.value.copy(
                     message = "Memoriza la nueva secuencia...",
                     isUserTurn = false,
-                    sequence = model.getMachineSequence()
+                    sequence = newSequence
                 )
 
-                delay(500)
-                scope.launch {
-                    simulateSequence(model.getMachineSequence()) // ✅ llama simulación
-                    model.beginPlayerTurn()
-                    _uiState.value = _uiState.value.copy(
-                        message = "¡Tu turno!",
-                        isUserTurn = true
-                    )
-                }
+                delay(1000)
+
+                _uiState.value = _uiState.value.copy(
+                    sequence = emptyList() // ✅ ocultar color
+                )
+
+                delay(300)
+
+                model.beginPlayerTurn()
+                _uiState.value = _uiState.value.copy(
+                    message = "¡Tu turno!",
+                    isUserTurn = true
+                )
             }
         }
     }
-    private suspend fun simulateSequence(sequence: List<String>) {
-        for (color in sequence) {
-            highlightedColor.value = color
-            delay(500)
-            highlightedColor.value = null
-            delay(200)
-        }
-    }
+
 
     fun goHome(){
         navigateTo("memory")

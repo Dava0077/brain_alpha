@@ -58,7 +58,7 @@ fun App() {
         //MENTAL AGILTY
         mentalMathController.navigateTo = { route -> currentScreen = route }
         clickNumberController.navigateTo = { route -> currentScreen = route }
-        mentalMathController.navigateTo = { route -> currentScreen = route }
+        mentalHomeController.navigateTo = { route -> currentScreen = route }
 
         //CONCENTRATION
         stroopController.navigateTo = { route -> currentScreen = route }
@@ -104,18 +104,14 @@ fun App() {
             )
             //MEMORY
             "memory" -> memoryHomeScreen(
-                controller = memoryHomeController,
-                onNavigateToHome = {currentScreen = "home"},
-                onNavigateToCouples = {currentScreen = "couples"},
-                onNavigateToSimon = {currentScreen = "simon"}
-            )
+                controller = memoryHomeController)
             "couples" -> couplesScreen(
                 controller = couplesController,
-                onNavigateToHome = {currentScreen="memory"}
+
             )
             "simon" -> simonScreen(
                 controller = simonController,
-                onNavigateToHome = {currentScreen="memory"}
+
             )
 
             //MENTAL AGILITY

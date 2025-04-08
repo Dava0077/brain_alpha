@@ -15,6 +15,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -81,11 +82,16 @@ fun mentalHomeScreen(
             Spacer(modifier = Modifier.height(5.dp)) // Espacio tras el logo
 
             Button(
-                onClick = { controller.goHome() },
-                modifier = Modifier.align(Alignment.End),
+                onClick = {controller.goHome()},
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .height(46.dp),
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow),
-            ) {
-                Text("ATRAS", color = Color.Black)
+                shape = RoundedCornerShape(12.dp),
+                elevation = ButtonDefaults.elevation(4.dp),
+                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+            ){
+                Text("⬅ Volver", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
             }
 
             Spacer(modifier = Modifier.height(30.dp))
@@ -109,13 +115,13 @@ fun mentalHomeScreen(
                 brain.alpha.view.CategoryItem(
                     "MENTAL MATH",
                     Res.drawable.math,
-                    Color(0xFF0647D7),
+                    Color.Yellow,
                     onNavigateToMath
                 )
                 brain.alpha.view.CategoryItem(
                     "CLICK NUMBER",
                     Res.drawable.clickNumber,
-                    Color(0xFF0647D7),
+                    Color.Yellow,
                     onNavigateToClick
                 )
             }

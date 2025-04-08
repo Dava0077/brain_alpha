@@ -37,7 +37,7 @@ import brainalpha.composeapp.generated.resources.*
 @Composable
 fun couplesScreen(
     controller: couplesController,
-    onNavigateToHome: () -> Unit) {
+    ) {
 
     val revealed = remember { mutableStateListOf<Boolean>().apply { addAll(controller.getRevealedStates()) } }
     val matched = remember { mutableStateListOf<Boolean>().apply { addAll(controller.getMatchedStates()) } }
@@ -135,10 +135,15 @@ fun couplesScreen(
 
             Button(
                 onClick = {controller.goHome()},
-                modifier = Modifier.align(Alignment.End),
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .height(46.dp),
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
+                shape = RoundedCornerShape(12.dp),
+                elevation = ButtonDefaults.elevation(4.dp),
+                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
                 ){
-                Text("ATRAS", color = Color.White)
+                Text("⬅ Volver", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
             }
 
             Spacer(modifier = Modifier.height(30.dp)) // Espacio tras el logo

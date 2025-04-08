@@ -6,4 +6,10 @@ object memoryHomeController {
     fun goHome(){
         navigateTo("home")
     }
+    fun goCouples(){
+        navigateTo("couples")
+    }
+    fun goSimon(){
+        navigateTo("simon")
+    }
 }
