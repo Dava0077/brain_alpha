@@ -119,6 +119,8 @@ object LoginController {
     }
 
     // Reserved callbacks for user/settings buttons
-    fun buttonSettings() {}
+    fun buttonSettings() {
+        navigateTo("settings")
+    }
     fun buttonUsername() {}
 }

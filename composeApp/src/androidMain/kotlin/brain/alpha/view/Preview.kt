@@ -21,10 +21,22 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.interaction.DragInteraction
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.TextButton
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 
-import androidx.compose.ui.draw.scale
-import brainalpha.composeapp.generated.resources.Res
-import brainalpha.composeapp.generated.resources.*
 
 @Preview(showBackground = true)
 @Composable
@@ -33,75 +45,110 @@ fun CouplesScreenPreview() {
 }
 @Composable
 fun sudokuScreen() {
-    Box(modifier = Modifier.fillMaxSize()) {
-        Image(
-            painter = painterResource(Res.drawable.fondoLogic),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
+    Box(modifier = Modifier.fillMaxSize()
+    ){
+        var currentLanguage by remember { mutableStateOf("Español") }
 
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(70.dp)
-                    .background(Color(0xFF222937), shape = RoundedCornerShape(4.dp))
-                    .border(BorderStroke(2.dp, Color(0xFF4CE3E8)))
-            )
-            {
-
-                IconButton(
-                    onClick = { /* Dummy action */ },
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .padding(start = 8.dp)
-                        .size(55.dp)
-                ) {
-                    Image(
-                        painter = painterResource(Res.drawable.user),
-                        contentDescription = "User"
-                    )
-                }
-                Image(
-                    painter = org.jetbrains.compose.resources.painterResource(Res.drawable.logo),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(120.dp)
-                        .align(Alignment.Center)
-                        .scale(1.5f)
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("Ajustes", color = Color.White)
+                        }
+                    },
+                    backgroundColor = Color(0xFF303030)
                 )
-                IconButton(
-                    onClick = { /* Dummy action */ },
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .padding(end = 8.dp)
-                        .size(55.dp)
+            }
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                // PREFERENCIAS
+                Text(
+                    text = "PREFERENCIAS",
+                    style = MaterialTheme.typography.h6,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(vertical = 8.dp)
                 ) {
-                    Image(
-                        painter = painterResource(Res.drawable.ajustes),
-                        contentDescription = "Settings"
-                    )
+                    Text("Idioma:", modifier = Modifier.weight(1f))
+                    DropdownMenuLanguage(currentLanguage) { selected ->
+                        currentLanguage = selected
+                        // TODO: Cambiar idioma
+                    }
                 }
 
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // CUENTA Y PERFIL
+                Text(
+                    text = "CUENTA Y PERFIL",
+                    style = MaterialTheme.typography.h6,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                SettingsItem("Cambiar nombre") {
+                    // TODO
+                }
+
+                SettingsItem("Cambiar email") {
+                    // TODO
+                }
+
+                SettingsItem("Cambiar contraseña") {
+                    // TODO
+                }
             }
-            Spacer(modifier = Modifier.height(40.dp)) // Espacio tras el logo
+        }
+    }
+}
+@Composable
+fun DropdownMenuLanguage(current: String, onLanguageChange: (String) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    val options = listOf("Español", "English")
 
+    Box {
+        TextButton(onClick = { expanded = true }) {
+            Text(current, color = Color(0xFF0647D7))
+        }
 
-            Text(
-                text = "SUDOKU",
-                fontSize = 40.sp,
-                color = Color.Black,
-                fontFamily = FontFamily.SansSerif,
-                textAlign = TextAlign.Center
-            )
-            Spacer(modifier = Modifier.height(30.dp))
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            options.forEach { lang ->
+                DropdownMenuItem(onClick = {
+                    onLanguageChange(lang)
+                    expanded = false
+                }) {
+                    Text(lang)
+                }
+            }
         }
     }
 }
 
-
+    @Composable
+    fun SettingsItem(title: String, onClick: () -> Unit) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onClick() }
+                .padding(vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(title, modifier = Modifier.weight(1f))
+            Icon(
+                imageVector = Icons.Default.ArrowForward,
+                contentDescription = null,
+                tint = Color(0xFF0647D7)
+            )
+        }
+    }

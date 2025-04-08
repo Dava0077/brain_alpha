@@ -4,6 +4,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import brain.alpha.view.LoginScreen
 import brain.alpha.controller.LoginController
+import brain.alpha.controller.SettingsController
 import brain.alpha.controller.concentrationController.stroopController
 import brain.alpha.controller.logicController.logicHomeController
 import brain.alpha.controller.logicController.sudokuController
@@ -15,6 +16,7 @@ import brain.alpha.controller.mentalAgilityController.clickNumberController
 import brain.alpha.controller.mentalAgilityController.mentalHomeController
 import brain.alpha.controller.mentalAgilityController.mentalMathController
 import brain.alpha.view.HomeScreen
+import brain.alpha.view.SettingsScreen
 import brain.alpha.view.SignUpScreen
 import brain.alpha.view.concentrationViews.StroopScreen
 import brain.alpha.view.logicView.logicHomeScreen
@@ -49,6 +51,8 @@ fun App() {
         // Assigns a navigation callback for use in controllers
         //LOGIN
         LoginController.navigateTo = { route -> currentScreen = route }
+        //SETTINGS
+        SettingsController.navigateTo = { route -> currentScreen = route }
 
         //MEMORY GAMES
         memoryHomeController.navigateTo = { route -> currentScreen = route }
@@ -101,6 +105,10 @@ fun App() {
                 onNavigateToLogic = { currentScreen = "logic" },
                 onNavigateToConcentration = { currentScreen = "concentration" },
                 onNavigateToAgility = { currentScreen = "agility" }
+            )
+            //SETTINGS
+            "settings" -> SettingsScreen(
+                controller = SettingsController
             )
             //MEMORY
             "memory" -> memoryHomeScreen(
