@@ -1,6 +1,7 @@
 package brain.alpha.controller.memoryController
 
 import brain.alpha.model.memoryModel.simonModel
+import brain.alpha.strings.Strings
 import brain.alpha.view.memoryView.SimonUiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +20,7 @@ object simonController {
 
     private val _uiState = MutableStateFlow(
         SimonUiState(
-            message = "Presiona Empezar",
+            message = Strings.t("press_play"),
             isUserTurn = false,
             sequence = emptyList(),
             gameOver = false,
@@ -40,7 +41,7 @@ object simonController {
         model.startGame()
 
         _uiState.value = _uiState.value.copy(
-            message = "Memoriza el color...",
+            message = Strings.t("mem_color"),
             isUserTurn = false,
             sequence = model.getMachineSequence(),
             gameOver = false,
@@ -58,7 +59,7 @@ object simonController {
 
             model.beginPlayerTurn()
             _uiState.value = _uiState.value.copy(
-                message = "¡Tu turno!",
+                message = Strings.t("your_turn"),
                 isUserTurn = true
             )
         }
@@ -73,7 +74,7 @@ object simonController {
 
         if (!isValid) {
             _uiState.value = _uiState.value.copy(
-                message = "¡Fallaste! Pulsa Reiniciar.",
+                message = Strings.t("error_press_rei"),
                 isUserTurn = false,
                 sequence = emptyList(),
                 gameOver = true
@@ -97,7 +98,7 @@ object simonController {
                 val newSequence = model.getMachineSequence()
 
                 _uiState.value = _uiState.value.copy(
-                    message = "Memoriza la nueva secuencia...",
+                    message = Strings.t("mem_seq"),
                     isUserTurn = false,
                     sequence = newSequence
                 )
@@ -112,7 +113,7 @@ object simonController {
 
                 model.beginPlayerTurn()
                 _uiState.value = _uiState.value.copy(
-                    message = "¡Tu turno!",
+                    message = Strings.t("your_turn"),
                     isUserTurn = true
                 )
             }

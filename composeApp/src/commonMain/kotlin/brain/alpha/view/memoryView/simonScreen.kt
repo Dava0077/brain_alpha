@@ -29,6 +29,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.draw.shadow
 import androidx.compose.animation.core.animateFloatAsState
+import brain.alpha.strings.Strings
 
 @Composable
 fun simonScreen(
@@ -82,7 +83,7 @@ fun simonScreen(
                         .scale(1.5f)
                 )
                 IconButton(
-                    onClick = { /* Dummy action */ },
+                    onClick = { brain.alpha.controller.LoginController.buttonSettings() },
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .padding(end = 8.dp)
@@ -107,13 +108,13 @@ fun simonScreen(
                 elevation = ButtonDefaults.elevation(4.dp),
                 border = BorderStroke(1.dp, Color(0xFFB0BEC5))
             ){
-                Text("⬅ Volver", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
+                Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
             }
 
             Spacer(modifier = Modifier.height(30.dp)) // Espacio tras el logo
 
             Text(
-                text = "SIMON DICE",
+                text = Strings.t("title_simon"),
                 fontSize = 40.sp,
                 color = Color.Black,
                 fontFamily = FontFamily.SansSerif,
@@ -172,7 +173,7 @@ fun simonScreen(
 
                 },
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),) {
-                    Text(if (uiState.gameOver) "REINICIAR" else "JUGAR", color = Color.White)
+                    Text(if (uiState.gameOver) Strings.t("reiniciar") else Strings.t("play"), color = Color.White)
                 }
                 if (uiState.gameOver) {
                     Text(

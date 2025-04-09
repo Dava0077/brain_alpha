@@ -27,6 +27,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brain.alpha.controller.concentrationController.stroopController
+import brain.alpha.strings.Strings
 import brainalpha.composeapp.generated.resources.*
 import brainalpha.composeapp.generated.resources.Res
 import brainalpha.composeapp.generated.resources.logo
@@ -188,7 +189,7 @@ fun StroopScreen(controller: stroopController = stroopController,onNavigateToHom
                     elevation = ButtonDefaults.elevation(4.dp),
                     border = BorderStroke(1.dp, Color(0xFFB0BEC5))
                 ) {
-                    Text("⬅ Volver", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                    Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium)
                 }
 
                 // Game title and timer
@@ -394,14 +395,14 @@ fun InstructionsScreen(onStart: () -> Unit, controller: stroopController) {
                 elevation = ButtonDefaults.elevation(4.dp),
                 border = BorderStroke(1.dp, Color(0xFFB0BEC5))
             ) {
-                Text("⬅ Volver", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium)
             }
 
             Spacer(modifier = Modifier.height(100.dp))
 
             // Title of instruction section
             Text(
-                "Instrucciones",
+                Strings.t("instructions"),
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF212121)
@@ -445,7 +446,7 @@ fun InstructionsScreen(onStart: () -> Unit, controller: stroopController) {
                 elevation = ButtonDefaults.elevation(4.dp),
                 border = BorderStroke(1.dp, Color(0xFFB0BEC5))
             ) {
-                Text("Empezar juego", fontWeight = FontWeight.SemiBold)
+                Text(Strings.t("start_game"), fontWeight = FontWeight.SemiBold)
             }
         }
     }

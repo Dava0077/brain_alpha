@@ -70,6 +70,7 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -108,7 +109,7 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                 border = BorderStroke(1.dp, Color(0xFFB0BEC5))
             ) {
                 Text("⬅ Volver", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
-            }}
+            }
 
             Spacer(modifier = Modifier.height(30.dp))
             Text(
@@ -285,3 +286,5 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
             }
         }
     }
+}
+

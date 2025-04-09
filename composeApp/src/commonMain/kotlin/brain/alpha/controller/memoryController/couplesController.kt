@@ -1,11 +1,14 @@
 package brain.alpha.controller.memoryController
 
 
+import androidx.compose.runtime.mutableStateOf
+import brain.alpha.controller.concentrationController.stroopController
 import brain.alpha.model.memoryModel.couplesModel
 
 object couplesController {
     private val model = couplesModel
     lateinit var navigateTo: (String) -> Unit
+    val showInstructions = mutableStateOf(true)
 
     fun startGame() {
         model.shuffledCards = (model.allCards + model.allCards).shuffled().toMutableList()
@@ -13,6 +16,10 @@ object couplesController {
         model.matched = MutableList(16) { false }
         model.selectedIndices.clear()
         model.started = true
+    }
+    fun beginGame() {
+        showInstructions.value = false
+        startGame()
     }
 
     fun hasStarted(): Boolean = model.started
@@ -46,6 +53,7 @@ object couplesController {
     fun goHome(){
         navigateTo("memory")
         model.started = false;
+        showInstructions.value = true
     }
 
     fun processTurnEnd() {

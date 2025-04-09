@@ -28,8 +28,13 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
+import brain.alpha.controller.concentrationController.stroopController
 import brain.alpha.controller.memoryController.couplesController
+import brain.alpha.strings.Strings
 import brainalpha.composeapp.generated.resources.*
 
 
@@ -49,6 +54,17 @@ fun couplesScreen(
 
     val shuffledCards = List(16) { index -> controller.getCardValue(index) }
     var timerTrigger by remember { mutableStateOf(0) }
+    val showInstructions by controller.showInstructions
+
+
+    // Show instructions first
+    if (showInstructions) {
+        InstructionsScreen(
+            onStart = { controller.beginGame() },
+            controller = stroopController
+        )
+        return
+    }
 
 
 
@@ -118,7 +134,7 @@ fun couplesScreen(
                         .scale(1.5f)
                 )
                 IconButton(
-                    onClick = { /* Dummy action */ },
+                    onClick = { brain.alpha.controller.LoginController.buttonSettings() },
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .padding(end = 8.dp)
@@ -143,13 +159,13 @@ fun couplesScreen(
                 elevation = ButtonDefaults.elevation(4.dp),
                 border = BorderStroke(1.dp, Color(0xFFB0BEC5))
                 ){
-                Text("⬅ Volver", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
+                Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
             }
 
             Spacer(modifier = Modifier.height(30.dp)) // Espacio tras el logo
 
             Text(
-                text = "JUEGO DE PAREJAS",
+                text = Strings.t("title_couples"),
                 fontSize = 40.sp,
                 color = Color.Black,
                 fontFamily = FontFamily.SansSerif,
@@ -159,7 +175,7 @@ fun couplesScreen(
 
 
             Text(
-                text = "Tiempo: $remainingTime",
+                text = "${Strings.t("time")} $remainingTime",
                 fontSize = 20.sp,
                 color = Color.Black,
                 fontFamily = FontFamily.SansSerif,
@@ -216,21 +232,145 @@ fun couplesScreen(
                     timerTrigger++ // fuerza reinicio del temporizador
                 },
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),) {
-                    Text("JUGAR", color = Color.White)
+                    Text(Strings.t("play"), color = Color.White)
                 }
             }
 
             if (gameFinished) {
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("✅ Parejas correctas", fontSize = 20.sp)
+                Text(Strings.t("correct_couples"), fontSize = 20.sp)
             } else if (gameLost) {
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("❌ Parejas incorrectas", fontSize = 20.sp, color = Color.Red)
+                Text(Strings.t("incorrect_couples"), fontSize = 20.sp, color = Color.Red)
             }
         }
+    }
+}
+@Composable
+fun InstructionsScreen(onStart: () -> Unit, controller: stroopController) {
+    Box(modifier = Modifier.fillMaxSize()) {
 
+        // Background image
+        Image(
+            painter = painterResource(Res.drawable.fondoMemory),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
 
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ) {
+            // Same HEADER as game screen (user icon, logo, settings)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(70.dp)
+                    .background(Color(0xFF222937), shape = RoundedCornerShape(4.dp))
+                    .border(BorderStroke(2.dp, Color(0xFF4CE3E8))))
+            {
+                IconButton(
+                    onClick = { /* Dummy user action */ },
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = 8.dp)
+                        .size(48.dp)
+                ) {
+                    Image(
+                        painter = painterResource(Res.drawable.user),
+                        contentDescription = "Usuario"
+                    )
+                }
 
+                Image(
+                    painter = painterResource(Res.drawable.logo),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(100.dp)
+                        .align(Alignment.Center)
+                        .scale(1.2f)
+                )
+
+                IconButton(
+                    onClick = { brain.alpha.controller.LoginController.buttonSettings() },
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(end = 8.dp)
+                        .size(48.dp)
+                ) {
+                    Image(
+                        painter = painterResource(Res.drawable.ajustes),
+                        contentDescription = "Ajustes"
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(5.dp))
+            // Back Button (same design as in game)
+            Button(
+                onClick = {controller.goHome()},
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .height(46.dp),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
+                shape = RoundedCornerShape(12.dp),
+                elevation = ButtonDefaults.elevation(4.dp),
+                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+            ){
+                Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
+            }
+
+            Spacer(modifier = Modifier.height(100.dp))
+
+            // Title of instruction section
+            Text(
+                Strings.t("instructions"),
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF212121)
+            )
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+            // Game explanation using styled text
+            Text(
+                buildAnnotatedString {
+                    append(Strings.t("insC1"))
+                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(Strings.t("insC2")) }
+                    append(Strings.t("insC3")+"\n\n")
+
+                    append(Strings.t("insC4"))
+                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(Strings.t("insC5")) }
+                    append(" .\n")
+
+                    append(Strings.t("insC6"))
+                },
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center,
+                color = Color(0xFF424242),
+                lineHeight = 24.sp,
+                modifier = Modifier.padding(horizontal = 32.dp)
+            )
+
+            Spacer(modifier = Modifier.height(40.dp))
+
+            // Start game button
+            Button(
+                onClick = onStart,
+                modifier = Modifier
+                    .height(48.dp)
+                    .width(200.dp),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
+                shape = RoundedCornerShape(12.dp),
+                elevation = ButtonDefaults.elevation(4.dp),
+                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+            ) {
+                Text(Strings.t("start_game"), fontWeight = FontWeight.Medium, color = Color.White)
+            }
+        }
     }
 }
 
