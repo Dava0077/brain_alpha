@@ -2,6 +2,8 @@ package brain.alpha.controller
 
 import brain.alpha.model.UserSession
 import brain.alpha.services.SupabaseClientProvider
+import io.github.jan.supabase.auth.OtpType
+
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.user.UserInfo
@@ -42,6 +44,10 @@ object AuthController {
 
             val user = auth.currentUserOrNull()
                 ?: throw IllegalStateException("No se pudo obtener el usuario")
+
+            if (user.emailConfirmedAt == null) {
+                throw IllegalStateException("Debes confirmar tu correo electrónico antes de iniciar sesión.")
+            }
 
             UserSession.setSession(
                 id = user.id,
@@ -134,6 +140,25 @@ object AuthController {
     fun isValidEmail(email: String): Boolean {
         val regex = "^[A-Za-z](.*)([@]{1})(.{1,})(\\.)(.{1,})"
         return regex.toRegex().matches(email)
+    }
+
+    suspend fun sendPasswordReset(email: String): Result<Unit> = withContext(Dispatchers.Default) {
+        runCatching {
+            if (!isValidEmail(email)) {
+                throw IllegalArgumentException("El email ingresado no es válido.")
+            }
+
+            SupabaseClientProvider.client.auth.resetPasswordForEmail(email)
+        }
+    }
+
+    suspend fun resendEmailVerification(email: String): Result<Unit> = withContext(Dispatchers.Default) {
+        runCatching {
+            SupabaseClientProvider.client.auth.resendEmail(
+                type = OtpType.Email,
+                email = email
+            )
+        }
     }
 }
 

@@ -15,6 +15,8 @@ import brain.alpha.controller.memoryController.simonController
 import brain.alpha.controller.mentalAgilityController.clickNumberController
 import brain.alpha.controller.mentalAgilityController.mentalHomeController
 import brain.alpha.controller.mentalAgilityController.mentalMathController
+import brain.alpha.model.UserSession
+import brain.alpha.services.SupabaseClientProvider
 import brain.alpha.view.HomeScreen
 import brain.alpha.view.SettingsScreen
 import brain.alpha.view.SignUpScreen
@@ -27,6 +29,7 @@ import brain.alpha.view.memoryView.memoryHomeScreen
 import brain.alpha.view.memoryView.simonScreen
 import brain.alpha.view.mentalAgilityView.clickNumberScreen
 import brain.alpha.view.mentalAgilityView.mentalHomeScreen
+import io.github.jan.supabase.auth.auth
 
 import view.mentalMathView
 
@@ -47,6 +50,24 @@ fun App() {
     MaterialTheme {
         // Stores the current screen route
         var currentScreen by remember { mutableStateOf("login") }
+
+
+        //Persistent log session
+        LaunchedEffect(Unit) {
+            val session = SupabaseClientProvider.client.auth.sessionManager.loadSession()
+            val user = SupabaseClientProvider.client.auth.currentUserOrNull()
+
+            if (session != null && user != null) {
+                UserSession.setSession(
+                    id = user.id,
+                    emailValue = user.email ?: "desconocido@correo.com",
+                    usernameValue = user.userMetadata?.get("username")?.toString() ?: "Usuario"
+                )
+                LoginController.clear()
+                LoginController.navigateTo("home")
+            }
+        }
+
 
         // Assigns a navigation callback for use in controllers
         //LOGIN

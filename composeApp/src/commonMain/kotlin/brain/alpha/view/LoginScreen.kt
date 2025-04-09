@@ -38,6 +38,10 @@ fun LoginScreen(
 ) {
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
+    var showResetDialog by remember { mutableStateOf(false) }
+    var resetEmail by remember { mutableStateOf("") }
+    var resetFeedback by remember { mutableStateOf<String?>(null) }
+    var sendingReset by remember { mutableStateOf(false) }
 
 
     Scaffold(scaffoldState = scaffoldState) {
@@ -121,10 +125,16 @@ fun LoginScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     // Forgot password (non-functional placeholder)
-                    Text("Olvidaste contraseña?",
-                        color = Color.Black, fontSize = 14.sp,
-                        modifier = Modifier.align(Alignment.End))
-
+                    TextButton(
+                        onClick = {
+                            resetEmail = controller.email
+                            resetFeedback = null
+                            showResetDialog = true
+                        },
+                        modifier = Modifier.align(Alignment.End)
+                    ) {
+                        Text("¿Olvidaste tu contraseña?", color = Color.Black, fontSize = 14.sp)
+                    }
                     Spacer(modifier = Modifier.height(12.dp))
 
                     // Error message if login fails
@@ -209,6 +219,53 @@ fun LoginScreen(
                             .height(5.dp)
                             .background(Color.Black, shape = RoundedCornerShape(100.dp))
                     )
+
+                    //Password reset
+                    if (showResetDialog) {
+                        AlertDialog(
+                            onDismissRequest = { showResetDialog = false },
+                            title = { Text("Recuperar contraseña") },
+                            text = {
+                                Column {
+                                    OutlinedTextField(
+                                        value = resetEmail,
+                                        onValueChange = { resetEmail = it },
+                                        label = { Text("Email") },
+                                        singleLine = true,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                    if (resetFeedback != null) {
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Text(resetFeedback!!, color = Color.Red)
+                                    }
+                                }
+                            },
+                            confirmButton = {
+                                TextButton(
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            sendingReset = true
+                                            val result = brain.alpha.controller.AuthController.sendPasswordReset(resetEmail.trim())
+                                            sendingReset = false
+                                            result.onSuccess {
+                                                resetFeedback = "Revisa tu correo para restablecer tu contraseña."
+                                            }.onFailure { e ->
+                                                resetFeedback = e.message ?: "Error al enviar el correo."
+                                            }
+                                        }
+                                    },
+                                    enabled = !sendingReset
+                                ) {
+                                    Text("Enviar")
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(onClick = { showResetDialog = false }) {
+                                    Text("Cancelar")
+                                }
+                            }
+                        )
+                    }
                 }
             }
         }
