@@ -69,16 +69,6 @@ object LoginController {
                         "Demasiados intentos. Intenta más tarde."
                     }
 
-                    error.message?.contains("Email not confirmed", ignoreCase = true) == true -> {
-                        coroutineScope.launch {
-                            AuthController.resendEmailVerification(email.trim()).onSuccess {
-                                errorMessage = "Correo de verificación reenviado. Revisa tu bandeja de entrada."
-                            }.onFailure {
-                                errorMessage = "No se pudo reenviar el correo. Intenta más tarde."
-                            }
-                        }
-                        "Debes confirmar tu email antes de iniciar sesión."
-                    }
 
                     else -> error.message ?: "Error desconocido durante el login."
                 }

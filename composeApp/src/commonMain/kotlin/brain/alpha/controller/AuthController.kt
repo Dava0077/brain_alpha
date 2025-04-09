@@ -2,8 +2,6 @@ package brain.alpha.controller
 
 import brain.alpha.model.UserSession
 import brain.alpha.services.SupabaseClientProvider
-import io.github.jan.supabase.auth.OtpType
-
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.user.UserInfo
@@ -152,13 +150,6 @@ object AuthController {
         }
     }
 
-    suspend fun resendEmailVerification(email: String): Result<Unit> = withContext(Dispatchers.Default) {
-        runCatching {
-            SupabaseClientProvider.client.auth.resendEmail(
-                type = OtpType.Email,
-                email = email
-            )
-        }
-    }
+
 }
 
