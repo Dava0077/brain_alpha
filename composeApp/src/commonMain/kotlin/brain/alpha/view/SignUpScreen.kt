@@ -179,8 +179,10 @@ fun SignUpScreen(
             if (showSuccessDialog) {
                 AlertDialog(
                     onDismissRequest = {},
-                    title = { Text("¡Registro exitoso!") },
-                    text = { Text("Tu cuenta ha sido creada correctamente.") },
+                    title = { Text("Verifica tu correo electrónico") },
+                    text = {
+                        Text("Hemos enviado un enlace de confirmación a tu email. Debes verificarlo antes de iniciar sesión.")
+                    },
                     confirmButton = {
                         TextButton(onClick = {
                             showSuccessDialog = false

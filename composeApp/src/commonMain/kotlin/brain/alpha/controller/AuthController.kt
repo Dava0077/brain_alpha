@@ -43,6 +43,10 @@ object AuthController {
             val user = auth.currentUserOrNull()
                 ?: throw IllegalStateException("No se pudo obtener el usuario")
 
+            if (user.emailConfirmedAt == null) {
+                throw IllegalStateException("Debes confirmar tu correo electrónico antes de iniciar sesión.")
+            }
+
             UserSession.setSession(
                 id = user.id,
                 emailValue = user.email ?: "desconocido@correo.com",
@@ -135,5 +139,17 @@ object AuthController {
         val regex = "^[A-Za-z](.*)([@]{1})(.{1,})(\\.)(.{1,})"
         return regex.toRegex().matches(email)
     }
+
+    suspend fun sendPasswordReset(email: String): Result<Unit> = withContext(Dispatchers.Default) {
+        runCatching {
+            if (!isValidEmail(email)) {
+                throw IllegalArgumentException("El email ingresado no es válido.")
+            }
+
+            SupabaseClientProvider.client.auth.resetPasswordForEmail(email)
+        }
+    }
+
+
 }
 
