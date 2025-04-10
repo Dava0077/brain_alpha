@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brain.alpha.controller.memoryController.memoryHomeController
+import brain.alpha.strings.Strings
 import brainalpha.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -67,7 +68,7 @@ fun memoryHomeScreen(
                         .scale(1.5f)
                 )
                 IconButton(
-                    onClick = { /* Dummy action */ },
+                    onClick = { brain.alpha.controller.LoginController.buttonSettings() },
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .padding(end = 8.dp)
@@ -88,13 +89,13 @@ fun memoryHomeScreen(
                 elevation = ButtonDefaults.elevation(4.dp),
                 border = BorderStroke(1.dp, Color(0xFFB0BEC5))
             ){
-                Text("⬅ Volver", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
+                Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
             }
 
             Spacer(modifier = Modifier.height(30.dp))
 
             Text(
-                text = "MEMORIA",
+                text = Strings.t("memory"),
                 fontSize = 40.sp,
                 color = Color.Black,
                 fontFamily = FontFamily.SansSerif,
@@ -110,13 +111,13 @@ fun memoryHomeScreen(
                 verticalArrangement = Arrangement.spacedBy(32.dp)
             ) {
                 brain.alpha.view.CategoryItem(
-                    "JUEGO DE PAREJAS",
+                    Strings.t("title_couples"),
                     Res.drawable.parejas,
                     Color(0xFF0647D7),
                     {controller.goCouples()}
                 )
                 brain.alpha.view.CategoryItem(
-                    "SIMON DICE",
+                    Strings.t("title_simon"),
                     Res.drawable.simon,
                     Color(0xFF0647D7),
                     {controller.goSimon()}

@@ -1,5 +1,6 @@
 package brain.alpha.controller.memoryController
 
+import androidx.compose.runtime.mutableStateOf
 import brain.alpha.model.memoryModel.simonModel
 import brain.alpha.strings.Strings
 import brain.alpha.view.memoryView.SimonUiState
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 object simonController {
     lateinit var navigateTo: (String) -> Unit
     val highlightedColor = MutableStateFlow<String?>(null)
+    val showInstructions = mutableStateOf(true)
 
     private val model = simonModel
     private val scope = CoroutineScope(Dispatchers.Default)
@@ -31,6 +33,9 @@ object simonController {
 
     private var gameOver = false
 
+    fun beginGame() {
+        showInstructions.value = false
+    }
     fun onStartPressed() {
         if (gameOver) {
             model.resetGame()
@@ -121,7 +126,18 @@ object simonController {
     }
 
 
-    fun goHome(){
+    fun goHome() {
+        model.resetGame()
+        model.resetScore()
+        showInstructions.value = true
+        _uiState.value = SimonUiState(
+            message = Strings.t("press_play"),
+            isUserTurn = false,
+            sequence = emptyList(),
+            gameOver = false,
+            score = 0
+        )
+        gameOver = false
         navigateTo("memory")
     }
 }

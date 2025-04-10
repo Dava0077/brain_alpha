@@ -49,7 +49,7 @@ fun couplesScreen(
     var selectedIndices by remember { mutableStateOf(controller.getSelectedIndices()) }
     var gameStarted by remember { mutableStateOf(controller.hasStarted()) }
     var gameFinished by remember { mutableStateOf(false) }
-    var remainingTime by remember { mutableStateOf(60) }
+    var elapsedTime by remember { mutableStateOf(0) }
     var gameLost by remember { mutableStateOf(false) }
 
     val shuffledCards = List(16) { index -> controller.getCardValue(index) }
@@ -59,9 +59,9 @@ fun couplesScreen(
 
     // Show instructions first
     if (showInstructions) {
-        InstructionsScreen(
+        InstructionsCouples(
             onStart = { controller.beginGame() },
-            controller = stroopController
+            controller = couplesController
         )
         return
     }
@@ -80,13 +80,12 @@ fun couplesScreen(
     }
     LaunchedEffect(timerTrigger) {
         if (gameStarted) {
-            remainingTime = 60
-            gameLost = false
-            while (remainingTime > 0 && !gameFinished) {
+            elapsedTime = 0
+            while (!gameFinished && !gameLost) {
                 delay(1000)
-                remainingTime--
+                elapsedTime++
             }
-            if (!gameFinished && remainingTime == 0) {
+            if (!gameFinished && elapsedTime >= 90) {
                 gameLost = true
                 gameStarted = false
             }
@@ -175,7 +174,7 @@ fun couplesScreen(
 
 
             Text(
-                text = "${Strings.t("time")} $remainingTime",
+                text = "${Strings.t("time")} $elapsedTime",
                 fontSize = 20.sp,
                 color = Color.Black,
                 fontFamily = FontFamily.SansSerif,
@@ -228,7 +227,7 @@ fun couplesScreen(
                     gameStarted = true
                     gameFinished = false
                     gameLost = false
-                    remainingTime = 60
+                    elapsedTime = 0
                     timerTrigger++ // fuerza reinicio del temporizador
                 },
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),) {
@@ -238,16 +237,18 @@ fun couplesScreen(
 
             if (gameFinished) {
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(Strings.t("correct_couples"), fontSize = 20.sp)
-            } else if (gameLost) {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(Strings.t("incorrect_couples"), fontSize = 20.sp, color = Color.Red)
+                Text(
+                    text = Strings.t("final_time") + "$elapsedTime s",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFF2E7D32)
+                )
             }
         }
     }
 }
 @Composable
-fun InstructionsScreen(onStart: () -> Unit, controller: stroopController) {
+fun InstructionsCouples(onStart: () -> Unit, controller: couplesController) {
     Box(modifier = Modifier.fillMaxSize()) {
 
         // Background image
@@ -336,24 +337,35 @@ fun InstructionsScreen(onStart: () -> Unit, controller: stroopController) {
             Spacer(modifier = Modifier.height(30.dp))
 
             // Game explanation using styled text
-            Text(
-                buildAnnotatedString {
-                    append(Strings.t("insC1"))
-                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(Strings.t("insC2")) }
-                    append(Strings.t("insC3")+"\n\n")
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 32.dp)
+                    .background(Color(0xFF0647D7), shape = RoundedCornerShape(16.dp))
+                    .padding(16.dp) // Padding interno
+            ) {
+                Text(
+                    buildAnnotatedString {
+                        append(Strings.t("insC1"))
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append(Strings.t("insC2"))
+                        }
+                        append(Strings.t("insC3") + "\n\n")
 
-                    append(Strings.t("insC4"))
-                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(Strings.t("insC5")) }
-                    append(" .\n")
+                        append(Strings.t("insC4"))
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append(Strings.t("insC5"))
+                        }
+                        append(" .\n")
 
-                    append(Strings.t("insC6"))
-                },
-                fontSize = 16.sp,
-                textAlign = TextAlign.Center,
-                color = Color(0xFF424242),
-                lineHeight = 24.sp,
-                modifier = Modifier.padding(horizontal = 32.dp)
-            )
+                        append(Strings.t("insC6"))
+                    },
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center,
+                    color = Color.White,
+                    lineHeight = 24.sp
+                )
+            }
+
 
             Spacer(modifier = Modifier.height(40.dp))
 

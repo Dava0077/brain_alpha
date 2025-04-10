@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import brain.alpha.controller.LoginController
 import brain.alpha.model.UserSession
+import brain.alpha.strings.Strings
 import brainalpha.composeapp.generated.resources.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -129,7 +130,7 @@ fun HomeScreen(
 
                     // Display greeting with user name
                     Text(
-                        text = "Hola, $displayName!",
+                        text = Strings.t("hi") +"$displayName!",
                         color = Color.White,
                         fontSize = 16.sp,
                         modifier = Modifier
@@ -141,7 +142,7 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.height(70.dp))
 
                 Text(
-                    text = "CATEGORIAS",
+                    text = Strings.t("categories"),
                     fontSize = 40.sp,
                     color = Color.Black,
                     fontFamily = FontFamily.SansSerif,
@@ -157,23 +158,23 @@ fun HomeScreen(
                     verticalArrangement = Arrangement.spacedBy(32.dp)
                 ) {
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        CategoryItem("MEMORIA",
+                        CategoryItem(Strings.t("memory"),
                             Res.drawable.memoria,
                             Color(0xFF4CE3E8),
                             onNavigateToMemory)
 
-                        CategoryItem("LOGICA",
+                        CategoryItem(Strings.t("logic"),
                             Res.drawable.logica,
                             Color(0xFF4CE3E8),
                             onNavigateToLogic)
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        CategoryItem("CONCENTRACIÓN",
+                        CategoryItem(Strings.t("concentration"),
                             Res.drawable.concentracion,
                             Color(0xFF4CE3E8),
                             onNavigateToConcentration)
 
-                        CategoryItem("AGILIDAD MENTAL",
+                        CategoryItem(Strings.t("mental_agility"),
                             Res.drawable.mentalA,
                             Color(0xFF4CE3E8),
                             onNavigateToAgility)
@@ -210,26 +211,26 @@ fun HomeScreen(
             if (showConfirmDialog.value) {
                 AlertDialog(
                     onDismissRequest = { showConfirmDialog.value = false },
-                    title = { Text("Cerrar sesión") },
-                    text = { Text("¿Estás seguro de que deseas cerrar sesión?") },
+                    title = { Text(Strings.t("log_out")) },
+                    text = { Text(Strings.t("you_sure")) },
                     confirmButton = {
                         TextButton(onClick = {
                             showConfirmDialog.value = false
                             coroutineScope.launch {
                                 brain.alpha.controller.AuthController.signOut()
                                 LoginController.clear()
-                                scaffoldState.snackbarHostState.showSnackbar("Sesión cerrada correctamente.")
+                                scaffoldState.snackbarHostState.showSnackbar(Strings.t("successful"))
                                 controller.navigateTo("login")
                             }
                         }) {
-                            Text("Sí")
+                            Text(Strings.t("yes"))
                         }
                     },
                     dismissButton = {
                         TextButton(onClick = {
                             showConfirmDialog.value = false
                         }) {
-                            Text("Cancelar")
+                            Text(Strings.t("cancel"))
                         }
                     },
                     properties = DialogProperties()

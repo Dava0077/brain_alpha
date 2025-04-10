@@ -11,8 +11,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -20,16 +22,37 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brain.alpha.controller.logicController.sudokuController
+import brain.alpha.strings.Strings
 import brainalpha.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
+import brain.alpha.controller.concentrationController.stroopController
+import brain.alpha.view.memoryView.InstructionsCouples
+
 
 @Composable
 fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
-    var gameStarted by remember { mutableStateOf(false) }
+    val gameStarted = !controller.showInstructions.value
     var selectedRow by remember { mutableStateOf(-1) }
     var selectedCol by remember { mutableStateOf(-1) }
     var gridVersion by remember { mutableStateOf(0) }
 
+
+    val showInstructions by controller.showInstructions
+
+
+    // Show instructions first
+    if (showInstructions) {
+        InstructionsSudoku(
+            onStart = { controller.beginGame() },
+            controller = sudokuController
+        )
+        return
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
@@ -69,7 +92,7 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
                         .scale(1.5f)
                 )
                 IconButton(
-                    onClick = { /* Dummy action */ },
+                    onClick = { brain.alpha.controller.LoginController.buttonSettings() },
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .padding(end = 8.dp)
@@ -90,7 +113,7 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
                 elevation = ButtonDefaults.elevation(4.dp),
                 border = BorderStroke(1.dp, Color(0xFFB0BEC5))
             ) {
-                Text("⬅ Volver", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
+                Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
             }
 
             Spacer(modifier = Modifier.height(30.dp))
@@ -109,51 +132,51 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
                 Button(
                     onClick = {
                         controller.startGame()
-                        gameStarted = true
                     },
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
                 ) {
-                    Text("JUGAR", color = Color.Black)
+                    Text(Strings.t("play"), color = Color.Black)
                 }
             } else {
                 // Sudoku Grid
-                Column {
-                    for (row in 0 until 9) {
-                        Row {
-                            for (col in 0 until 9) {
-                                val value = controller.getCellValue(row, col)
-                                val isInitial = controller.isCellInitial(row, col)
+                key(gridVersion){
+                    Column {
+                        for (row in 0 until 9) {
+                            Row {
+                                for (col in 0 until 9) {
+                                    val value = controller.getCellValue(row, col)
+                                    val isInitial = controller.isCellInitial(row, col)
 
-                                Box(
-                                    modifier = Modifier
-                                        .padding(2.dp)
-                                        .size(36.dp)
-                                        .background(
-                                            when {
-                                                isInitial -> Color.Gray
-                                                selectedRow == row && selectedCol == col -> Color(0xFFB3E5FC) // azul claro para seleccionada
-                                                else -> Color.White
+                                    Box(
+                                        modifier = Modifier
+                                            .padding(2.dp)
+                                            .size(36.dp)
+                                            .background(
+                                                when {
+                                                    isInitial -> Color.Gray
+                                                    selectedRow == row && selectedCol == col -> Color(0xFFB3E5FC) // azul claro para seleccionada
+                                                    else -> Color.White
+                                                },
+                                                shape = RoundedCornerShape(4.dp)
+                                            )
+                                            .border(1.dp, Color.Black)
+                                            .clickable(enabled = !isInitial) {
+                                                selectedRow = row
+                                                selectedCol = col
                                             },
-                                            shape = RoundedCornerShape(4.dp)
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = if (value != 0) value.toString() else "",
+                                            fontSize = 16.sp,
+                                            color = if (isInitial) Color.White else Color.Black
                                         )
-                                        .border(1.dp, Color.Black)
-                                        .clickable(enabled = !isInitial) {
-                                            selectedRow = row
-                                            selectedCol = col
-                                        },
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = if (value != 0) value.toString() else "",
-                                        fontSize = 16.sp,
-                                        color = if (isInitial) Color.White else Color.Black
-                                    )
+                                    }
                                 }
                             }
                         }
                     }
                 }
-
 
                 if (selectedRow in 0..8 && selectedCol in 0..8) {
                     Spacer(modifier = Modifier.height(16.dp))
@@ -193,16 +216,17 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
                         controller.startGame()
                         selectedRow = -1
                         selectedCol = -1
+                        gridVersion++
                     },
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
                 ) {
-                    Text("REINICIAR", color = Color.Black)
+                    Text(Strings.t("restart"), color = Color.Black)
                 }
                 if (controller.isBoardComplete()) {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     val isValid = controller.isBoardValid()
-                    val message = if (isValid) "✅ Sudoku correcto" else "❌ Sudoku incorrecto"
+                    val message = if (isValid) Strings.t("correct_sudoku") else Strings.t("incorrect_sudoku")
                     val color = if (isValid) Color(0xFF4CAF50) else Color(0xFFFF5252)
 
                     Text(
@@ -216,16 +240,147 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
                         Button(
                             onClick = {
                                 controller.startGame()
-                                gameStarted = true
                                 selectedRow = -1
                                 selectedCol = -1
                             },
                             colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
                         ) {
-                            Text("JUGAR DE NUEVO", color = Color.White)
+                            Text(Strings.t("play_again"), color = Color.White)
                         }
                     }
                 }
+            }
+        }
+    }
+}
+@Composable
+fun InstructionsSudoku(onStart: () -> Unit, controller: sudokuController) {
+    Box(modifier = Modifier.fillMaxSize()) {
+
+        // Background image
+        Image(
+            painter = painterResource(Res.drawable.fondoLogic),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ) {
+            // Same HEADER as game screen (user icon, logo, settings)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(70.dp)
+                    .background(Color(0xFF222937), shape = RoundedCornerShape(4.dp))
+                    .border(BorderStroke(2.dp, Color(0xFF4CE3E8))))
+            {
+                IconButton(
+                    onClick = { /* Dummy user action */ },
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = 8.dp)
+                        .size(48.dp)
+                ) {
+                    Image(
+                        painter = painterResource(Res.drawable.user),
+                        contentDescription = "Usuario"
+                    )
+                }
+
+                Image(
+                    painter = painterResource(Res.drawable.logo),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(100.dp)
+                        .align(Alignment.Center)
+                        .scale(1.2f)
+                )
+
+                IconButton(
+                    onClick = { brain.alpha.controller.LoginController.buttonSettings() },
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(end = 8.dp)
+                        .size(48.dp)
+                ) {
+                    Image(
+                        painter = painterResource(Res.drawable.ajustes),
+                        contentDescription = "Ajustes"
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(5.dp))
+            // Back Button (same design as in game)
+            Button(
+                onClick = {controller.goHomeLogic()},
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .height(46.dp),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+                shape = RoundedCornerShape(12.dp),
+                elevation = ButtonDefaults.elevation(4.dp),
+                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+            ){
+                Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
+            }
+
+            Spacer(modifier = Modifier.height(100.dp))
+
+            // Title of instruction section
+            Text(
+                Strings.t("instructions"),
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF212121)
+            )
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+            // Game explanation using styled text
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 32.dp)
+                    .background(Color.White, shape = RoundedCornerShape(16.dp))
+                    .padding(16.dp) // Espaciado interno del fondo
+            ) {
+                Text(
+                    buildAnnotatedString {
+                        append(Strings.t("insK1"))
+                        append(Strings.t("insK2"))
+
+                        append(Strings.t("insK3"))
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append(Strings.t("insK5"))
+                        }
+                        append(Strings.t("insK6"))
+                    },
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center,
+                    color = Color(0xFF424242),
+                    lineHeight = 24.sp
+                )
+            }
+
+            Spacer(modifier = Modifier.height(40.dp))
+
+            // Start game button
+            Button(
+                onClick = onStart,
+                modifier = Modifier
+                    .height(48.dp)
+                    .width(200.dp),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+                shape = RoundedCornerShape(12.dp),
+                elevation = ButtonDefaults.elevation(4.dp),
+                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+            ) {
+                Text(Strings.t("start_game"), fontWeight = FontWeight.Medium, color = Color.Black)
             }
         }
     }

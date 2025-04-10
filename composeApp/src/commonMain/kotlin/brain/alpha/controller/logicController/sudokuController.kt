@@ -1,13 +1,23 @@
 package brain.alpha.controller.logicController
 
+import androidx.compose.runtime.mutableStateOf
+import brain.alpha.controller.memoryController.couplesController
 import brain.alpha.model.logicModel.sudokuModel
 
 object sudokuController {
     private val model = sudokuModel
     lateinit var navigateTo: (String) -> Unit
+    val showInstructions = mutableStateOf(true)
 
     fun startGame() {
         sudokuModel.generateValidBoard()
+    }
+    fun beginGame() {
+        showInstructions.value = false
+        startGame()
+    }
+    fun isGameStarted(): Boolean {
+        return !showInstructions.value
     }
     fun setCellValue(row: Int, col: Int, value: Int) {
         sudokuModel.setCell(row, col, value)
@@ -59,5 +69,6 @@ object sudokuController {
     }
     fun goHomeLogic(){
         navigateTo("logic")
+        showInstructions.value = true
     }
 }
