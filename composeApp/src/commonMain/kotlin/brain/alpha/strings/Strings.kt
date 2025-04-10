@@ -67,6 +67,12 @@ object Strings {
             "insK4" to "contenga los números del ",
             "insK5" to "1 al 9\n\n",
             "insK6" to " sin repetir. ¡Buena suerte!",
+            // ODD EMOJI SCREEN
+            "title_oddEmoji" to "EMOJI DIFERENTE",
+            "game_over" to "¡Juego Terminado!",
+            "level_reached" to "Nivel alcanzado",
+            "errors" to "Errores cometidos",
+            "insOdd" to "Verás una cuadrícula llena de emojis.\nSolo uno es diferente.\n\n¡Encuéntralo lo más rápido posible!\nTienes un límite de errores.\n\n¡Buena suerte!",
             ),
         "en" to mapOf(
             //GENERAL
@@ -132,6 +138,12 @@ object Strings {
             "insK4" to "contains the numbers",
             "insK5" to "1 to 9\n\n",
             "insK6" to " without repeating.Good luck!",
+            // ODD EMOJI SCREEN
+            "title_oddEmoji" to "ODD EMOJI",
+            "game_over" to "Game Over!",
+            "level_reached" to "Level reached",
+            "errors" to "Errors made",
+            "insOdd" to "You will see a grid of emojis.\nOnly one is different.\n\nFind it as quickly as possible!\nYou have a limited number of mistakes.\n\nGood luck!",
 
         )
     )

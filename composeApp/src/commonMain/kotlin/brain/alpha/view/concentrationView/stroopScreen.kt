@@ -45,7 +45,7 @@ import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun StroopScreen(controller: stroopController = stroopController,onNavigateToHome: () -> Unit,) {
+fun StroopScreen(controller: stroopController = stroopController) {
 
     // State bindings from controller
     val timeLeft by controller.timeLeft

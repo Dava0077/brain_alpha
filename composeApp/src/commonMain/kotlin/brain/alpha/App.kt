@@ -5,6 +5,8 @@ import androidx.compose.runtime.*
 import brain.alpha.view.LoginScreen
 import brain.alpha.controller.LoginController
 import brain.alpha.controller.SettingsController
+import brain.alpha.controller.concentrationController.concentrationHomeController
+import brain.alpha.controller.concentrationController.oddEmojiController
 import brain.alpha.controller.concentrationController.stroopController
 import brain.alpha.controller.logicController.logicHomeController
 import brain.alpha.controller.logicController.sudokuController
@@ -20,7 +22,9 @@ import brain.alpha.services.SupabaseClientProvider
 import brain.alpha.view.HomeScreen
 import brain.alpha.view.SettingsScreen
 import brain.alpha.view.SignUpScreen
+import brain.alpha.view.concentrationView.concentrationHomeScreen
 import brain.alpha.view.concentrationViews.StroopScreen
+import brain.alpha.view.concentrationViews.oddEmojiScreen
 import brain.alpha.view.logicView.logicHomeScreen
 import brain.alpha.view.logicView.sudokuScreen
 import brain.alpha.view.logicView.wordSearchScreen
@@ -86,7 +90,9 @@ fun App() {
         mentalHomeController.navigateTo = { route -> currentScreen = route }
 
         //CONCENTRATION
+        concentrationHomeController.navigateTo = { route -> currentScreen = route}
         stroopController.navigateTo = { route -> currentScreen = route }
+        oddEmojiController.navigateTo = {route -> currentScreen = route}
 
         //LOGIC GAMES
         sudokuController.navigateTo = { route -> currentScreen = route }
@@ -160,9 +166,17 @@ fun App() {
             )
 
 
-            "concentration" -> StroopScreen(
-                controller = stroopController,
-                onNavigateToHome = {currentScreen="home"}
+            //CONCENTRATION
+            "concentration" -> concentrationHomeScreen(
+                controller = concentrationHomeController
+            )
+
+            "stroop" -> StroopScreen(
+                controller = stroopController
+            )
+
+            "emoji" -> oddEmojiScreen(
+                controller = oddEmojiController
             )
 
             //LOGIC
