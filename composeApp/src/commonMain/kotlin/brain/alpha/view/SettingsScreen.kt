@@ -14,11 +14,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import brain.alpha.controller.LoginController
 import brain.alpha.controller.SettingsController
-import brainalpha.composeapp.generated.resources.Res
 import brain.alpha.strings.Strings
-import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun SettingsScreen(controller: SettingsController) {
@@ -74,7 +71,7 @@ fun SettingsScreen(controller: SettingsController) {
                     modifier = Modifier.padding(vertical = 8.dp)
                 ) {
                     Text(Strings.t("language"), modifier = Modifier.weight(1f))
-                    DropdownMenuLanguage(selectedLanguage) { selected ->
+                    dropdownMenuLanguage(selectedLanguage) { selected ->
                         Strings.setLanguage(if (selected == "English") "en" else "es")
                     }
                 }
@@ -88,15 +85,15 @@ fun SettingsScreen(controller: SettingsController) {
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
-                SettingsItem(Strings.t("change_name")) {
+                settingsItem(Strings.t("change_name")) {
                     // TODO
                 }
 
-                SettingsItem(Strings.t("change_email")) {
+                settingsItem(Strings.t("change_email")) {
                     // TODO
                 }
 
-                SettingsItem(Strings.t("change_password")) {
+                settingsItem(Strings.t("change_password")) {
                     // TODO
                 }
             }
@@ -104,7 +101,7 @@ fun SettingsScreen(controller: SettingsController) {
     }
 }
 @Composable
-fun DropdownMenuLanguage(current: String, onLanguageChange: (String) -> Unit) {
+fun dropdownMenuLanguage(current: String, onLanguageChange: (String) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     val options = listOf("Español", "English")
 
@@ -127,7 +124,7 @@ fun DropdownMenuLanguage(current: String, onLanguageChange: (String) -> Unit) {
 }
 
 @Composable
-fun SettingsItem(title: String, onClick: () -> Unit) {
+fun settingsItem(title: String, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()

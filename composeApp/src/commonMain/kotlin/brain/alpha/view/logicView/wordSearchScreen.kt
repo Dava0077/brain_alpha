@@ -10,13 +10,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brain.alpha.controller.logicController.wordSearchController
+import brain.alpha.controller.memoryController.couplesController
+import brain.alpha.strings.Strings
+import brain.alpha.view.memoryView.InstructionsCouples
 import brainalpha.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 import kotlinx.coroutines.Dispatchers
@@ -38,6 +44,17 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
     var showDialog by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) } // Estado de carga
     val scope = rememberCoroutineScope()
+    val showInstructions by controller.showInstructions
+
+
+    // Show instructions first
+    if (showInstructions) {
+        InstructionsWordSearch(
+            onStart = { controller.beginGame() },
+            controller = wordSearchController
+        )
+        return
+    }
 
     LaunchedEffect(gameStarted) {
         if (gameStarted) {
@@ -90,7 +107,7 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                     modifier = Modifier.size(120.dp).align(Alignment.Center).scale(1.5f)
                 )
                 IconButton(
-                    onClick = { /* Dummy action */ },
+                    onClick = { brain.alpha.controller.LoginController.buttonSettings() },
                     modifier = Modifier.align(Alignment.CenterEnd).padding(end = 8.dp).size(55.dp)
                 ) {
                     Image(painter = painterResource(Res.drawable.ajustes), contentDescription = "Settings")
@@ -108,12 +125,12 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                 elevation = ButtonDefaults.elevation(4.dp),
                 border = BorderStroke(1.dp, Color(0xFFB0BEC5))
             ) {
-                Text("⬅ Volver", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
+                Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
             }
 
             Spacer(modifier = Modifier.height(30.dp))
             Text(
-                text = "SOPA DE LETRAS",
+                text = Strings.t("title_wordSearch"),
                 fontSize = 40.sp,
                 color = Color.Black,
                 fontFamily = FontFamily.SansSerif,
@@ -139,12 +156,12 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                     enabled = !isLoading, // Deshabilitar mientras carga
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
                 ) {
-                    Text(if (isLoading) "CARGANDO..." else "JUGAR", color = Color.Black)
+                    Text(if (isLoading) Strings.t("charging") else Strings.t("play"), color = Color.Black)
                 }
             }
 
             if (gameStarted) {
-                Text("Tiempo restante: $timeLeft s", fontSize = 20.sp, color = Color.Black)
+                Text(Strings.t("remaining_time")+ "$timeLeft s", fontSize = 20.sp, color = Color.Black)
                 Spacer(modifier = Modifier.height(10.dp))
 
                 Column {
@@ -199,7 +216,7 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
-                Text("Palabras a encontrar:", fontSize = 20.sp, color = Color.Black)
+                Text(Strings.t("words_find"), fontSize = 20.sp, color = Color.Black)
                 controller.getWordsToFind().forEach { word ->
                     val isFound = word in foundWords
                     Text(
@@ -220,7 +237,7 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                         },
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
                     ) {
-                        Text("RESETEAR", color = Color.Black)
+                        Text(Strings.t("restart"), color = Color.Black)
                     }
                     Button(
                         onClick = {
@@ -237,7 +254,7 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                         },
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
                     ) {
-                        Text("VALIDAR", color = Color.Black)
+                        Text(Strings.t("validate"), color = Color.Black)
                     }
                 }
             }
@@ -245,8 +262,8 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
             if (showDialog != null) {
                 AlertDialog(
                     onDismissRequest = { showDialog = null },
-                    title = { Text(if (showDialog == "win") "¡Has ganado!" else "¡Has perdido!") },
-                    text = { Text(if (showDialog == "win") "¡Felicidades!" else "Se acabó el tiempo.") },
+                    title = { Text(if (showDialog == "win") Strings.t("you_win") else Strings.t("you_lose")) },
+                    text = { Text(if (showDialog == "win") Strings.t("congrats") else Strings.t("times_up")) },
                     buttons = {
                         Row(
                             modifier = Modifier.padding(8.dp),
@@ -269,7 +286,7 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                                 },
                                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
                             ) {
-                                Text("Volver a jugar", color = Color.Black)
+                                Text(Strings.t("replay"), color = Color.Black)
                             }
                             Button(
                                 onClick = {
@@ -278,11 +295,149 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                                 },
                                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
                             ) {
-                                Text("Volver al inicio", color = Color.Black)
+                                Text(Strings.t("return_home"), color = Color.Black)
                             }
                         }
                     }
                 )
+            }
+        }
+    }
+}
+@Composable
+fun InstructionsWordSearch(onStart: () -> Unit, controller: wordSearchController) {
+    Box(modifier = Modifier.fillMaxSize()) {
+
+        // Background image
+        Image(
+            painter = painterResource(Res.drawable.fondoMemory),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ) {
+            // Same HEADER as game screen (user icon, logo, settings)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(70.dp)
+                    .background(Color(0xFF222937), shape = RoundedCornerShape(4.dp))
+                    .border(BorderStroke(2.dp, Color(0xFF4CE3E8))))
+            {
+                IconButton(
+                    onClick = { /* Dummy user action */ },
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = 8.dp)
+                        .size(48.dp)
+                ) {
+                    Image(
+                        painter = painterResource(Res.drawable.user),
+                        contentDescription = "Usuario"
+                    )
+                }
+
+                Image(
+                    painter = painterResource(Res.drawable.logo),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(100.dp)
+                        .align(Alignment.Center)
+                        .scale(1.2f)
+                )
+
+                IconButton(
+                    onClick = { brain.alpha.controller.LoginController.buttonSettings() },
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(end = 8.dp)
+                        .size(48.dp)
+                ) {
+                    Image(
+                        painter = painterResource(Res.drawable.ajustes),
+                        contentDescription = "Ajustes"
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(5.dp))
+            // Back Button (same design as in game)
+            Button(
+                onClick = {controller.goHomeLogic()},
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .height(46.dp),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+                shape = RoundedCornerShape(12.dp),
+                elevation = ButtonDefaults.elevation(4.dp),
+                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+            ){
+                Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
+            }
+
+            Spacer(modifier = Modifier.height(100.dp))
+
+            // Title of instruction section
+            Text(
+                Strings.t("instructions"),
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF212121)
+            )
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+            // Game explanation using styled text
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 32.dp)
+                    .background(Color.White, shape = RoundedCornerShape(16.dp))
+                    .padding(16.dp) // Padding interno
+            ) {
+                Text(
+                    buildAnnotatedString {
+                        append(Strings.t("insW1"))
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append(Strings.t("insW2"))
+                        }
+                        append(Strings.t("insW3") + "\n\n")
+
+                        append(Strings.t("insW4"))
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append(Strings.t("insW5"))
+                        }
+                        append(" .\n")
+
+                        append(Strings.t("insW6"))
+                    },
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center,
+                    color = Color.Black,
+                    lineHeight = 24.sp
+                )
+            }
+
+
+            Spacer(modifier = Modifier.height(40.dp))
+
+            // Start game button
+            Button(
+                onClick = onStart,
+                modifier = Modifier
+                    .height(48.dp)
+                    .width(200.dp),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+                shape = RoundedCornerShape(12.dp),
+                elevation = ButtonDefaults.elevation(4.dp),
+                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+            ) {
+                Text(Strings.t("start_game"), fontWeight = FontWeight.Medium, color = Color.Black)
             }
         }
     }

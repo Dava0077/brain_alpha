@@ -8,8 +8,12 @@ object Strings {
             "play" to "JUGAR",
             "play_again" to "JUGAR DE NUEVO",
             "restart" to "REINICIAR",
+            "charging" to "CARGANDO...",
             "press_play" to "Presiona Jugar",
             "you_won" to "Has ganado: ",
+            "time" to "Tiempo:",
+            "final_time" to "Tiempo final: ",
+            "remaining_time" to "Tiempo restante: ",
             //HOME SCREEN
             "hi" to "Hola, ",
             "categories" to "CATEGORIAS",
@@ -34,8 +38,6 @@ object Strings {
             "change_password" to "Cambiar contraseña",
             //COUPLES SCREEN
             "title_couples" to "JUEGO DE PAREJAS",
-            "time" to "Tiempo:",
-            "final_time" to "Tiempo final: ",
             "correct_couples" to "Parejas correctas:",
             "incorrect_couples" to "Parejas incorrectas:",
             "instructions" to "Instrucciones",
@@ -67,20 +69,37 @@ object Strings {
             "insK4" to "contenga los números del ",
             "insK5" to "1 al 9\n\n",
             "insK6" to " sin repetir. ¡Buena suerte!",
-            // ODD EMOJI SCREEN
-            "title_oddEmoji" to "EMOJI DIFERENTE",
-            "game_over" to "¡Juego Terminado!",
-            "level_reached" to "Nivel alcanzado",
-            "errors" to "Errores cometidos",
-            "insOdd" to "Verás una cuadrícula llena de emojis.\nSolo uno es diferente.\n\n¡Encuéntralo lo más rápido posible!\nTienes un límite de errores.\n\n¡Buena suerte!",
+            //WORD SEARCH SCREEN
+            "title_wordSearch" to "SOPA DE LETRAS",
+            "words_find" to "Palabras a encontrar:",
+            "validate" to "VALIDAR",
+            "you_win" to "¡Has ganado!",
+            "you_lose" to "¡Has perdido!",
+            "congrats" to "¡Felicidades!",
+            "times_up" to "Se acabó el tiempo.",
+            "replay" to "Volver a jugar",
+            "return_home" to "Volver al inicio",
+            "insW1" to "Debes buscar las ",
+            "insW2" to "palabras",
+            "insW3" to " que se te mostraran en una lista.",
+            "insW4" to "Cuento menos tiempo tardes ",
+            "insW5" to "MEJOR!!",
+            "insW6" to "Concéntrate, ¡y buena suerte!",
+
+
+
             ),
         "en" to mapOf(
             //GENERAL
             "play" to "PLAY",
             "play_again" to "PLAY AGAIN",
             "restart" to "RESTART",
+            "charging" to "CHARGING...",
             "press_play" to "Press Play",
             "you_won" to "You won: ",
+            "time" to "Time:",
+            "final_time" to "Final time: ",
+            "remaining_time" to "Remaining time: ",
             //HOME SCREEN
             "hi" to "Hi, ",
             "categories" to "CATEGORIES",
@@ -105,8 +124,6 @@ object Strings {
             "change_password" to "Change password",
             //COUPLES SCREEN
             "title_couples" to "COUPLES GAME",
-            "time" to "Time:",
-            "final_time" to "Final time: ",
             "correct_couples" to "Couples correct:",
             "incorrect_couples" to "Couples incorrect:",
             "instructions" to "Instructions",
@@ -138,12 +155,22 @@ object Strings {
             "insK4" to "contains the numbers",
             "insK5" to "1 to 9\n\n",
             "insK6" to " without repeating.Good luck!",
-            // ODD EMOJI SCREEN
-            "title_oddEmoji" to "ODD EMOJI",
-            "game_over" to "Game Over!",
-            "level_reached" to "Level reached",
-            "errors" to "Errors made",
-            "insOdd" to "You will see a grid of emojis.\nOnly one is different.\n\nFind it as quickly as possible!\nYou have a limited number of mistakes.\n\nGood luck!",
+            //WORD SEARCH SCREEN
+            "title_wordSearch" to "WORD SEARCH",
+            "words_find" to "Words to find:",
+            "validate" to "VALIDATE",
+            "you_win" to "¡YOU WIN!",
+            "you_lose" to "¡YOU LOSE!",
+            "congrats" to "¡CONGRATULATIONS!",
+            "times_up" to "Time's up.",
+            "replay" to "Replay",
+            "return_home" to "Return home",
+            "insW1" to "You must look fot the ",
+            "insW2" to "words",
+            "insW3" to " that will shown you in a list.",
+            "insW4" to "The faster you finish the ",
+            "insW5" to "BETTER!!",
+            "insW6" to "Focus, and good luck!",
 
         )
     )

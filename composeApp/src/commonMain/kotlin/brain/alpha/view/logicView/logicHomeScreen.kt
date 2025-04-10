@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brain.alpha.controller.logicController.logicHomeController
+import brain.alpha.strings.Strings
 import brain.alpha.view.CategoryItem
 import brainalpha.composeapp.generated.resources.*
 import brainalpha.composeapp.generated.resources.Res
@@ -74,7 +75,7 @@ fun logicHomeScreen(
                         .scale(1.5f)
                 )
                 IconButton(
-                    onClick = { /* Dummy action */ },
+                    onClick = { brain.alpha.controller.LoginController.buttonSettings() },
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .padding(end = 8.dp)
@@ -95,13 +96,13 @@ fun logicHomeScreen(
                 elevation = ButtonDefaults.elevation(4.dp),
                 border = BorderStroke(1.dp, Color(0xFFB0BEC5))
             ) {
-                Text("⬅ Volver", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
+                Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
             }
 
             Spacer(modifier = Modifier.height(30.dp))
 
             Text(
-                text = "LOGICA",
+                text = Strings.t("logic"),
                 fontSize = 40.sp,
                 color = Color.Black,
                 fontFamily = FontFamily.SansSerif,
@@ -123,7 +124,7 @@ fun logicHomeScreen(
                         onNavigateToSudoku
                     )
                     CategoryItem(
-                        "SOPA DE LETRAS",
+                        Strings.t("title_wordSearch"),
                         Res.drawable.sopaLetras,
                         Color.White,
                         onNavigateToWordS

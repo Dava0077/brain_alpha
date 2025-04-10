@@ -3,7 +3,7 @@
 
 <img src="logo.PNG" width="400">
 
-
+<https://play.google.com/store/apps/details?id=brain.alpha&hl=es_419>
 
 ## Development
 

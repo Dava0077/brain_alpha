@@ -1,5 +1,7 @@
 package brain.alpha.controller.logicController
 
+import androidx.compose.runtime.mutableStateOf
+import brain.alpha.controller.memoryController.couplesController
 import brain.alpha.model.logicModel.wordSearchModel
 
 object wordSearchController {
@@ -7,6 +9,7 @@ object wordSearchController {
     lateinit var navigateTo: (String) -> Unit
     private val selectedCells = mutableListOf<Pair<Int, Int>>()
     var selectionDirection: Pair<Int, Int>? = null
+    val showInstructions = mutableStateOf(true)
 
     fun selectCell(row: Int, col: Int) {
         selectedCells.add(Pair(row, col))
@@ -23,6 +26,10 @@ object wordSearchController {
         val rowDiff = kotlin.math.abs(row - lastRow)
         val colDiff = kotlin.math.abs(col - lastCol)
         return rowDiff <= 1 && colDiff <= 1 && (row != lastRow || col != lastCol)
+    }
+    fun beginGame() {
+        showInstructions.value = false
+        startGame()
     }
 
     fun clearSelection() {
@@ -44,6 +51,7 @@ object wordSearchController {
 
     fun goHomeLogic() {
         navigateTo("logic") // Solo navegamos, sin reiniciar el modelo
+        showInstructions.value = true
     }
 
     fun startGame() {
