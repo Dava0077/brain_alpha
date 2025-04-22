@@ -3,6 +3,7 @@ package brain.alpha.controller.concentrationController
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import brain.alpha.model.concentrationModel.stroopModel
+import brain.alpha.model.shared.Difficulty
 import kotlinx.coroutines.*
 
 /**
@@ -49,8 +50,23 @@ object stroopController {
     val options: List<Color> get() = model.options
 
     // Controls visibility of the instructions screen
-    val showInstructions = mutableStateOf(true)
+    val showInstructions = mutableStateOf(false)
 
+    val totalTime: State<Int> get() = derivedStateOf { model.getMaxTime() }
+
+    val isOngoingGame: Boolean
+        get() = model.hasStartedGame && model.timeLeft > 0 && !model.isGameOver
+
+    fun getCurrentDifficulty(): Difficulty = model.currentDifficulty
+
+    fun setDifficulty(difficulty: Difficulty) {
+        model.setDifficulty(difficulty)
+    }
+
+
+    fun showInstructionsScreen() {
+        showInstructions.value = true
+    }
 
     /**
      * Checks whether the selected answer is correct and updates state.
@@ -84,6 +100,10 @@ object stroopController {
         startGame()
     }
 
+    fun continueGame() {
+        startTimer()
+    }
+
     /**
      * Resets the game and starts the countdown timer.
      */
@@ -112,7 +132,17 @@ object stroopController {
      */
     fun goHome(){
         navigateTo("home")
-        showInstructions.value = true
+        showInstructions.value = false
+    }
+
+    fun goConcentrationHome(){
+        navigateTo("concentration")
+        showInstructions.value = false
+    }
+
+    fun goBackTo(route: String) {
+        navigateTo(route)
+        showInstructions.value = false
     }
 
 
@@ -138,4 +168,6 @@ object stroopController {
     fun clearFeedback() {
         _answerFeedback.value = null
     }
+
+
 }
