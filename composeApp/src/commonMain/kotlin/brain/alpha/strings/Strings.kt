@@ -1,5 +1,7 @@
 package brain.alpha.strings
 
+import brain.alpha.model.shared.Difficulty
+
 object Strings {
 
     private val translations = mapOf(
@@ -14,6 +16,11 @@ object Strings {
             "time" to "Tiempo:",
             "final_time" to "Tiempo final: ",
             "remaining_time" to "Tiempo restante: ",
+            "back" to "⬅ Volver",
+            "instructions" to "Instrucciones",
+            "easy" to "Fácil",
+            "medium" to "Medio",
+            "hard" to "Difícil",
             //HOME SCREEN
             "hi" to "Hola, ",
             "categories" to "CATEGORIAS",
@@ -29,7 +36,6 @@ object Strings {
             "cancel" to "Cancelar",
             //SETTINGS SCREEN
             "settings_title" to "Ajustes",
-            "back" to "⬅ Volver",
             "preferences" to "Preferencias",
             "language" to "Idioma",
             "account_profile" to "Cuenta y perfil",
@@ -48,6 +54,7 @@ object Strings {
             "insC4" to "Cuento menos tiempo tardes ",
             "insC5" to "MEJOR!!",
             "insC6" to "Concéntrate, ¡y buena suerte!",
+            "insC7" to "Información de la dificultad:\t\n - Fácil: 8 parejas\n - Medio: 12 parejas\n - Dificil: 16 parejas",
             //SIMON SCREEN
             "title_simon" to "SIMON DICE",
             "mem_color" to "Memoriza el color...",
@@ -100,6 +107,11 @@ object Strings {
             "time" to "Time:",
             "final_time" to "Final time: ",
             "remaining_time" to "Remaining time: ",
+            "back" to "⬅ Back",
+            "instructions" to "Instructions",
+            "easy" to "Easy",
+            "medium" to "Medium",
+            "hard" to "Hard",
             //HOME SCREEN
             "hi" to "Hi, ",
             "categories" to "CATEGORIES",
@@ -115,7 +127,6 @@ object Strings {
             "cancel" to "Cancel",
             //SETTINGS SCREEN
             "settings_title" to "Settings",
-            "back" to "⬅ Back",
             "preferences" to "Preferences",
             "language" to "Language",
             "account_profile" to "Account & Profile",
@@ -123,17 +134,18 @@ object Strings {
             "change_email" to "Change email",
             "change_password" to "Change password",
             //COUPLES SCREEN
-            "title_couples" to "COUPLES GAME",
-            "correct_couples" to "Couples correct:",
-            "incorrect_couples" to "Couples incorrect:",
+            "title_couples" to "PAIRS GAME",
+            "correct_couples" to "Pairs correct:",
+            "incorrect_couples" to "Pairs incorrect:",
             "instructions" to "Instructions",
             "start_game" to "Start game",
             "insC1" to "You must select the different ",
-            "insC2" to "couples",
+            "insC2" to "pais",
             "insC3" to " on the board.",
             "insC4" to "The faster you finish the ",
             "insC5" to "BETTER!!",
             "insC6" to "Focus, and good luck!",
+            "insC7" to "Difficulty information:\t\n - Easy: 8 pairs\n - Medium: 12 pairs\n - Hard: 16 pairs",
             //SIMON SCREEN
             "title_simon" to "SIMON SAYS",
             "mem_color" to "Memorize the color...",
@@ -182,6 +194,13 @@ object Strings {
 
     fun setLanguage(lang: String) {
         LanguageState.current.value = lang
+    }
+    fun translateDifficulty(diff: Difficulty): String {
+        return when (diff) {
+            Difficulty.EASY -> t("easy")
+            Difficulty.MEDIUM -> t("medium")
+            Difficulty.HARD -> t("hard")
+        }
     }
 
     val currentLanguage get() = LanguageState.current.value

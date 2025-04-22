@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 object simonController {
     lateinit var navigateTo: (String) -> Unit
     val highlightedColor = MutableStateFlow<String?>(null)
-    val showInstructions = mutableStateOf(true)
+    val showInstructions = mutableStateOf(false)
 
     private val model = simonModel
     private val scope = CoroutineScope(Dispatchers.Default)
@@ -29,6 +29,9 @@ object simonController {
             score = 0
         )
     )
+    fun toggleInstructions(show: Boolean) {
+        showInstructions.value = show
+    }
     val uiState: StateFlow<SimonUiState> = _uiState
 
     private var gameOver = false
@@ -108,13 +111,13 @@ object simonController {
                     sequence = newSequence
                 )
 
-                delay(1000)
+                delay(800)
 
                 _uiState.value = _uiState.value.copy(
                     sequence = emptyList() // ✅ ocultar color
                 )
 
-                delay(300)
+                delay(200)
 
                 model.beginPlayerTurn()
                 _uiState.value = _uiState.value.copy(
@@ -129,7 +132,7 @@ object simonController {
     fun goHome() {
         model.resetGame()
         model.resetScore()
-        showInstructions.value = true
+        showInstructions.value = false
         _uiState.value = SimonUiState(
             message = Strings.t("press_play"),
             isUserTurn = false,

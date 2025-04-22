@@ -4,22 +4,29 @@ package brain.alpha.controller.memoryController
 import androidx.compose.runtime.mutableStateOf
 import brain.alpha.controller.concentrationController.stroopController
 import brain.alpha.model.memoryModel.couplesModel
+import brain.alpha.model.shared.Difficulty
 
 object couplesController {
     private val model = couplesModel
     lateinit var navigateTo: (String) -> Unit
-    val showInstructions = mutableStateOf(true)
+    val showInstructions = mutableStateOf(false)
 
     fun startGame() {
-        model.shuffledCards = (model.allCards + model.allCards).shuffled().toMutableList()
-        model.revealed = MutableList(16) { false }
-        model.matched = MutableList(16) { false }
+        val pairCount = model.pairCount
+        val cardsToUse = model.allCards.shuffled().take(pairCount)
+        model.shuffledCards = (cardsToUse + cardsToUse).shuffled().toMutableList()
+        model.revealed = MutableList(pairCount * 2) { false }
+        model.matched = MutableList(pairCount * 2) { false }
         model.selectedIndices.clear()
         model.started = true
     }
+
     fun beginGame() {
         showInstructions.value = false
         startGame()
+    }
+    fun toggleInstructions(show: Boolean) {
+        showInstructions.value = show
     }
 
     fun hasStarted(): Boolean = model.started
@@ -53,7 +60,7 @@ object couplesController {
     fun goHome(){
         navigateTo("memory")
         model.started = false;
-        showInstructions.value = true
+        showInstructions.value = false
     }
 
     fun processTurnEnd() {
@@ -64,6 +71,12 @@ object couplesController {
             model.selectedIndices.clear()
         }
     }
+    fun getShuffledCardCount(): Int = model.shuffledCards.size
+
+    fun setDifficulty(difficulty: Difficulty) {
+        couplesModel.difficulty = difficulty
+    }
+    fun getPairCount(): Int = couplesModel.pairCount
 
     fun isGameFinished(): Boolean = model.matched.all { it }
 }

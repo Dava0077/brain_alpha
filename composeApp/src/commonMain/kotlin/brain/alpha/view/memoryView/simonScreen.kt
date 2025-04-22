@@ -113,17 +113,34 @@ fun simonScreen(
             }
             Spacer(modifier = Modifier.height(5.dp)) // Espacio tras el logo
 
-            Button(
-                onClick = {controller.goHome()},
+            Row(
                 modifier = Modifier
-                    .align(Alignment.End)
-                    .height(46.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
-                shape = RoundedCornerShape(12.dp),
-                elevation = ButtonDefaults.elevation(4.dp),
-                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+
             ){
-                Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
+                Button(
+                    onClick = {controller.toggleInstructions(true)},
+                    modifier = Modifier
+                        .height(46.dp),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.elevation(4.dp),
+                    border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+                ){
+                    Text(Strings.t("instructions"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
+                }
+                Button(
+                    onClick = {controller.goHome()},
+                    modifier = Modifier
+                        .height(46.dp),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.elevation(4.dp),
+                    border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+                ){
+                    Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
+                }
             }
 
             Spacer(modifier = Modifier.height(30.dp)) // Espacio tras el logo
@@ -300,18 +317,6 @@ fun InstructionsSimon(onStart: () -> Unit, controller: simonController) {
 
             Spacer(modifier = Modifier.height(5.dp))
             // Back Button (same design as in game)
-            Button(
-                onClick = {controller.goHome()},
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .height(46.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
-                shape = RoundedCornerShape(12.dp),
-                elevation = ButtonDefaults.elevation(4.dp),
-                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
-            ){
-                Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
-            }
 
             Spacer(modifier = Modifier.height(100.dp))
 

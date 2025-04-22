@@ -6,8 +6,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.IconButton
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,8 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import androidx.compose.foundation.clickable
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.SpanStyle
@@ -34,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import brain.alpha.controller.concentrationController.stroopController
 import brain.alpha.controller.memoryController.couplesController
+import brain.alpha.model.shared.Difficulty
 import brain.alpha.strings.Strings
 import brainalpha.composeapp.generated.resources.*
 
@@ -51,10 +49,13 @@ fun couplesScreen(
     var gameFinished by remember { mutableStateOf(false) }
     var elapsedTime by remember { mutableStateOf(0) }
     var gameLost by remember { mutableStateOf(false) }
+    var selectedDifficulty by remember { mutableStateOf(Difficulty.EASY) }
 
-    val shuffledCards = List(16) { index -> controller.getCardValue(index) }
     var timerTrigger by remember { mutableStateOf(0) }
     val showInstructions by controller.showInstructions
+    val pairCount = controller.getPairCount()
+    val (rows, cols) = getGridDimensions(pairCount)
+    val shuffledCards = List(controller.getShuffledCardCount()) { index -> controller.getCardValue(index) }
 
 
     // Show instructions first
@@ -67,7 +68,6 @@ fun couplesScreen(
     }
 
 
-
     LaunchedEffect(selectedIndices) {
         if (selectedIndices.size == 2) {
             delay(1000)
@@ -75,7 +75,10 @@ fun couplesScreen(
             revealed.clear(); revealed.addAll(controller.getRevealedStates())
             matched.clear(); matched.addAll(controller.getMatchedStates())
             selectedIndices = controller.getSelectedIndices()
-            if (controller.isGameFinished()) gameFinished = true
+            if (controller.isGameFinished()) {
+                gameFinished = true
+                gameStarted = false // ✅ REACTIVA los RadioButtons
+            }
         }
     }
     LaunchedEffect(timerTrigger) {
@@ -148,18 +151,56 @@ fun couplesScreen(
             }
             Spacer(modifier = Modifier.height(5.dp)) // Espacio tras el logo
 
-            Button(
-                onClick = {controller.goHome()},
+            Row(
                 modifier = Modifier
-                    .align(Alignment.End)
-                    .height(46.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
-                shape = RoundedCornerShape(12.dp),
-                elevation = ButtonDefaults.elevation(4.dp),
-                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+
+            ){
+                Button(
+                    onClick = {controller.toggleInstructions(true)},
+                    modifier = Modifier
+                        .height(46.dp),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.elevation(4.dp),
+                    border = BorderStroke(1.dp, Color(0xFFB0BEC5))
                 ){
-                Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
+                    Text(Strings.t("instructions"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
+                }
+                Button(
+                    onClick = {controller.goHome()},
+                    modifier = Modifier
+                        .height(46.dp),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.elevation(4.dp),
+                    border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+                ){
+                    Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
+                }
             }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(vertical = 16.dp)
+            ) {
+                Difficulty.values().forEach { difficulty ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RadioButton(
+                            selected = selectedDifficulty == difficulty,
+                            onClick = {
+                                selectedDifficulty = difficulty
+                                controller.setDifficulty(difficulty) // <- necesitas este método
+                            },
+                            enabled = !gameStarted
+                        )
+                        Text(text = Strings.translateDifficulty(difficulty))
+                    }
+                }
+            }
+
+
 
             Spacer(modifier = Modifier.height(30.dp)) // Espacio tras el logo
 
@@ -183,17 +224,24 @@ fun couplesScreen(
             )
             Spacer(modifier = Modifier.height(10.dp))
 
-            for (row in 0 until 4) {
+            val (rows, cols) = getGridDimensions(pairCount)
+
+            for (row in 0 until rows) {
                 Row {
-                    for (col in 0 until 4) {
-                        val index = row * 4 + col
+                    for (col in 0 until cols) {
+                        val index = row * cols + col
+                        if (index >= shuffledCards.size) continue  // Evita crash si sobran casillas
+
                         val isVisible = revealed.getOrNull(index) == true || matched.getOrNull(index) == true
 
                         Box(
                             modifier = Modifier
                                 .padding(4.dp)
                                 .size(64.dp)
-                                .background(if (isVisible) Color.White else Color(0xFF80C6E8), shape = RoundedCornerShape(8.dp))
+                                .background(
+                                    if (isVisible) Color.White else Color(0xFF80C6E8),
+                                    shape = RoundedCornerShape(8.dp)
+                                )
                                 .clickable(enabled = gameStarted && !isVisible && selectedIndices.size < 2) {
                                     if (controller.selectCard(index)) {
                                         revealed.clear(); revealed.addAll(controller.getRevealedStates())
@@ -215,6 +263,8 @@ fun couplesScreen(
                     }
                 }
             }
+
+
 
             Spacer(modifier = Modifier.height(30.dp))
 
@@ -311,18 +361,7 @@ fun InstructionsCouples(onStart: () -> Unit, controller: couplesController) {
 
             Spacer(modifier = Modifier.height(5.dp))
             // Back Button (same design as in game)
-            Button(
-                onClick = {controller.goHome()},
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .height(46.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
-                shape = RoundedCornerShape(12.dp),
-                elevation = ButtonDefaults.elevation(4.dp),
-                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
-            ){
-                Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
-            }
+
 
             Spacer(modifier = Modifier.height(100.dp))
 
@@ -350,6 +389,8 @@ fun InstructionsCouples(onStart: () -> Unit, controller: couplesController) {
                             append(Strings.t("insC2"))
                         }
                         append(Strings.t("insC3") + "\n\n")
+
+                        append(Strings.t("insC7")+"\n")
 
                         append(Strings.t("insC4"))
                         withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
@@ -383,6 +424,15 @@ fun InstructionsCouples(onStart: () -> Unit, controller: couplesController) {
                 Text(Strings.t("start_game"), fontWeight = FontWeight.Medium, color = Color.White)
             }
         }
+    }
+}
+fun getGridDimensions(pairCount: Int): Pair<Int, Int> {
+    val totalCards = pairCount * 2
+    return when (totalCards) {
+        16 -> 4 to 4
+        24 -> 6 to 4
+        36 -> 6 to 6
+        else -> 4 to 4
     }
 }
 
