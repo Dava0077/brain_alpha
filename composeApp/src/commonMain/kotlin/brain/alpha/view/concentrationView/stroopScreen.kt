@@ -27,6 +27,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brain.alpha.controller.concentrationController.stroopController
+import brain.alpha.model.shared.Difficulty
 import brain.alpha.strings.Strings
 import brainalpha.composeapp.generated.resources.*
 import brainalpha.composeapp.generated.resources.Res
@@ -56,11 +57,23 @@ fun StroopScreen(controller: stroopController = stroopController) {
     val answerFeedback by controller.answerFeedback
     val options = controller.options
     val showInstructions by controller.showInstructions
+    val isGameStarted = remember { mutableStateOf(false) }
+    val selectedDifficulty = remember { mutableStateOf(Difficulty.MEDIUM) }
+
+    val showContinuePrompt = remember { mutableStateOf(false) }
 
 
-    // Show instructions first
+    LaunchedEffect(Unit) {
+        if (controller.isOngoingGame) {
+            selectedDifficulty.value = controller.getCurrentDifficulty()
+            showContinuePrompt.value = true
+        }
+    }
+
+
+    // Show instructions
     if (showInstructions) {
-        InstructionsScreen(onStart = { controller.beginGame() }, controller = stroopController)
+        InstructionsScreen(onBack = { controller.showInstructions.value = false })
         return
     }
 
@@ -155,7 +168,10 @@ fun StroopScreen(controller: stroopController = stroopController) {
                         }
                     },
                     confirmButton = {
-                        TextButton(onClick = { controller.beginGame() }) {
+                        TextButton(onClick = {
+                            isGameStarted.value = false
+                            controller.beginGame()
+                        }) {
                             Text("Volver a jugar", color = Color(0xFF0647D7))
                         }
                     },
@@ -177,7 +193,11 @@ fun StroopScreen(controller: stroopController = stroopController) {
 
                 // Back button
                 Button(
-                    onClick = { controller.goHome() },
+                    onClick = {
+                        controller.goConcentrationHome()
+                        isGameStarted.value = false // ✅ Vuelve a pantalla de dificultad
+                        controller.stopGame()       // ✅ Opcional: detiene el timer
+                    },
                     modifier = Modifier
                         .padding(8.dp)
                         .height(46.dp),
@@ -192,13 +212,55 @@ fun StroopScreen(controller: stroopController = stroopController) {
                     Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium)
                 }
 
+                if (!isGameStarted.value) {
+                    Text("Selecciona dificultad:", fontSize = 18.sp, fontWeight = FontWeight.Medium)
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Difficulty.values().forEach { diff ->
+                            Button(
+                                onClick = { selectedDifficulty.value = diff },
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = if (selectedDifficulty.value == diff) Color.Gray else Color.LightGray
+                                ),
+                                shape = RoundedCornerShape(10.dp)
+                            ) {
+                                Text(diff.name)
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Button(onClick = {
+                        controller.setDifficulty(selectedDifficulty.value)
+                        controller.beginGame()
+                        isGameStarted.value = true
+                    }) {
+                        Text("Iniciar juego")
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Button(onClick = {
+                        controller.showInstructions.value = true
+                    }) {
+                        Text("Instrucciones")
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+                    return@Column
+                }
+
+
+
                 // Game title and timer
                 Text("Prueba de Stroop", fontSize = 24.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Cursive)
                 Text("Tiempo restante: $timeLeft s", fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
                 // Progress bar
-                val totalTime = 30f
-                val progress = timeLeft / totalTime
+                val totalTime by controller.totalTime
+                val progress = timeLeft / totalTime.toFloat()
 
                 LinearProgressIndicator(
                     progress = progress,
@@ -315,10 +377,43 @@ fun StroopScreen(controller: stroopController = stroopController) {
         }
 
     }
+
+    if (showContinuePrompt.value) {
+        AlertDialog(
+            onDismissRequest = { showContinuePrompt.value = false },
+            title = { Text("¿Continuar partida?") },
+            text = { Text("Tienes una partida en curso. ¿Deseas continuarla o reiniciar desde cero?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showContinuePrompt.value = false
+                    controller.continueGame()         // ⏱️ Reactiva el timer
+                    isGameStarted.value = true
+                }) {
+                    Text("Continuar")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showContinuePrompt.value = false
+                    isGameStarted.value = false
+                    controller.beginGame() // Nueva partida
+                }) {
+                    Text("Reiniciar")
+                }
+            }
+        )
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            controller.stopGame() // ⛔ Detiene el timer en background
+            isGameStarted.value = false // 🔄 Resetea el estado del juego local
+        }
+    }
 }
 
 @Composable
-fun InstructionsScreen(onStart: () -> Unit, controller: stroopController) {
+fun InstructionsScreen(onBack: () -> Unit) {
     Box(modifier = Modifier.fillMaxSize()) {
 
         // Background image
@@ -381,23 +476,6 @@ fun InstructionsScreen(onStart: () -> Unit, controller: stroopController) {
 
             Spacer(modifier = Modifier.height(50.dp))
 
-            // Back Button (same design as in game)
-            Button(
-                onClick = { controller.goHome() },
-                modifier = Modifier
-                    .padding(bottom = 24.dp)
-                    .height(46.dp),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color.White,
-                    contentColor = Color(0xFF455A64)
-                ),
-                shape = RoundedCornerShape(12.dp),
-                elevation = ButtonDefaults.elevation(4.dp),
-                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
-            ) {
-                Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium)
-            }
-
             Spacer(modifier = Modifier.height(100.dp))
 
             // Title of instruction section
@@ -434,7 +512,7 @@ fun InstructionsScreen(onStart: () -> Unit, controller: stroopController) {
 
             // Start game button
             Button(
-                onClick = onStart,
+                onClick = onBack,
                 modifier = Modifier
                     .height(48.dp)
                     .width(200.dp),

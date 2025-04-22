@@ -2,6 +2,7 @@ package brain.alpha.model.concentrationModel
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
+import brain.alpha.model.shared.Difficulty
 import kotlin.random.Random
 
 /**
@@ -52,16 +53,47 @@ object stroopModel {
     // Last answer correctness (for optional external use)
     var lastAnswerCorrect by mutableStateOf<Boolean?>(null)
 
+    var currentDifficulty by mutableStateOf(Difficulty.MEDIUM)
+        private set
+
+    var hasStartedGame by mutableStateOf(false)
+        private set
+
+    fun setDifficulty(difficulty: Difficulty) {
+        currentDifficulty = difficulty
+    }
+
+
+
+
+    private fun getTimeForDifficulty(): Int {
+        return when (currentDifficulty) {
+            Difficulty.EASY -> 45
+            Difficulty.MEDIUM -> 30
+            Difficulty.HARD -> 15
+        }
+    }
+
+
+    fun getMaxTime(): Int {
+        return when (currentDifficulty) {
+            Difficulty.EASY -> 45
+            Difficulty.MEDIUM -> 30
+            Difficulty.HARD -> 15
+        }
+    }
+
 
     /**
      * Resets all game values to start a new session.
      */
     fun resetGame() {
         score = 0
-        timeLeft = 30
+        timeLeft = getTimeForDifficulty()
         isGameOver = false
         currentWord = generateRandomWord()
         options = colorMap.values.shuffled()
+        hasStartedGame = true
     }
 
 
