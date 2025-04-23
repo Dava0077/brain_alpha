@@ -11,9 +11,9 @@ object sudokuModel {
 
     val clueCount: Int
         get() = when (difficulty) {
-            Difficulty.EASY -> 42
-            Difficulty.MEDIUM -> 34
-            Difficulty.HARD -> 26
+            Difficulty.EASY -> 54
+            Difficulty.MEDIUM -> 42
+            Difficulty.HARD -> 30
         }
 
     fun generateValidBoard() {

@@ -66,7 +66,7 @@ object Strings {
                     " de colores que se muestran en pantalla.\n",
             "insS2" to "Cuando termine la secuencia, es tu turno de ",
             "insS3" to "repetirla\n\n",
-            "insS4" to " tocando los colores en el mismo orden.\n",
+            "insS4" to " sumando los colores en el mismo orden.\n",
             "insS5" to "A más dificultad más rápido irá la sequencia. \n" +
                     "\n" +
                     "Concéntrate bien y trata de superar cada ronda. ¡Buena suerte!",
@@ -78,7 +78,7 @@ object Strings {
             "insK3" to "Asegúrate de que cada fila, columna y bloque 3x3 contenga ",
             "insK4" to "los números \n",
             "insK5" to "1 al 9",
-            "insK6" to " sin repetir\n\n Información de la dificultad:\t\n - Fácil: 40-45 celdas visibles\n - Medio: 32-36 celdas visibles\n - Dificil: 24-28 celdas visibles",
+            "insK6" to " sin repetir\n\n Información de la dificultad:\t\n - Fácil: 54 celdas visibles\n - Medio: 42 celdas visibles\n - Dificil: 30 celdas visibles",
             "insK7" to "¡Buena suerte!",
             //WORD SEARCH SCREEN
             "title_wordSearch" to "SOPA DE LETRAS",
@@ -95,6 +95,7 @@ object Strings {
             "insW3" to " que se te mostraran en una lista.",
             "insW4" to "Cuento menos tiempo tardes ",
             "insW5" to "MEJOR!!",
+            "insW7" to "Información de la dificultad:\t\n - Fácil: 5-8 palabras\n - Medio: 10-15 palabras\n - Dificil: 20-25 palabras",
             "insW6" to "Concéntrate, ¡y buena suerte!",
 
 
@@ -161,7 +162,7 @@ object Strings {
                     "of colors that appears on the screen.\n",
             "insS2" to "When the sequence ends, it's your turn to ",
             "insS3" to "repeat it\n\n",
-            "insS4" to "by tapping the colors in the same order.\n",
+            "insS4" to "adding the colors in the same order.\n",
             "insS5" to "The more difficult the sequence will be, the faster it will go. \n" +
                     "\n" +
                     "Focus carefully and try to beat each round. Good luck!",
@@ -173,7 +174,7 @@ object Strings {
             "insK3" to "Make sure each row, column, and 3x3 block contains ",
             "insK4" to "the numbers \n",
             "insK5" to "1 to 9",
-            "insK6" to " without repeating\n\n Difficulty information:\t\n - Easy: 40-45 visible cells\n - Medium: 32-36 visible cells\n - Hard: 24-28 visible cells",
+            "insK6" to " without repeating\n\n Difficulty information:\t\n - Easy: 54 visible cells\n - Medium: 42 visible cells\n - Hard: 30 visible cells",
             "insK7" to "Good luck!",
             //WORD SEARCH SCREEN
             "title_wordSearch" to "WORD SEARCH",
@@ -190,6 +191,7 @@ object Strings {
             "insW3" to " that will shown you in a list.",
             "insW4" to "The faster you finish the ",
             "insW5" to "BETTER!!",
+            "insW7" to "Difficulty information:\t\n - Easy: 5-8 words\n - Medium: 10-15 words\n - Hard: 20-25 words",
             "insW6" to "Focus, and good luck!",
 
         )

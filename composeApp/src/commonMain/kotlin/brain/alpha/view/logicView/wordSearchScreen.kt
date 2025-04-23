@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brain.alpha.controller.logicController.wordSearchController
 import brain.alpha.controller.memoryController.couplesController
+import brain.alpha.model.shared.Difficulty
 import brain.alpha.strings.Strings
 import brain.alpha.view.memoryView.InstructionsCouples
 import brainalpha.composeapp.generated.resources.*
@@ -38,16 +39,19 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
     val selectedCells = remember { mutableStateListOf<Pair<Int, Int>>() }
     var selectionDirection by remember { mutableStateOf<Pair<Int, Int>?>(null) }
     var gameStarted by remember { mutableStateOf(false) }
-    val foundWords = remember { mutableStateListOf<String>() }
+    var gameFinished by remember { mutableStateOf(false) }
     val validatedCells = remember { mutableStateListOf<Pair<Int, Int>>() }
     var timeLeft by remember { mutableStateOf(60) }
     var showDialog by remember { mutableStateOf<String?>(null) }
-    var isLoading by remember { mutableStateOf(false) } // Estado de carga
+    var isLoading by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val showInstructions by controller.showInstructions
+    var elapsedTime by remember { mutableStateOf(0) }
+    var timerTrigger by remember { mutableStateOf(0) }
+    val min = (elapsedTime / 60).toString().padStart(2, '0')
+    val sec = (elapsedTime % 60).toString().padStart(2, '0')
+    val selectedDifficulty = remember { mutableStateOf(Difficulty.EASY) }
 
-
-    // Show instructions first
     if (showInstructions) {
         InstructionsWordSearch(
             onStart = { controller.beginGame() },
@@ -58,19 +62,18 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
 
     LaunchedEffect(gameStarted) {
         if (gameStarted) {
-            while (timeLeft > 0) {
-                delay(1000L)
-                timeLeft--
-            }
-            if (foundWords.size < words.size) {
-                showDialog = "lose"
+            elapsedTime = 0
+            while (!controller.isGameFinished()) {
+                delay(1000)
+                elapsedTime++
             }
         }
     }
 
-    LaunchedEffect(foundWords.size) {
-        if (gameStarted && foundWords.size == words.size && timeLeft > 0) {
+    LaunchedEffect(gameStarted, controller.isGameFinished()) {
+        if (gameStarted && controller.isGameFinished()) {
             showDialog = "win"
+            gameFinished = true
         }
     }
 
@@ -96,7 +99,7 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                     .border(BorderStroke(2.dp, Color(0xFF4CE3E8)))
             ) {
                 IconButton(
-                    onClick = { /* Dummy action */ },
+                    onClick = { },
                     modifier = Modifier.align(Alignment.CenterStart).padding(start = 8.dp).size(55.dp)
                 ) {
                     Image(painter = painterResource(Res.drawable.user), contentDescription = "User")
@@ -115,27 +118,53 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
             }
             Spacer(modifier = Modifier.height(5.dp))
 
-            Button(
-                onClick = { controller.goHomeLogic() },
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .height(46.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
-                shape = RoundedCornerShape(12.dp),
-                elevation = ButtonDefaults.elevation(4.dp),
-                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
+                Button(
+                    onClick = { controller.toggleInstructions(true) },
+                    modifier = Modifier.height(46.dp),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.elevation(4.dp),
+                    border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+                ) {
+                    Text(Strings.t("instructions"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
+                }
+                Button(
+                    onClick = { controller.goHomeLogic() },
+                    modifier = Modifier.height(46.dp),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.elevation(4.dp),
+                    border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+                ) {
+                    Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
+                }
+            }
+
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Difficulty.values().forEach { difficulty ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RadioButton(
+                            selected = selectedDifficulty.value == difficulty,
+                            onClick = {
+                                selectedDifficulty.value = difficulty
+                                controller.configureGame(difficulty)
+                            },
+                            enabled = !gameStarted
+                        )
+                        Text(text = Strings.translateDifficulty(difficulty))
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(30.dp))
-            Text(
-                text = Strings.t("title_wordSearch"),
-                fontSize = 40.sp,
-                color = Color.Black,
-                fontFamily = FontFamily.SansSerif,
-                textAlign = TextAlign.Center
-            )
+            Text(Strings.t("title_wordSearch"), fontSize = 40.sp, color = Color.Black, fontFamily = FontFamily.SansSerif, textAlign = TextAlign.Center)
+            Spacer(modifier = Modifier.height(15.dp))
+            Text("${Strings.t("time")} $min:$sec", fontSize = 20.sp, color = Color.Black, fontFamily = FontFamily.SansSerif, textAlign = TextAlign.Center)
+            Spacer(modifier = Modifier.height(10.dp))
 
             if (!gameStarted) {
                 Button(
@@ -143,17 +172,19 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                         scope.launch {
                             isLoading = true
                             withContext(Dispatchers.Default) {
-                                controller.startGame() // Ejecutar en hilo secundario
+                                controller.configureGame(selectedDifficulty.value)
+                                controller.startGame()
                             }
                             selectedCells.clear()
                             validatedCells.clear()
-                            foundWords.clear()
                             timeLeft = 60
                             gameStarted = true
+                            gameFinished = false
                             isLoading = false
+                            timerTrigger++
                         }
                     },
-                    enabled = !isLoading, // Deshabilitar mientras carga
+                    enabled = !isLoading,
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
                 ) {
                     Text(if (isLoading) Strings.t("charging") else Strings.t("play"), color = Color.Black)
@@ -161,13 +192,13 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
             }
 
             if (gameStarted) {
-                Text(Strings.t("remaining_time")+ "$timeLeft s", fontSize = 20.sp, color = Color.Black)
+
                 Spacer(modifier = Modifier.height(10.dp))
 
                 Column {
-                    for (i in 0 until grid.size) {
+                    for (i in grid.indices) {
                         Row {
-                            for (j in 0 until grid[i].size) {
+                            for (j in grid[i].indices) {
                                 val isSelected = selectedCells.contains(Pair(i, j))
                                 val isValidated = validatedCells.contains(Pair(i, j))
                                 Box(
@@ -178,11 +209,10 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                                                 isValidated -> Color.Yellow
                                                 isSelected -> Color.Cyan
                                                 else -> Color.White
-                                            },
-                                            shape = RoundedCornerShape(4.dp)
+                                            }, shape = RoundedCornerShape(4.dp)
                                         )
                                         .border(1.dp, Color.Black)
-                                        .clickable {
+                                        .clickable(enabled = !gameFinished) {
                                             val pos = Pair(i, j)
                                             if (selectedCells.isEmpty()) {
                                                 selectedCells.add(pos)
@@ -204,11 +234,7 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                                         },
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text(
-                                        text = grid[i][j].toString(),
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
+                                    Text(grid[i][j].toString(), fontSize = 16.sp, fontWeight = FontWeight.Bold)
                                 }
                             }
                         }
@@ -217,15 +243,30 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
 
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(Strings.t("words_find"), fontSize = 20.sp, color = Color.Black)
-                controller.getWordsToFind().forEach { word ->
-                    val isFound = word in foundWords
-                    Text(
-                        text = word,
-                        fontSize = 16.sp,
-                        color = if (isFound) Color.Gray else Color.Black,
-                        textDecoration = if (isFound) TextDecoration.LineThrough else TextDecoration.None
-                    )
+
+                val wordsPerLine = 5
+                val wordGroups = controller.getWordsToFind().chunked(wordsPerLine)
+
+                wordGroups.forEach { group ->
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        group.forEachIndexed { index, word ->
+                            val isFound = controller.isWordFound(word)
+                            Text(
+                                text = word,
+                                fontSize = 14.sp,
+                                color = if (isFound) Color.Gray else Color.Black,
+                                textDecoration = if (isFound) TextDecoration.LineThrough else TextDecoration.None
+                            )
+                            if (index != group.lastIndex) {
+                                Text(" - ", fontSize = 14.sp, color = Color.Black)
+                            }
+                        }
+                    }
                 }
+
 
                 Spacer(modifier = Modifier.height(20.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -242,9 +283,9 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                     Button(
                         onClick = {
                             val word = selectedCells.map { (r, c) -> grid[r][c] }.joinToString("")
-                            if (controller.getWordsToFind().contains(word) && word !in foundWords) {
+                            if (controller.getWordsToFind().contains(word) && !controller.isWordFound(word)) {
                                 println("✅ Palabra correcta: $word")
-                                foundWords.add(word)
+                                controller.markWordAsFound(word)
                                 validatedCells.addAll(selectedCells)
                             } else {
                                 println("❌ Palabra incorrecta: $word")
@@ -252,6 +293,7 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                             selectedCells.clear()
                             selectionDirection = null
                         },
+                        enabled = selectedCells.isNotEmpty(),
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
                     ) {
                         Text(Strings.t("validate"), color = Color.Black)
@@ -274,14 +316,18 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                                     scope.launch {
                                         isLoading = true
                                         withContext(Dispatchers.Default) {
+                                            controller.configureGame(selectedDifficulty.value)
                                             controller.startGame()
                                         }
                                         selectedCells.clear()
                                         validatedCells.clear()
-                                        foundWords.clear()
                                         timeLeft = 60
+                                        elapsedTime = 0
+                                        gameStarted = true
+                                        gameFinished = false
                                         showDialog = null
                                         isLoading = false
+                                        timerTrigger++
                                     }
                                 },
                                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
@@ -304,13 +350,14 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
         }
     }
 }
+
 @Composable
 fun InstructionsWordSearch(onStart: () -> Unit, controller: wordSearchController) {
     Box(modifier = Modifier.fillMaxSize()) {
 
         // Background image
         Image(
-            painter = painterResource(Res.drawable.fondoMemory),
+            painter = painterResource(Res.drawable.fondoLogic),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
@@ -328,7 +375,8 @@ fun InstructionsWordSearch(onStart: () -> Unit, controller: wordSearchController
                     .fillMaxWidth()
                     .height(70.dp)
                     .background(Color(0xFF222937), shape = RoundedCornerShape(4.dp))
-                    .border(BorderStroke(2.dp, Color(0xFF4CE3E8))))
+                    .border(BorderStroke(2.dp, Color(0xFF4CE3E8)))
+            )
             {
                 IconButton(
                     onClick = { /* Dummy user action */ },
@@ -368,18 +416,8 @@ fun InstructionsWordSearch(onStart: () -> Unit, controller: wordSearchController
 
             Spacer(modifier = Modifier.height(5.dp))
             // Back Button (same design as in game)
-            Button(
-                onClick = {controller.goHomeLogic()},
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .height(46.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
-                shape = RoundedCornerShape(12.dp),
-                elevation = ButtonDefaults.elevation(4.dp),
-                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
-            ){
-                Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
-            }
+
+
 
             Spacer(modifier = Modifier.height(100.dp))
 
@@ -412,8 +450,8 @@ fun InstructionsWordSearch(onStart: () -> Unit, controller: wordSearchController
                         withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
                             append(Strings.t("insW5"))
                         }
-                        append(" .\n")
-
+                        append(" .\n\n")
+                        append(Strings.t("insW7")+"\n\n")
                         append(Strings.t("insW6"))
                     },
                     fontSize = 16.sp,

@@ -64,6 +64,7 @@ object sudokuController {
         return model.getGrid().all { row -> row.all { it in 1..9 } }
     }
 
+
     fun isBoardValid(): Boolean {
         val grid = model.getGrid()
 
