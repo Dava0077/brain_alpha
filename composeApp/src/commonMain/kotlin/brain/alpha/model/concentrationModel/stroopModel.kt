@@ -57,7 +57,6 @@ object stroopModel {
         private set
 
     var hasStartedGame by mutableStateOf(false)
-        private set
 
     fun setDifficulty(difficulty: Difficulty) {
         currentDifficulty = difficulty
