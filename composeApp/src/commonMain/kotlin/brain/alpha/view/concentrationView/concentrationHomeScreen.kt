@@ -33,7 +33,7 @@ fun concentrationHomeScreen(
     ) {
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
-            painter = painterResource(Res.drawable.fondoMemory),
+            painter = painterResource(Res.drawable.stroopTestBG),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
@@ -113,13 +113,13 @@ fun concentrationHomeScreen(
             ) {
                 brain.alpha.view.CategoryItem(
                     Strings.t("title_stroop"),
-                    Res.drawable.parejas,
+                    Res.drawable.icono_stroop,
                     Color(0xFF0647D7),
                     {controller.goStroop()}
                 )
                 brain.alpha.view.CategoryItem(
                     Strings.t("title_oddEmoji"),
-                    Res.drawable.simon,
+                    Res.drawable.icono_emoji,
                     Color(0xFF0647D7),
                     {controller.goEmoji()}
                 )

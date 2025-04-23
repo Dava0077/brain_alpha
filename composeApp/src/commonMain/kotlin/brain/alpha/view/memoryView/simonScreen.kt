@@ -33,6 +33,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import brain.alpha.controller.concentrationController.stroopController
+import brain.alpha.model.shared.Difficulty
 import brain.alpha.strings.Strings
 
 @Composable
@@ -63,8 +64,12 @@ fun simonScreen(
             contentScale = ContentScale.Crop
         )
 
+        val scrollState = rememberScrollState()
+
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
@@ -142,6 +147,27 @@ fun simonScreen(
                     Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
                 }
             }
+            val selectedDifficulty = remember { mutableStateOf(controller.getDifficulty()) }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(vertical = 16.dp)
+            ) {
+                Difficulty.values().forEach { level ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RadioButton(
+                            selected = selectedDifficulty.value == level,
+                            onClick = {
+                                selectedDifficulty.value = level
+                                controller.setDifficulty(level)
+                            },
+                            enabled = !uiState.isUserTurn
+                        )
+                        Text(text = Strings.translateDifficulty(level))
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.height(30.dp)) // Espacio tras el logo
 
@@ -215,6 +241,7 @@ fun simonScreen(
                 }
             }
         }
+
     }
 
 }
@@ -330,22 +357,29 @@ fun InstructionsSimon(onStart: () -> Unit, controller: simonController) {
 
             Spacer(modifier = Modifier.height(30.dp))
 
-            // Game explanation using styled text
-            Text(
-                buildAnnotatedString {
-                    append(Strings.t("insS1"))
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 32.dp)
+                    .background(Color(0xFF0647D7), shape = RoundedCornerShape(16.dp))
+                    .padding(16.dp) // Padding interno
+            ) {
+                Text(
+                    buildAnnotatedString {
+                        append(Strings.t("insS1")+ "\n\n")
 
-                    append(Strings.t("insS2"))
-                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(Strings.t("insS3")) }
-                    append(Strings.t("insS4"))
+                        append(Strings.t("insS2"))
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(Strings.t("insS3")) }
+                        append(Strings.t("insS4")+ "\n\n")
+                        append(Strings.t("insS5"))
 
-                },
-                fontSize = 16.sp,
-                textAlign = TextAlign.Center,
-                color = Color(0xFF424242),
-                lineHeight = 18.sp,
-                modifier = Modifier.padding(horizontal = 32.dp)
-            )
+                    },
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center,
+                    color = Color.White,
+                    lineHeight = 18.sp,
+                    modifier = Modifier.padding(horizontal = 32.dp)
+                )
+            }
 
             Spacer(modifier = Modifier.height(40.dp))
 

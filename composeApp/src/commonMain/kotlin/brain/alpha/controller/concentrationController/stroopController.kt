@@ -131,12 +131,20 @@ object stroopController {
      * Navigates to the home screen and resets instruction state.
      */
     fun goHome(){
+        stopGame()
         navigateTo("home")
         showInstructions.value = false
     }
 
-    fun goConcentrationHome(){
+    fun goBackToConcentrationHome(){
+        stopGame()
         navigateTo("concentration")
+        showInstructions.value = false
+    }
+
+    fun goBackToDifficultySelection(){
+        stopGame()
+        model.hasStartedGame = false
         showInstructions.value = false
     }
 

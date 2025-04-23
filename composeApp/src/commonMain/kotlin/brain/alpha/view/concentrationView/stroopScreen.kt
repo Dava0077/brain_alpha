@@ -20,7 +20,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
@@ -32,7 +31,6 @@ import brain.alpha.strings.Strings
 import brainalpha.composeapp.generated.resources.*
 import brainalpha.composeapp.generated.resources.Res
 import brainalpha.composeapp.generated.resources.logo
-import brainalpha.composeapp.generated.resources.memoryFondo
 import brainalpha.composeapp.generated.resources.user
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
@@ -58,13 +56,20 @@ fun StroopScreen(controller: stroopController = stroopController) {
     val options = controller.options
     val showInstructions by controller.showInstructions
     val isGameStarted = remember { mutableStateOf(false) }
+
+    val showEndDialog = remember { mutableStateOf(false) }
+
+    LaunchedEffect(isGameOver) {
+        if (isGameOver) showEndDialog.value = true
+    }
+
     val selectedDifficulty = remember { mutableStateOf(Difficulty.MEDIUM) }
 
     val showContinuePrompt = remember { mutableStateOf(false) }
 
 
     LaunchedEffect(Unit) {
-        if (controller.isOngoingGame) {
+        if (controller.isOngoingGame && !isGameOver) {
             selectedDifficulty.value = controller.getCurrentDifficulty()
             showContinuePrompt.value = true
         }
@@ -141,7 +146,7 @@ fun StroopScreen(controller: stroopController = stroopController) {
 
 
             // End-game dialog
-            if (isGameOver) {
+            if (showEndDialog.value) {
                 AlertDialog(
                     onDismissRequest = {},
                     title = {
@@ -169,14 +174,20 @@ fun StroopScreen(controller: stroopController = stroopController) {
                     },
                     confirmButton = {
                         TextButton(onClick = {
-                            isGameStarted.value = false
+                            controller.stopGame()
                             controller.beginGame()
+                            isGameStarted.value = true
+                            showEndDialog.value = false
                         }) {
                             Text("Volver a jugar", color = Color(0xFF0647D7))
                         }
                     },
                     dismissButton = {
-                        TextButton(onClick = { controller.goHome() }) {
+                        TextButton(onClick = {
+                            controller.goBackToDifficultySelection()
+                            isGameStarted.value = false
+                            showEndDialog.value = false
+                        }) {
                             Text("Volver al inicio", color = Color(0xFF0647D7))
                         }
                     },
@@ -194,9 +205,15 @@ fun StroopScreen(controller: stroopController = stroopController) {
                 // Back button
                 Button(
                     onClick = {
-                        controller.goConcentrationHome()
-                        isGameStarted.value = false // ✅ Vuelve a pantalla de dificultad
-                        controller.stopGame()       // ✅ Opcional: detiene el timer
+                        if (isGameStarted.value) {
+                            // Si el juego está corriendo, simplemente vuelve a la selección de dificultad
+                            isGameStarted.value = false
+                            controller.stopGame()
+                            controller.goBackToDifficultySelection()
+                        } else {
+                            // Si no hay juego en curso, vuelve a la pantalla principal de concentración
+                            controller.goBackToConcentrationHome()
+                        }
                     },
                     modifier = Modifier
                         .padding(8.dp)

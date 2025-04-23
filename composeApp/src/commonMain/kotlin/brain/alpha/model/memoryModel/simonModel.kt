@@ -1,6 +1,9 @@
 package brain.alpha.model.memoryModel
 
+import brain.alpha.model.shared.Difficulty
+
 object simonModel {
+    var difficulty: Difficulty = Difficulty.EASY
     private val availableColors: List<String> = listOf("Rojo", "Verde", "Azul", "Amarillo")
     enum class GameState { START, MACHINE, PLAYER }
 
@@ -12,7 +15,17 @@ object simonModel {
     fun incrementScore() {
         score++
     }
+    fun getDelayBetweenColors(): Long = when (difficulty) {
+        Difficulty.EASY -> 1000L
+        Difficulty.MEDIUM -> 700L
+        Difficulty.HARD -> 400L
+    }
 
+    fun getAnimationSpeed(): Int = when (difficulty) {
+        Difficulty.EASY -> 300
+        Difficulty.MEDIUM -> 150
+        Difficulty.HARD -> 80
+    }
     fun getScore(): Int = score
 
     fun resetScore() {
