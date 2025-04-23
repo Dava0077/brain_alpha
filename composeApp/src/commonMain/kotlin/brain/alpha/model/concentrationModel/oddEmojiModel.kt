@@ -1,19 +1,17 @@
 package brain.alpha.model.concentrationModel
 
+import brain.alpha.model.shared.Difficulty
 import brain.alpha.utils.currentTimeMillis
 import kotlin.random.Random
 
 object oddEmojiModel {
 
-    private val emojiList = listOf("😀", "😃", "😄", "😁", "😆", "😅", "🤣", "😂", "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "😚")
     private val similarPairs = listOf(
         Pair("😀", "😃"), Pair("😄", "😁"), Pair("😆", "😅"), Pair("😂", "🤣"), Pair("🙂", "🙃"),
         Pair("😌", "😉"), Pair("😍", "🥰"), Pair("😘", "😗"), Pair("😙", "😚")
     )
 
     var level = 1
-        private set
-    var maxLevel = 1
         private set
     var errors = 0
         private set
@@ -33,8 +31,21 @@ object oddEmojiModel {
     var oddCol = 0
         private set
 
+    var currentDifficulty: Difficulty = Difficulty.MEDIUM
+        private set
+
+    fun setDifficulty(difficulty: Difficulty) {
+        currentDifficulty = difficulty
+    }
+
+
+    fun getMaxLevel(): Int = when (currentDifficulty) {
+        Difficulty.EASY -> 5
+        Difficulty.MEDIUM -> 8
+        Difficulty.HARD -> 12
+    }
+
     fun startLevel() {
-        if (level > maxLevel) maxLevel = level
         gridSize = 2 + (level / 2).coerceAtMost(6) // grows with level
         val (base, odd) = similarPairs.random()
         val oddIndex = Pair(Random.nextInt(gridSize), Random.nextInt(gridSize))
@@ -62,9 +73,10 @@ object oddEmojiModel {
         }
     }
 
+    fun hasFinished(): Boolean = level > getMaxLevel()
+
     fun reset() {
         level = 1
-        maxLevel = 1
         errors = 0
         totalTime = 0
     }
