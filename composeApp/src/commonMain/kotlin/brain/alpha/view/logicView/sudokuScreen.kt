@@ -3,10 +3,7 @@ package brain.alpha.view.logicView
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.IconButton
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -31,12 +28,16 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import brain.alpha.controller.concentrationController.stroopController
+import brain.alpha.model.logicModel.sudokuModel
+import brain.alpha.model.shared.Difficulty
 import brain.alpha.view.memoryView.InstructionsCouples
 
 
 @Composable
 fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
-    val gameStarted = !controller.showInstructions.value
+    val gameStarted by remember { derivedStateOf { !controller.showInstructions.value } }
+    val model = sudokuModel
+
     var selectedRow by remember { mutableStateOf(-1) }
     var selectedCol by remember { mutableStateOf(-1) }
     var gridVersion by remember { mutableStateOf(0) }
@@ -103,17 +104,56 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
             }
             Spacer(modifier = Modifier.height(5.dp)) // Espacio tras el logo
 
-            Button(
-                onClick = { controller.goHomeLogic() },
+            Row(
                 modifier = Modifier
-                    .align(Alignment.End)
-                    .height(46.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
-                shape = RoundedCornerShape(12.dp),
-                elevation = ButtonDefaults.elevation(4.dp),
-                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+
+            ){
+                Button(
+                    onClick = {controller.toggleInstructions(true)},
+                    modifier = Modifier
+                        .height(46.dp),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.elevation(4.dp),
+                    border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+                ){
+                    Text(Strings.t("instructions"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
+                }
+                Button(
+                    onClick = { controller.goHomeLogic() },
+                    modifier = Modifier
+                        .height(46.dp),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.elevation(4.dp),
+                    border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+                ) {
+                    Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
+                }
+            }
+
+            val selectedDifficulty = remember { mutableStateOf(controller.getDifficulty()) }
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(vertical = 16.dp)
             ) {
-                Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
+                Difficulty.values().forEach { level ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RadioButton(
+                            selected = selectedDifficulty.value == level,
+                            onClick = {
+                                selectedDifficulty.value = level
+                                controller.setDifficulty(level)
+                            },
+                            enabled = !controller.hasStarted() // deshabilitar si ya empezó
+                        )
+                        Text(text = Strings.translateDifficulty(level)) // si tienes traducción
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(30.dp))
@@ -160,7 +200,7 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
                                                 shape = RoundedCornerShape(4.dp)
                                             )
                                             .border(1.dp, Color.Black)
-                                            .clickable(enabled = !isInitial) {
+                                            .clickable(enabled = controller.hasStarted() && isInitial) {
                                                 selectedRow = row
                                                 selectedCol = col
                                             },
@@ -178,7 +218,7 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
                     }
                 }
 
-                if (selectedRow in 0..8 && selectedCol in 0..8) {
+                if (controller.hasStarted() && selectedRow in 0..8 && selectedCol in 0..8) {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -220,7 +260,8 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
                     },
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
                 ) {
-                    Text(Strings.t("restart"), color = Color.Black)
+                    Text(if (model.started) Strings.t("restart") else Strings.t("play"))
+
                 }
                 if (controller.isBoardComplete()) {
                     Spacer(modifier = Modifier.height(16.dp))
@@ -355,10 +396,13 @@ fun InstructionsSudoku(onStart: () -> Unit, controller: sudokuController) {
                         append(Strings.t("insK2"))
 
                         append(Strings.t("insK3"))
+                        append(Strings.t("insK4"))
                         withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
                             append(Strings.t("insK5"))
                         }
-                        append(Strings.t("insK6"))
+
+                        append(Strings.t("insK6")+"\n\n")
+                        append(Strings.t("insK7"))
                     },
                     fontSize = 16.sp,
                     textAlign = TextAlign.Center,
@@ -371,7 +415,7 @@ fun InstructionsSudoku(onStart: () -> Unit, controller: sudokuController) {
 
             // Start game button
             Button(
-                onClick = onStart,
+                onClick = { controller.goToGameScreen() },
                 modifier = Modifier
                     .height(48.dp)
                     .width(200.dp),

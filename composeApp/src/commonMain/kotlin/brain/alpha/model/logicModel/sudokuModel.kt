@@ -1,8 +1,20 @@
 package brain.alpha.model.logicModel
 
+import brain.alpha.model.shared.Difficulty
+
 object sudokuModel {
     private val grid = Array(9) { IntArray(9) }
     private val initialCells = Array(9) { BooleanArray(9) }
+    var difficulty: Difficulty = Difficulty.EASY
+    var started: Boolean = false
+
+
+    val clueCount: Int
+        get() = when (difficulty) {
+            Difficulty.EASY -> 42
+            Difficulty.MEDIUM -> 34
+            Difficulty.HARD -> 26
+        }
 
     fun generateValidBoard() {
         clearBoard()

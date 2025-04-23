@@ -63,19 +63,23 @@ object Strings {
             "error_press_rei" to "¡Fallaste! Pulsa Reiniciar.",
             "neurons" to "\uD83C\uDF40 Neuronas",
             "insS1" to "Tienes que observar atentamente la secuencia \n\n" +
-                    " de colores que se muestran en pantalla.\n\n",
+                    " de colores que se muestran en pantalla.\n",
             "insS2" to "Cuando termine la secuencia, es tu turno de ",
             "insS3" to "repetirla\n\n",
-            "insS4" to " tocando los colores en el mismo orden.\n\nConcéntrate bien y trata de superar cada ronda. ¡Buena suerte!",
+            "insS4" to " tocando los colores en el mismo orden.\n",
+            "insS5" to "A más dificultad más rápido irá la sequencia. \n" +
+                    "\n" +
+                    "Concéntrate bien y trata de superar cada ronda. ¡Buena suerte!",
             //SUDOKU SCREEN
             "correct_sudoku" to "✅ Sudoku Correcto",
             "incorrect_sudoku" to "❌ Sudoku Incorrecto",
             "insK1" to "Debes completar el tablero de Sudoku ",
             "insK2" to "rellenando los números faltantes\n\n",
-            "insK3" to "Asegúrate de que cada fila, columna y bloque 3x3 ",
-            "insK4" to "contenga los números del ",
-            "insK5" to "1 al 9\n\n",
-            "insK6" to " sin repetir. ¡Buena suerte!",
+            "insK3" to "Asegúrate de que cada fila, columna y bloque 3x3 contenga ",
+            "insK4" to "los números \n",
+            "insK5" to "1 al 9",
+            "insK6" to " sin repetir\n\n Información de la dificultad:\t\n - Fácil: 40-45 celdas visibles\n - Medio: 32-36 celdas visibles\n - Dificil: 24-28 celdas visibles",
+            "insK7" to "¡Buena suerte!",
             //WORD SEARCH SCREEN
             "title_wordSearch" to "SOPA DE LETRAS",
             "words_find" to "Palabras a encontrar:",
@@ -154,19 +158,23 @@ object Strings {
             "error_press_rei" to "¡You failed! Press Restart.",
             "neurons" to "\uD83C\uDF40 Neurons",
             "insS1" to "You must carefully watch the sequence \n\n" +
-                    "of colors that appears on the screen.\n\n",
+                    "of colors that appears on the screen.\n",
             "insS2" to "When the sequence ends, it's your turn to ",
             "insS3" to "repeat it\n\n",
-            "insS4" to "by tapping the colors in the same order.\n\nFocus carefully and try to beat each round. Good luck!",
+            "insS4" to "by tapping the colors in the same order.\n",
+            "insS5" to "The more difficult the sequence will be, the faster it will go. \n" +
+                    "\n" +
+                    "Focus carefully and try to beat each round. Good luck!",
             //SUDOKU SCREEN
             "correct_sudoku" to "✅ Correct Sudoku",
             "incorrect_sudoku" to "❌ Incorrect Sudoku",
             "insK1" to "You must complete the Sudoku board ",
             "insK2" to "by filling in the missing numbers\n\n",
-            "insK3" to "Make sure each row, column, and 3x3 block ",
-            "insK4" to "contains the numbers",
-            "insK5" to "1 to 9\n\n",
-            "insK6" to " without repeating.Good luck!",
+            "insK3" to "Make sure each row, column, and 3x3 block contains ",
+            "insK4" to "the numbers \n",
+            "insK5" to "1 to 9",
+            "insK6" to " without repeating\n\n Difficulty information:\t\n - Easy: 40-45 visible cells\n - Medium: 32-36 visible cells\n - Hard: 24-28 visible cells",
+            "insK7" to "Good luck!",
             //WORD SEARCH SCREEN
             "title_wordSearch" to "WORD SEARCH",
             "words_find" to "Words to find:",

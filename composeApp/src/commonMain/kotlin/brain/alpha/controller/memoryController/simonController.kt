@@ -2,6 +2,7 @@ package brain.alpha.controller.memoryController
 
 import androidx.compose.runtime.mutableStateOf
 import brain.alpha.model.memoryModel.simonModel
+import brain.alpha.model.shared.Difficulty
 import brain.alpha.strings.Strings
 import brain.alpha.view.memoryView.SimonUiState
 import kotlinx.coroutines.CoroutineScope
@@ -32,6 +33,9 @@ object simonController {
     fun toggleInstructions(show: Boolean) {
         showInstructions.value = show
     }
+    fun setDifficulty(level: Difficulty) {
+        model.difficulty = level
+    }
     val uiState: StateFlow<SimonUiState> = _uiState
 
     private var gameOver = false
@@ -56,14 +60,17 @@ object simonController {
             score = model.getScore()
         )
 
+        val delayDuration = model.getDelayBetweenColors()
+        val pauseBeforeTurn = model.getAnimationSpeed().toLong()
+
         scope.launch {
-            delay(1000) // mostrar el color 1 segundo
+            delay(delayDuration) // ⏱️ tiempo de espera según dificultad
 
             _uiState.value = _uiState.value.copy(
-                sequence = emptyList() // ocultar el color (Box transparente)
+                sequence = emptyList() // ocultar color
             )
 
-            delay(300) // pequeña pausa antes del turno
+            delay(pauseBeforeTurn) // ⏸️ pequeña pausa antes del turno
 
             model.beginPlayerTurn()
             _uiState.value = _uiState.value.copy(
@@ -72,6 +79,7 @@ object simonController {
             )
         }
     }
+    fun getDifficulty(): Difficulty = model.difficulty
 
     fun onColorPressed(color: String) {
         if (!_uiState.value.isUserTurn || gameOver) return

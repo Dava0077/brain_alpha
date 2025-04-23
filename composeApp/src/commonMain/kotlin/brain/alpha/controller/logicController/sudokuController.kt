@@ -3,40 +3,69 @@ package brain.alpha.controller.logicController
 import androidx.compose.runtime.mutableStateOf
 import brain.alpha.controller.memoryController.couplesController
 import brain.alpha.model.logicModel.sudokuModel
+import brain.alpha.model.shared.Difficulty
 
 object sudokuController {
     private val model = sudokuModel
     lateinit var navigateTo: (String) -> Unit
-    val showInstructions = mutableStateOf(true)
+    val showInstructions = mutableStateOf(false)
 
+    fun hasStarted(): Boolean = model.started
     fun startGame() {
-        sudokuModel.generateValidBoard()
+        model.started = true
+        generateNewBoard() // tu lógica actual de iniciar juego
+    }
+    fun resetGame() {
+        model.started = false
+        generateNewBoard()
+    }
+    fun generateNewBoard() {
+        val cluesToRemove = 81 - sudokuModel.clueCount
+        model.clearBoard()
+        model.fillDiagonalBlocks()
+        model.solveBoard()
+        model.removeCells(cluesToRemove)
     }
     fun beginGame() {
         showInstructions.value = false
         startGame()
     }
+    fun goToGameScreen() {
+        showInstructions.value = false
+        model.started = false // asegura que se quede en la pantalla previa al inicio
+    }
+    fun toggleInstructions(show: Boolean) {
+        showInstructions.value = show
+    }
     fun isGameStarted(): Boolean {
         return !showInstructions.value
     }
+
     fun setCellValue(row: Int, col: Int, value: Int) {
-        sudokuModel.setCell(row, col, value)
+        model.setCell(row, col, value)
+    }
+    fun setDifficulty(level: Difficulty) {
+        model.difficulty = level
+    }
+
+    fun getDifficulty(): Difficulty {
+        return model.difficulty
     }
 
     fun getCellValue(row: Int, col: Int): Int {
-        return sudokuModel.getGrid()[row][col]
+        return model.getGrid()[row][col]
     }
 
     fun isCellInitial(row: Int, col: Int): Boolean {
-        return sudokuModel.isInitial(row, col)
+        return model.isInitial(row, col)
     }
 
     fun isBoardComplete(): Boolean {
-        return sudokuModel.getGrid().all { row -> row.all { it in 1..9 } }
+        return model.getGrid().all { row -> row.all { it in 1..9 } }
     }
 
     fun isBoardValid(): Boolean {
-        val grid = sudokuModel.getGrid()
+        val grid = model.getGrid()
 
         fun isValidGroup(group: List<Int>) =
             group.filter { it != 0 }.let { it.size == it.toSet().size }
@@ -51,6 +80,7 @@ object sudokuController {
             val column = List(9) { row -> grid[row][col] }
             if (!isValidGroup(column)) return false
         }
+
 
         // Regiones 3x3
         for (boxRow in 0..2) {
@@ -69,6 +99,7 @@ object sudokuController {
     }
     fun goHomeLogic(){
         navigateTo("logic")
-        showInstructions.value = true
+        showInstructions.value = false
+        model.started = false
     }
 }
