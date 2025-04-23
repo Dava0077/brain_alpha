@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import brain.alpha.model.mentalAgilityModel.clickNumberModel
+import kotlinx.coroutines.Job
 
 object clickNumberController {
 
@@ -30,11 +31,15 @@ object clickNumberController {
     var gameOver by mutableStateOf(false) // Estado para fin del juego
         private set
     val showInstructions = mutableStateOf(true)
+    var isGameStarted by mutableStateOf(false)
+        private set
+
+    private var timerJob: Job? = null
 
     private val scope = CoroutineScope(Dispatchers.Main)
 
     init {
-        startNewGame()
+        startGame()
         startTimer()
     }
 
@@ -43,42 +48,62 @@ object clickNumberController {
         startGame()
     }
 
-    // Inicia un nuevo juego
-    fun startNewGame() {
-        if (!gameOver) {
-            clickNumberModel.startGame()
-            numbers = clickNumberModel.getNumbers()
-            targetNumber = clickNumberModel.targetNumber
-            instructionMessage = "Haz clic en el número: $targetNumber"
-            resultMessage = ""
-        }
+    // Inicia el juego
+    fun startGame() {
+        isGameStarted = true
+        gameOver = false
+        score = 0
+        timeLeft = 30
+        clickNumberModel.startGame()
+        numbers = clickNumberModel.getNumbers()
+        targetNumber = clickNumberModel.targetNumber
+        instructionMessage = "Haz clic en el número: $targetNumber"
+        resultMessage = ""
+        startTimer()
     }
 
     // Maneja el clic en un botón
     fun handleButtonClick(selectedNumber: Int) {
-        if (!gameOver) {
+        if (!gameOver && isGameStarted) {
             val isCorrect = clickNumberModel.checkNumber(selectedNumber)
             if (isCorrect) {
                 score++
                 resultMessage = "¡Correcto!"
-                startNewGame() // Genera una nueva cuadrícula
+                clickNumberModel.startGame()
+                numbers = clickNumberModel.getNumbers()
+                targetNumber = clickNumberModel.targetNumber
+                instructionMessage = "Haz clic en el número: $targetNumber"
             } else {
                 resultMessage = "Incorrecto, intenta de nuevo."
             }
         }
     }
 
-    // Inicia el temporizador de 30 segundos
+    // Inicia el temporizador
     private fun startTimer() {
-        scope.launch {
+        timerJob?.cancel() // Cancela cualquier temporizador anterior
+        timerJob = scope.launch {
             while (timeLeft > 0) {
-                delay(1000L) // Espera 1 segundo
+                delay(1000L)
                 timeLeft--
             }
             gameOver = true
             instructionMessage = "¡Tiempo terminado!"
             resultMessage = "Aciertos: $score"
         }
+    }
+
+    // Reinicia el juego (botón Atrás)
+    fun resetGame() {
+        timerJob?.cancel()
+        isGameStarted = false
+        gameOver = false
+        score = 0
+        timeLeft = 30
+        numbers = emptyList()
+        targetNumber = 0
+        instructionMessage = ""
+        resultMessage = ""
     }
 
     fun goHomeLogic() {
