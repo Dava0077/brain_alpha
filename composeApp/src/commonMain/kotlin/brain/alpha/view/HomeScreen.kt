@@ -170,7 +170,7 @@ fun HomeScreen(
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         CategoryItem(Strings.t("concentration"),
-                            Res.drawable.concentracion,
+                            Res.drawable.icono_concentracion,
                             Color(0xFF4CE3E8),
                             onNavigateToConcentration)
 
