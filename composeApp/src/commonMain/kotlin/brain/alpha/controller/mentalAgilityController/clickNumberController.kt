@@ -4,19 +4,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import brain.alpha.controller.logicController.wordSearchController
-import brain.alpha.controller.logicController.wordSearchController.showInstructions
-import brain.alpha.controller.logicController.wordSearchController.startGame
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import brain.alpha.model.mentalAgilityModel.clickNumberModel
-import kotlinx.coroutines.Job
 
 object clickNumberController {
-
     var numbers by mutableStateOf(listOf<Int>())
-
+        private set
     lateinit var navigateTo: (String) -> Unit
     var targetNumber by mutableStateOf(0)
         private set
@@ -24,24 +21,18 @@ object clickNumberController {
         private set
     var resultMessage by mutableStateOf("")
         private set
-    var timeLeft by mutableStateOf(30) // Contador de 30 segundos
+    var timeLeft by mutableStateOf(30)
         private set
-    var score by mutableStateOf(0) // Contador de aciertos
+    var score by mutableStateOf(0)
         private set
-    var gameOver by mutableStateOf(false) // Estado para fin del juego
+    var gameOver by mutableStateOf(false)
         private set
     val showInstructions = mutableStateOf(true)
     var isGameStarted by mutableStateOf(false)
         private set
 
     private var timerJob: Job? = null
-
     private val scope = CoroutineScope(Dispatchers.Main)
-
-    init {
-        startGame()
-        startTimer()
-    }
 
     fun beginClickGame() {
         showInstructions.value = false
@@ -81,21 +72,25 @@ object clickNumberController {
 
     // Inicia el temporizador
     private fun startTimer() {
-        timerJob?.cancel() // Cancela cualquier temporizador anterior
+        timerJob?.cancel()
         timerJob = scope.launch {
-            while (timeLeft > 0) {
+            while (timeLeft > 0 && isGameStarted) {
                 delay(1000L)
                 timeLeft--
             }
-            gameOver = true
-            instructionMessage = "¡Tiempo terminado!"
-            resultMessage = "Aciertos: $score"
+            if (isGameStarted) {
+                gameOver = true
+                instructionMessage = "¡Tiempo terminado!"
+                resultMessage = "Aciertos: $score"
+                isGameStarted = false
+            }
         }
     }
 
     // Reinicia el juego (botón Atrás)
     fun resetGame() {
         timerJob?.cancel()
+        timerJob = null
         isGameStarted = false
         gameOver = false
         score = 0
@@ -107,12 +102,13 @@ object clickNumberController {
     }
 
     fun goHomeLogic() {
-        navigateTo("logic") // Solo navegamos, sin reiniciar el modelo
+        resetGame() // Reinicia el estado del juego
+        navigateTo("logic")
         wordSearchController.showInstructions.value = true
     }
 
-
-    fun goHome(){
+    fun goHome() {
+        resetGame() // Reinicia el estado del juego
         navigateTo("agility")
     }
 }
