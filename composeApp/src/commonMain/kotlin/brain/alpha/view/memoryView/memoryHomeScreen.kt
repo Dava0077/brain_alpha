@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brain.alpha.controller.memoryController.memoryHomeController
+import brain.alpha.model.UserSession
 import brain.alpha.strings.Strings
 import brainalpha.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.DrawableResource
@@ -30,6 +31,8 @@ fun memoryHomeScreen(
     controller: memoryHomeController,
 
 ) {
+    val displayName = UserSession.getDisplayName() // Show guest or username
+
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(Res.drawable.fondoMemory),
@@ -76,6 +79,14 @@ fun memoryHomeScreen(
                 ) {
                     Image(painter = painterResource(Res.drawable.ajustes), contentDescription = "Settings")
                 }
+                Text(
+                    text = "$displayName",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = 72.dp)
+                )
             }
             Spacer(modifier = Modifier.height(5.dp)) // Espacio tras el logo
 

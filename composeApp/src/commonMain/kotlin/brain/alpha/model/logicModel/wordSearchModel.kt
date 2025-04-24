@@ -1,5 +1,6 @@
 package brain.alpha.model.logicModel
 
+import androidx.compose.runtime.mutableStateOf
 import kotlin.random.Random
 
 object wordSearchModel {
@@ -10,29 +11,49 @@ object wordSearchModel {
         "KOTLIN", "JAVA", "PYTHON", "CODE", "PROGRAM", "ALPHA", "BRAIN", "MATH", "LOGIC", "GAME",
         "DATA", "STRING", "ARRAY", "LOOP", "CLASS", "METHOD", "OBJECT", "FUN", "TEST", "DEBUG"
     )
-
-    init {
-        generateGame()
+    val gameStarted = mutableStateOf(false)
+    fun isGameFinished(): Boolean {
+        return wordsToFind.isNotEmpty() && wordsToFind.all { isWordFound(it) }
     }
 
-    fun generateGame() {
-        // Limpiar la cuadrícula antes de generar un nuevo juego
-        for (i in 0 until GRID_SIZE) {
-            for (j in 0 until GRID_SIZE) {
+
+
+    fun clearFoundWords() {
+        foundWords.clear()
+    }
+
+    fun finishGame() {
+        gameStarted.value = false
+    }
+    private val foundWords = mutableSetOf<String>()
+
+    fun isWordFound(word: String): Boolean {
+        return foundWords.contains(word)
+    }
+
+    fun markWordAsFound(word: String) {
+        foundWords.add(word)
+    }
+
+
+    fun setupGrid(size: Int, words: List<String>, allowDiagonals: Boolean, allowReverse: Boolean) {
+        // Crea la matriz, distribuye las palabras según los parámetros
+        // Llenar el resto con letras aleatorias
+    }
+
+    fun generateGame(customWords: List<String>) {
+        wordsToFind.clear()
+        wordsToFind.addAll(customWords)
+
+        for (i in 0 until grid.size) {
+            for (j in 0 until grid[i].size) {
                 grid[i][j] = '-'
             }
         }
 
-        // Seleccionar 5 palabras aleatorias de la lista
-        wordsToFind.clear()
-        val shuffledWords = allWords.shuffled()
-        wordsToFind.addAll(shuffledWords.take(5))
-
-        // Colocar las palabras en la cuadrícula con límite de intentos
         placeWordsInGrid()
-
-        // Rellenar los espacios vacíos con letras aleatorias
         fillEmptySpaces()
+        gameStarted.value = true
     }
 
     fun placeWordsInGrid() {

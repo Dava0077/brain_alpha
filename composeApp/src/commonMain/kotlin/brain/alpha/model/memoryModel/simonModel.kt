@@ -11,20 +11,26 @@ object simonModel {
     private val playerSequence = mutableListOf<String>()
     private var state = GameState.START
     private var score = 0
+    val sequenceDelayMillis: Long
+        get() = when (difficulty) {
+            Difficulty.EASY -> 1000
+            Difficulty.MEDIUM -> 700
+            Difficulty.HARD -> 400
+        }
 
     fun incrementScore() {
         score++
     }
     fun getDelayBetweenColors(): Long = when (difficulty) {
-        Difficulty.EASY -> 1000L
-        Difficulty.MEDIUM -> 700L
-        Difficulty.HARD -> 400L
+        Difficulty.EASY -> 1500L    // muy lento
+        Difficulty.MEDIUM -> 800L   // intermedio
+        Difficulty.HARD -> 300L     // muy rápido
     }
 
     fun getAnimationSpeed(): Int = when (difficulty) {
-        Difficulty.EASY -> 300
-        Difficulty.MEDIUM -> 150
-        Difficulty.HARD -> 80
+        Difficulty.EASY -> 500      // largo entre cada color
+        Difficulty.MEDIUM -> 200
+        Difficulty.HARD -> 50       // casi inmediato
     }
     fun getScore(): Int = score
 
@@ -77,5 +83,13 @@ object simonModel {
     fun getGameState(): GameState = state
     fun setGameState(newState: GameState) {
         state = newState
+    }
+    fun getFinalScore(): Int {
+        val multiplier = when (difficulty) {
+            Difficulty.EASY -> 1
+            Difficulty.MEDIUM -> 2
+            Difficulty.HARD -> 3
+        }
+        return getScore() * multiplier
     }
 }

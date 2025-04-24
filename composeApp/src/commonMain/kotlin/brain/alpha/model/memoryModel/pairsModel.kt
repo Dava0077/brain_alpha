@@ -2,7 +2,7 @@ package brain.alpha.model.memoryModel
 
 import brain.alpha.model.shared.Difficulty
 
-object couplesModel {
+object pairsModel {
     val allCards = listOf(
         "A", "B", "C", "D", "E", "F", "G", "H",
         "I", "J", "K", "L", "M", "N", "O", "P",
@@ -30,5 +30,13 @@ object couplesModel {
         revealed = MutableList(totalCards) { false }
         matched = MutableList(totalCards) { false }
         selectedIndices.clear()
+    }
+    fun calculateEasyScore(seconds: Int): Int {
+        return when {
+            seconds <= 30 -> 10
+            seconds <= 60 -> 7
+            seconds <= 90 -> 5
+            else -> 3
+        }
     }
 }

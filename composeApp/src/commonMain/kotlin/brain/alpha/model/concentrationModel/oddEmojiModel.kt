@@ -1,87 +1,76 @@
 package brain.alpha.model.concentrationModel
 
+import io.ktor.util.date.*
 import brain.alpha.model.shared.Difficulty
-import brain.alpha.utils.currentTimeMillis
 import kotlin.random.Random
 
-object oddEmojiModel {
+class OddEmojiModel {
 
-    private val similarPairs = listOf(
-        Pair("😀", "😃"), Pair("😄", "😁"), Pair("😆", "😅"), Pair("😂", "🤣"), Pair("🙂", "🙃"),
-        Pair("😌", "😉"), Pair("😍", "🥰"), Pair("😘", "😗"), Pair("😙", "😚")
-    )
+    var difficulty: Difficulty = Difficulty.EASY
+    var currentLevel: Int = 1
+    var errors: Int = 0
+    private val levelTimes: MutableList<Long> = mutableListOf()
+    private var levelStartTime: Long = 0
 
-    var level = 1
-        private set
-    var errors = 0
-        private set
-    var totalTime: Long = 0
-        private set
+    var gridSize: Int = 3
+    var correctEmoji: String = "😀"
+    var oddEmoji: String = "😃"
+    var grid: List<List<String>> = listOf()
+    var oddPosition: Pair<Int, Int> = 0 to 0
 
-    private var startTime: Long = 0
+    private val similarEmojis = listOf("😀", "😃", "😄", "😁", "😆", "😅")
 
-    var gridSize = 2
-        private set
-
-    var grid: List<List<String>> = emptyList()
-        private set
-
-    var oddRow = 0
-        private set
-    var oddCol = 0
-        private set
-
-    var currentDifficulty: Difficulty = Difficulty.MEDIUM
-        private set
-
-    fun setDifficulty(difficulty: Difficulty) {
-        currentDifficulty = difficulty
+    fun startGame(difficulty: Difficulty) {
+        this.difficulty = difficulty
+        currentLevel = 1
+        errors = 0
+        levelTimes.clear()
+        generateLevel()
     }
 
+    fun generateLevel() {
+        val baseEmoji = similarEmojis.random()
+        val oddOutEmoji = similarEmojis.filter { it != baseEmoji }.random()
 
-    fun getMaxLevel(): Int = when (currentDifficulty) {
-        Difficulty.EASY -> 5
-        Difficulty.MEDIUM -> 8
-        Difficulty.HARD -> 12
-    }
+        gridSize = 3 + (currentLevel / 2)
+        val oddRow = Random.nextInt(gridSize)
+        val oddCol = Random.nextInt(gridSize)
+        oddPosition = oddRow to oddCol
 
-    fun startLevel() {
-        gridSize = 2 + (level / 2).coerceAtMost(6) // grows with level
-        val (base, odd) = similarPairs.random()
-        val oddIndex = Pair(Random.nextInt(gridSize), Random.nextInt(gridSize))
-        val newGrid = List(gridSize) { row ->
+        grid = List(gridSize) { row ->
             List(gridSize) { col ->
-                if (row == oddIndex.first && col == oddIndex.second) odd else base
+                if (row == oddRow && col == oddCol) oddOutEmoji else baseEmoji
             }
         }
 
-        grid = newGrid
-        oddRow = oddIndex.first
-        oddCol = oddIndex.second
-        startTime = currentTimeMillis()
+        correctEmoji = baseEmoji
+        oddEmoji = oddOutEmoji
+        levelStartTime = getTimeMillis()
     }
 
-    fun select(row: Int, col: Int): Boolean {
-        return if (row == oddRow && col == oddCol) {
-            val timeTaken = currentTimeMillis() - startTime
-            totalTime += timeTaken
-            level++
-            true
+    fun checkSelection(x: Int, y: Int): Boolean {
+        val levelEndTime = getTimeMillis()
+        levelTimes.add(levelEndTime - levelStartTime)
+
+        val isCorrect = x == oddPosition.first && y == oddPosition.second
+        if (isCorrect) {
+            currentLevel++
         } else {
             errors++
-            false
         }
+        return isCorrect
     }
 
-    fun hasFinished(): Boolean = level > getMaxLevel()
-
-    fun reset() {
-        level = 1
-        errors = 0
-        totalTime = 0
+    fun getAverageTime(): Long {
+        return if (levelTimes.isEmpty()) 0 else levelTimes.sum() / levelTimes.size
     }
 
-    fun getAverageTime(): Double {
-        return if (level > 1) totalTime.toDouble() / (level - 1) else 0.0
+    fun isGameOver(): Boolean {
+        val maxLevels = when (difficulty) {
+            Difficulty.EASY -> 5
+            Difficulty.MEDIUM -> 8
+            Difficulty.HARD -> 12
+        }
+        return currentLevel > maxLevels || errors >= 3
     }
 }

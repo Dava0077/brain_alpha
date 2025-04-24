@@ -20,6 +20,8 @@ object simonController {
 
     private val model = simonModel
     private val scope = CoroutineScope(Dispatchers.Default)
+    val gameInProgress = mutableStateOf(false)
+
 
     private val _uiState = MutableStateFlow(
         SimonUiState(
@@ -49,6 +51,7 @@ object simonController {
             model.resetScore()
             gameOver = false
         }
+        gameInProgress.value = true
 
         model.startGame()
 
@@ -60,24 +63,23 @@ object simonController {
             score = model.getScore()
         )
 
-        val delayDuration = model.getDelayBetweenColors()
-        val pauseBeforeTurn = model.getAnimationSpeed().toLong()
-
         scope.launch {
-            delay(delayDuration) // ⏱️ tiempo de espera según dificultad
-
-            _uiState.value = _uiState.value.copy(
-                sequence = emptyList() // ocultar color
-            )
-
-            delay(pauseBeforeTurn) // ⏸️ pequeña pausa antes del turno
-
-            model.beginPlayerTurn()
-            _uiState.value = _uiState.value.copy(
-                message = Strings.t("your_turn"),
-                isUserTurn = true
-            )
+            playMachineSequence()
         }
+    }
+    private suspend fun playMachineSequence() {
+        val lastColor = model.getMachineSequence().lastOrNull() ?: return
+
+        _uiState.value = _uiState.value.copy(sequence = listOf(lastColor))
+        delay(model.getDelayBetweenColors())
+        _uiState.value = _uiState.value.copy(sequence = emptyList())
+        delay(model.getAnimationSpeed().toLong())
+
+        model.beginPlayerTurn()
+        _uiState.value = _uiState.value.copy(
+            message = Strings.t("your_turn"),
+            isUserTurn = true
+        )
     }
     fun getDifficulty(): Difficulty = model.difficulty
 
@@ -89,13 +91,17 @@ object simonController {
         val isValid = model.validatePlayerInput()
 
         if (!isValid) {
+            val finalScore = model.getFinalScore()
+
             _uiState.value = _uiState.value.copy(
                 message = Strings.t("error_press_rei"),
                 isUserTurn = false,
                 sequence = emptyList(),
-                gameOver = true
+                gameOver = true,
+                score = finalScore
             )
             gameOver = true
+            gameInProgress.value = false
             return
         }
 
@@ -111,27 +117,13 @@ object simonController {
                 model.resetPlayerSequence()
                 model.addRandomColor()
 
-                val newSequence = model.getMachineSequence()
-
                 _uiState.value = _uiState.value.copy(
                     message = Strings.t("mem_seq"),
                     isUserTurn = false,
-                    sequence = newSequence
+                    sequence = model.getMachineSequence()
                 )
 
-                delay(800)
-
-                _uiState.value = _uiState.value.copy(
-                    sequence = emptyList() // ✅ ocultar color
-                )
-
-                delay(200)
-
-                model.beginPlayerTurn()
-                _uiState.value = _uiState.value.copy(
-                    message = Strings.t("your_turn"),
-                    isUserTurn = true
-                )
+                playMachineSequence() // 👈 llamamos la misma lógica con delays personalizados
             }
         }
     }
@@ -150,5 +142,7 @@ object simonController {
         )
         gameOver = false
         navigateTo("memory")
+        gameInProgress.value = false // ✅ Salimos del juego
+
     }
 }

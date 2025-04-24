@@ -1,7 +1,6 @@
 package brain.alpha.controller.logicController
 
 import androidx.compose.runtime.mutableStateOf
-import brain.alpha.controller.memoryController.couplesController
 import brain.alpha.model.logicModel.sudokuModel
 import brain.alpha.model.shared.Difficulty
 
@@ -63,6 +62,7 @@ object sudokuController {
     fun isBoardComplete(): Boolean {
         return model.getGrid().all { row -> row.all { it in 1..9 } }
     }
+
 
     fun isBoardValid(): Boolean {
         val grid = model.getGrid()
