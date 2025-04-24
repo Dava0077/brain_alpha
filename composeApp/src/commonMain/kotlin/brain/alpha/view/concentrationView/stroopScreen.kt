@@ -78,7 +78,7 @@ fun StroopScreen(controller: stroopController = stroopController) {
 
     // Show instructions
     if (showInstructions) {
-        InstructionsScreen(onBack = { controller.showInstructions.value = false })
+        StroopInstructionsScreen(onBack = { controller.showInstructions.value = false })
         return
     }
 
@@ -103,8 +103,8 @@ fun StroopScreen(controller: stroopController = stroopController) {
                     .fillMaxWidth()
                     .height(70.dp)
                     .background(Color(0xFFEFEFEF), shape = RoundedCornerShape(4.dp))
-                    .border(BorderStroke(2.dp, Color(0xFFB0BEC5))))
-            {
+                    .border(BorderStroke(2.dp, Color(0xFFB0BEC5)))
+            ) {
 
                 IconButton(
                     onClick = { /* future user action */ },
@@ -430,7 +430,7 @@ fun StroopScreen(controller: stroopController = stroopController) {
 }
 
 @Composable
-fun InstructionsScreen(onBack: () -> Unit) {
+fun StroopInstructionsScreen(onBack: () -> Unit) {
     Box(modifier = Modifier.fillMaxSize()) {
 
         // Background image
@@ -508,8 +508,8 @@ fun InstructionsScreen(onBack: () -> Unit) {
             // Game explanation using styled text
             Text(
                 buildAnnotatedString {
-                    append("Debes seleccionar el ")
-                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append("color") }
+                    append(Strings.t("insST1"))
+                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(Strings.t("insST2")) }
                     append(" en el que está escrita la palabra, no el nombre que aparece.\n\n")
 
                     append("Tienes ")

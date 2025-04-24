@@ -23,8 +23,8 @@ import brain.alpha.view.HomeScreen
 import brain.alpha.view.SettingsScreen
 import brain.alpha.view.SignUpScreen
 import brain.alpha.view.concentrationView.concentrationHomeScreen
+import brain.alpha.view.concentrationViews.OddEmojiScreen
 import brain.alpha.view.concentrationViews.StroopScreen
-import brain.alpha.view.concentrationViews.oddEmojiScreen
 import brain.alpha.view.logicView.logicHomeScreen
 import brain.alpha.view.logicView.sudokuScreen
 import brain.alpha.view.logicView.wordSearchScreen
@@ -175,7 +175,7 @@ fun App() {
                 controller = stroopController
             )
 
-            "emoji" -> oddEmojiScreen(
+            "emoji" -> OddEmojiScreen(
                 controller = oddEmojiController
             )
 
