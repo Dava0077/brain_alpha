@@ -98,6 +98,9 @@ object Strings {
             "insW5" to "MEJOR!!",
             "insW7" to "Información de la dificultad:\t\n - Fácil: 5-8 palabras\n - Medio: 10-15 palabras\n - Dificil: 20-25 palabras",
             "insW6" to "Concéntrate, ¡y buena suerte!",
+            //STROOP
+            "insST1" to "Debes seleccionar el",
+            "insST2" to "color",
 
 
 
@@ -195,6 +198,10 @@ object Strings {
             "insW5" to "BETTER!!",
             "insW7" to "Difficulty information:\t\n - Easy: 5-8 words\n - Medium: 10-15 words\n - Hard: 20-25 words",
             "insW6" to "Focus, and good luck!",
+            //STROOP
+            "insST1" to "You have to select the",
+            "insST2" to "color",
+
 
         )
     )

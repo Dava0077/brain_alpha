@@ -1,102 +1,90 @@
-
 package brain.alpha.controller.concentrationController
 
+
 import androidx.compose.runtime.*
-import brain.alpha.model.concentrationModel.oddEmojiModel
 import brain.alpha.model.shared.Difficulty
+import brain.alpha.model.concentrationModel.OddEmojiModel
 
 object oddEmojiController {
 
-    private val model = oddEmojiModel
-
+    // Callback for navigating between screens (e.g. to home)
     lateinit var navigateTo: (String) -> Unit
 
-    var showInstructions by mutableStateOf(false)
+    private val model = OddEmojiModel()
 
-    val grid = mutableStateListOf<List<String>>()
+    var grid = mutableStateOf(listOf<List<String>>())
+        private set
 
-    val correctClick = mutableStateOf<Pair<Int, Int>?>(null)
-    val wrongClick = mutableStateOf<Pair<Int, Int>?>(null)
+    var level = mutableStateOf(1)
+        private set
 
-    val showParticles = mutableStateOf(false)
+    var errors = mutableStateOf(0)
+        private set
 
-    var level by mutableStateOf(model.level)
-    val maxLevel: Int get() = model.getMaxLevel()
-    var errors by mutableStateOf(model.errors)
-    val averageTime: Double get() = model.getAverageTime()
-    val gridSize: Int get() = model.gridSize
-    val isGameOver = mutableStateOf(false)
+    var isGameOver = mutableStateOf(false)
+        private set
 
-    val selectedDifficulty = mutableStateOf(Difficulty.MEDIUM)
-    val isGameStarted = mutableStateOf(false)
-    val showDifficultySelector = mutableStateOf(true)
+    var showInstructions = mutableStateOf(false)
+    var isAnswering = false
 
-    fun beginGame() {
-        showInstructions = false
-        isGameStarted.value = true
-        showDifficultySelector.value = false
-        model.setDifficulty(selectedDifficulty.value)
-        model.reset()
-        model.startLevel()
-        grid.clear()
-        grid.addAll(model.grid)
-        level = model.level
-        errors = model.errors
+    fun startGame(difficulty: Difficulty) {
+        model.startGame(difficulty)
+        updateState()
+        isGameOver.value = false
     }
 
-    fun startLevel() {
-        model.startLevel()
-        grid.clear()
-        grid.addAll(model.grid)
-        level = model.level
-        errors = model.errors
-    }
+    fun checkSelection(row: Int, col: Int) {
+        if (isGameOver.value) return
 
-    fun selectEmoji(row: Int, col: Int) {
-        val correct = model.select(row, col)
-        level = model.level
-        errors = model.errors
-        if (correct) {
-            correctClick.value = row to col
-            showParticles.value = true
+        val correct = model.checkSelection(row, col)
+        updateState()
 
-            if (model.hasFinished()) {
-                isGameOver.value = true
-            } else {
-                startLevel()
-            }
-        } else if (model.errors >= 3) {
-            wrongClick.value = row to col
+        if (model.isGameOver()) {
             isGameOver.value = true
+        } else if (correct) {
+            model.generateLevel()
+            updateState()
         }
     }
 
+    fun getAverageTime(): Long {
+        return model.getAverageTime()
+    }
 
-
-    fun goConcentration() {
-        showInstructions = true
+    fun resetGame() {
+        model.currentLevel = 1
+        model.errors = 0
         isGameOver.value = false
-        model.reset()
+        showInstructions.value = false
+        grid.value = listOf()
+    }
+
+    fun stopGame() {
+            model.currentLevel = 1
+            model.errors = 0
+            isGameOver.value = false
+            showInstructions.value = false
+            isAnswering = false
+            grid.value = listOf()
+            level.value = 1
+            errors.value = 0
+    }
+
+    fun backToDifficultyMenu() {
+        showInstructions.value = false
+        resetGame()
+        stopGame()
+    }
+
+    fun goBackToConcentrationHome(){
+        stroopController.stopGame()
         navigateTo("concentration")
+        stroopController.showInstructions.value = false
     }
 
-    fun goBackToDifficultySelection() {
-        showInstructions = false
-        isGameStarted.value = false
-        showDifficultySelector.value = true
-        model.reset()
-    }
-
-    fun restartGame() {
-        showInstructions = false
-        isGameOver.value = false
-        correctClick.value = null
-        wrongClick.value = null
-        showParticles.value = false
-        isGameStarted.value = true
-        showDifficultySelector.value = false
-        model.reset()
-        model.setDifficulty(selectedDifficulty.value)
-        startLevel()
+    private fun updateState() {
+        grid.value = model.grid
+        level.value = model.currentLevel
+        errors.value = model.errors
     }
 }
