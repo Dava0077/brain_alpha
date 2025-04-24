@@ -28,6 +28,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import brain.alpha.controller.concentrationController.stroopController
+import brain.alpha.model.UserSession
 import brain.alpha.model.logicModel.sudokuModel
 import brain.alpha.model.shared.Difficulty
 import brain.alpha.view.memoryView.InstructionsCouples
@@ -48,6 +49,8 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
     val seconds = elapsedTime % 60
     val min = minutes.toString().padStart(2, '0')
     val sec = seconds.toString().padStart(2, '0')
+    val displayName = UserSession.getDisplayName() // Show guest or username
+
 
 
     // Show instructions first
@@ -115,6 +118,14 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
                 ) {
                     Image(painter = painterResource(Res.drawable.ajustes), contentDescription = "Settings")
                 }
+                Text(
+                    text = "$displayName",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = 72.dp)
+                )
             }
             Spacer(modifier = Modifier.height(5.dp)) // Espacio tras el logo
 
@@ -319,6 +330,8 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
 }
 @Composable
 fun InstructionsSudoku(onStart: () -> Unit, controller: sudokuController) {
+    val displayName = UserSession.getDisplayName() // Show guest or username
+
     Box(modifier = Modifier.fillMaxSize()) {
 
         // Background image
@@ -377,6 +390,14 @@ fun InstructionsSudoku(onStart: () -> Unit, controller: sudokuController) {
                         contentDescription = "Ajustes"
                     )
                 }
+                Text(
+                    text = "$displayName",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = 72.dp)
+                )
             }
 
             Spacer(modifier = Modifier.height(5.dp))

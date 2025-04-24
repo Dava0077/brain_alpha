@@ -1,7 +1,6 @@
 package brain.alpha.controller.logicController
 
 import androidx.compose.runtime.mutableStateOf
-import brain.alpha.controller.memoryController.couplesController
 import brain.alpha.model.logicModel.wordSearchModel
 import brain.alpha.model.shared.Difficulty
 

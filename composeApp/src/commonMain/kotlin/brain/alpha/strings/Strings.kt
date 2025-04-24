@@ -21,6 +21,8 @@ object Strings {
             "easy" to "Fácil",
             "medium" to "Medio",
             "hard" to "Difícil",
+            "your_score" to "Puntuación: ",
+            "neurons" to "\uD83C\uDF40 Neuronas",
             //HOME SCREEN
             "hi" to "Hola, ",
             "categories" to "CATEGORIAS",
@@ -61,7 +63,6 @@ object Strings {
             "mem_seq" to "Memoriza la nueva secuencia...",
             "your_turn" to "¡Tu turno!",
             "error_press_rei" to "¡Fallaste! Pulsa Reiniciar.",
-            "neurons" to "\uD83C\uDF40 Neuronas",
             "insS1" to "Tienes que observar atentamente la secuencia \n\n" +
                     " de colores que se muestran en pantalla.\n",
             "insS2" to "Cuando termine la secuencia, es tu turno de ",
@@ -117,6 +118,8 @@ object Strings {
             "easy" to "Easy",
             "medium" to "Medium",
             "hard" to "Hard",
+            "your_score" to "Score: ",
+            "neurons" to "\uD83C\uDF40 Neuronas",
             //HOME SCREEN
             "hi" to "Hi, ",
             "categories" to "CATEGORIES",
@@ -157,7 +160,6 @@ object Strings {
             "mem_seq" to "Memorize the new sequence...",
             "your_turn" to "¡Your turn!",
             "error_press_rei" to "¡You failed! Press Restart.",
-            "neurons" to "\uD83C\uDF40 Neurons",
             "insS1" to "You must carefully watch the sequence \n\n" +
                     "of colors that appears on the screen.\n",
             "insS2" to "When the sequence ends, it's your turn to ",

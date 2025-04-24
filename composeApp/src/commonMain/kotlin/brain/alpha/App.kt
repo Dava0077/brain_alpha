@@ -11,7 +11,7 @@ import brain.alpha.controller.concentrationController.stroopController
 import brain.alpha.controller.logicController.logicHomeController
 import brain.alpha.controller.logicController.sudokuController
 import brain.alpha.controller.logicController.wordSearchController
-import brain.alpha.controller.memoryController.couplesController
+import brain.alpha.controller.memoryController.pairsController
 import brain.alpha.controller.memoryController.memoryHomeController
 import brain.alpha.controller.memoryController.simonController
 import brain.alpha.controller.mentalAgilityController.clickNumberController
@@ -81,7 +81,7 @@ fun App() {
 
         //MEMORY GAMES
         memoryHomeController.navigateTo = { route -> currentScreen = route }
-        couplesController.navigateTo = { route -> currentScreen = route }
+        pairsController.navigateTo = { route -> currentScreen = route }
         simonController.navigateTo = { route -> currentScreen = route }
 
         //MENTAL AGILTY
@@ -141,7 +141,7 @@ fun App() {
             "memory" -> memoryHomeScreen(
                 controller = memoryHomeController)
             "couples" -> couplesScreen(
-                controller = couplesController,
+                controller = pairsController,
 
             )
             "simon" -> simonScreen(

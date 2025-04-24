@@ -159,12 +159,12 @@ fun HomeScreen(
                 ) {
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         CategoryItem(Strings.t("memory"),
-                            Res.drawable.memoria,
+                            Res.drawable.iconoMem,
                             Color(0xFF4CE3E8),
                             onNavigateToMemory)
 
                         CategoryItem(Strings.t("logic"),
-                            Res.drawable.logica,
+                            Res.drawable.iconoLog,
                             Color(0xFF4CE3E8),
                             onNavigateToLogic)
                     }
@@ -175,7 +175,7 @@ fun HomeScreen(
                             onNavigateToConcentration)
 
                         CategoryItem(Strings.t("mental_agility"),
-                            Res.drawable.mentalA,
+                            Res.drawable.iconoAgi,
                             Color(0xFF4CE3E8),
                             onNavigateToAgility)
                     }

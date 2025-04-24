@@ -33,6 +33,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import brain.alpha.controller.concentrationController.stroopController
+import brain.alpha.model.UserSession
 import brain.alpha.model.shared.Difficulty
 import brain.alpha.strings.Strings
 
@@ -44,6 +45,7 @@ fun simonScreen(
     val uiState by controller.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val showInstructions by controller.showInstructions
+    val displayName = UserSession.getDisplayName() // Show guest or username
 
 
     // Show instructions first
@@ -114,6 +116,14 @@ fun simonScreen(
                         contentDescription = "Settings"
                     )
                 }
+                Text(
+                    text = "$displayName",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = 72.dp)
+                )
 
             }
             Spacer(modifier = Modifier.height(5.dp)) // Espacio tras el logo
@@ -162,7 +172,7 @@ fun simonScreen(
                                 selectedDifficulty.value = level
                                 controller.setDifficulty(level)
                             },
-                            enabled = !uiState.isUserTurn
+                            enabled = !controller.gameInProgress.value // ✅ desactiva cuando se juega
                         )
                         Text(text = Strings.translateDifficulty(level))
                     }
@@ -235,8 +245,9 @@ fun simonScreen(
                 if (uiState.gameOver) {
                     Text(
                         text = Strings.t("you_won")+ "${uiState.score} "+Strings.t("neurons"),
-                        fontSize = 18.sp,
-                        color = Color.Black
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xFF2E7D32)
                     )
                 }
             }
@@ -282,6 +293,8 @@ fun colorFromName(name: String): Color = when (name) {
 }
 @Composable
 fun InstructionsSimon(onStart: () -> Unit, controller: simonController) {
+    val displayName = UserSession.getDisplayName() // Show guest or username
+
     Box(modifier = Modifier.fillMaxSize()) {
 
         // Background image
@@ -340,6 +353,14 @@ fun InstructionsSimon(onStart: () -> Unit, controller: simonController) {
                         contentDescription = "Ajustes"
                     )
                 }
+                Text(
+                    text = "$displayName",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = 72.dp)
+                )
             }
 
             Spacer(modifier = Modifier.height(5.dp))

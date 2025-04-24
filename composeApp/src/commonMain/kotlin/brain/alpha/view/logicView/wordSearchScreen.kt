@@ -20,10 +20,9 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brain.alpha.controller.logicController.wordSearchController
-import brain.alpha.controller.memoryController.couplesController
+import brain.alpha.model.UserSession
 import brain.alpha.model.shared.Difficulty
 import brain.alpha.strings.Strings
-import brain.alpha.view.memoryView.InstructionsCouples
 import brainalpha.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 import kotlinx.coroutines.Dispatchers
@@ -51,6 +50,7 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
     val min = (elapsedTime / 60).toString().padStart(2, '0')
     val sec = (elapsedTime % 60).toString().padStart(2, '0')
     val selectedDifficulty = remember { mutableStateOf(Difficulty.EASY) }
+    val displayName = UserSession.getDisplayName() // Show guest or username
 
     if (showInstructions) {
         InstructionsWordSearch(
@@ -115,6 +115,14 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                 ) {
                     Image(painter = painterResource(Res.drawable.ajustes), contentDescription = "Settings")
                 }
+                Text(
+                    text = "$displayName",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = 72.dp)
+                )
             }
             Spacer(modifier = Modifier.height(5.dp))
 
@@ -353,6 +361,8 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
 
 @Composable
 fun InstructionsWordSearch(onStart: () -> Unit, controller: wordSearchController) {
+    val displayName = UserSession.getDisplayName() // Show guest or username
+
     Box(modifier = Modifier.fillMaxSize()) {
 
         // Background image
@@ -412,6 +422,14 @@ fun InstructionsWordSearch(onStart: () -> Unit, controller: wordSearchController
                         contentDescription = "Ajustes"
                     )
                 }
+                Text(
+                    text = "$displayName",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = 72.dp)
+                )
             }
 
             Spacer(modifier = Modifier.height(5.dp))

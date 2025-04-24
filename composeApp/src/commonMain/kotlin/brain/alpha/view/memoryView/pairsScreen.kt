@@ -29,8 +29,8 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
-import brain.alpha.controller.concentrationController.stroopController
-import brain.alpha.controller.memoryController.couplesController
+import brain.alpha.controller.memoryController.pairsController
+import brain.alpha.model.UserSession
 import brain.alpha.model.shared.Difficulty
 import brain.alpha.strings.Strings
 import brainalpha.composeapp.generated.resources.*
@@ -39,7 +39,7 @@ import brainalpha.composeapp.generated.resources.*
 
 @Composable
 fun couplesScreen(
-    controller: couplesController,
+    controller: pairsController,
     ) {
 
     val revealed = remember { mutableStateListOf<Boolean>().apply { addAll(controller.getRevealedStates()) } }
@@ -50,6 +50,7 @@ fun couplesScreen(
     var elapsedTime by remember { mutableStateOf(0) }
     var gameLost by remember { mutableStateOf(false) }
     var selectedDifficulty by remember { mutableStateOf(Difficulty.EASY) }
+    val displayName = UserSession.getDisplayName() // Show guest or username
 
     var timerTrigger by remember { mutableStateOf(0) }
     val showInstructions by controller.showInstructions
@@ -62,7 +63,7 @@ fun couplesScreen(
     if (showInstructions) {
         InstructionsCouples(
             onStart = { controller.beginGame() },
-            controller = couplesController
+            controller = pairsController
         )
         return
     }
@@ -147,6 +148,14 @@ fun couplesScreen(
                         contentDescription = "Settings"
                     )
                 }
+                Text(
+                    text = "$displayName",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = 72.dp)
+                )
 
             }
             Spacer(modifier = Modifier.height(5.dp)) // Espacio tras el logo
@@ -202,7 +211,7 @@ fun couplesScreen(
 
 
 
-            Spacer(modifier = Modifier.height(30.dp)) // Espacio tras el logo
+            Spacer(modifier = Modifier.height(15.dp)) // Espacio tras el logo
 
             Text(
                 text = Strings.t("title_couples"),
@@ -287,8 +296,11 @@ fun couplesScreen(
 
             if (gameFinished) {
                 Spacer(modifier = Modifier.height(16.dp))
+
+                val score = controller.calculateScore(elapsedTime)
+
                 Text(
-                    text = Strings.t("final_time") + "$elapsedTime s",
+                    text = Strings.t("your_score") + " $score " + Strings.t("neurons"),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color(0xFF2E7D32)
@@ -298,7 +310,9 @@ fun couplesScreen(
     }
 }
 @Composable
-fun InstructionsCouples(onStart: () -> Unit, controller: couplesController) {
+fun InstructionsCouples(onStart: () -> Unit, controller: pairsController) {
+    val displayName = UserSession.getDisplayName() // Show guest or username
+
     Box(modifier = Modifier.fillMaxSize()) {
 
         // Background image
@@ -357,6 +371,14 @@ fun InstructionsCouples(onStart: () -> Unit, controller: couplesController) {
                         contentDescription = "Ajustes"
                     )
                 }
+                Text(
+                    text = "$displayName",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = 72.dp)
+                )
             }
 
             Spacer(modifier = Modifier.height(5.dp))

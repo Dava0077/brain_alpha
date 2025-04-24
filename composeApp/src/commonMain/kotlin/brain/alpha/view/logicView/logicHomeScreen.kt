@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brain.alpha.controller.logicController.logicHomeController
+import brain.alpha.model.UserSession
 import brain.alpha.strings.Strings
 import brain.alpha.view.CategoryItem
 import brainalpha.composeapp.generated.resources.*
@@ -37,6 +38,8 @@ fun logicHomeScreen(
     onNavigateToSudoku: () -> Unit,
     onNavigateToWordS: () -> Unit
     ) {
+    val displayName = UserSession.getDisplayName() // Show guest or username
+
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(Res.drawable.fondoLogic),
@@ -83,6 +86,14 @@ fun logicHomeScreen(
                 ) {
                     Image(painter = painterResource(Res.drawable.ajustes), contentDescription = "Settings")
                 }
+                 Text(
+                     text = "$displayName",
+                     color = Color.White,
+                     fontSize = 16.sp,
+                     modifier = Modifier
+                         .align(Alignment.CenterStart)
+                         .padding(start = 72.dp)
+                 )
             }
             Spacer(modifier = Modifier.height(5.dp)) // Espacio tras el logo
 

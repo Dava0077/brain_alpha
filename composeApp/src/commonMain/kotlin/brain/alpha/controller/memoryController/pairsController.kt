@@ -2,12 +2,11 @@ package brain.alpha.controller.memoryController
 
 
 import androidx.compose.runtime.mutableStateOf
-import brain.alpha.controller.concentrationController.stroopController
-import brain.alpha.model.memoryModel.couplesModel
+import brain.alpha.model.memoryModel.pairsModel
 import brain.alpha.model.shared.Difficulty
 
-object couplesController {
-    private val model = couplesModel
+object pairsController {
+    private val model = pairsModel
     lateinit var navigateTo: (String) -> Unit
     val showInstructions = mutableStateOf(false)
 
@@ -74,10 +73,48 @@ object couplesController {
     fun getShuffledCardCount(): Int = model.shuffledCards.size
 
     fun setDifficulty(difficulty: Difficulty) {
-        couplesModel.difficulty = difficulty
+        pairsModel.difficulty = difficulty
     }
-    fun getPairCount(): Int = couplesModel.pairCount
+    fun getDifficulty(): Difficulty = model.difficulty
+
+    fun getPairCount(): Int = pairsModel.pairCount
 
     fun isGameFinished(): Boolean = model.matched.all { it }
+    fun calculateScore(seconds: Int): Int {
+        val baseScore = when (model.difficulty) {
+            Difficulty.EASY -> {
+                when {
+                    seconds <= 30 -> 10
+                    seconds <= 60 -> 7
+                    seconds <= 90 -> 5
+                    else -> 3
+                }
+            }
+            Difficulty.MEDIUM -> {
+                when {
+                    seconds <= 45 -> 10
+                    seconds <= 75 -> 7
+                    seconds <= 105 -> 5
+                    else -> 3
+                }
+            }
+            Difficulty.HARD -> {
+                when {
+                    seconds <= 60 -> 10
+                    seconds <= 90 -> 7
+                    seconds <= 120 -> 5
+                    else -> 3
+                }
+            }
+        }
+
+        val multiplier = when (model.difficulty) {
+            Difficulty.EASY -> 1
+            Difficulty.MEDIUM -> 2
+            Difficulty.HARD -> 3
+        }
+
+        return baseScore * multiplier
+    }
 }
 
