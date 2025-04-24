@@ -40,6 +40,9 @@ fun OddEmojiScreen(controller: oddEmojiController = oddEmojiController) {
     val isGameOver by controller.isGameOver
     val showInstructions by controller.showInstructions
     val difficulty = remember { mutableStateOf(Difficulty.MEDIUM) }
+    val score by controller.score
+    val timeLeft by controller.timeLeft
+    val timeProgress = controller.getTimeProgress()
     val showEndDialog = remember { mutableStateOf(false) }
     val isGameStarted = remember { mutableStateOf(false) }
 
@@ -209,6 +212,18 @@ fun OddEmojiScreen(controller: oddEmojiController = oddEmojiController) {
                 // Game running
                 Text("Find the odd emoji!", fontSize = 24.sp, fontWeight = FontWeight.Bold)
 
+                Text("Time left: $timeLeft s", fontSize = 18.sp, color = Color(0xFF1565C0))
+
+                LinearProgressIndicator(
+                    progress = timeProgress,
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .height(12.dp)
+                        .padding(top = 4.dp),
+                    color = Color(0xFF4CAF50),
+                    backgroundColor = Color.LightGray
+                )
+
                 Spacer(modifier = Modifier.height(24.dp))
 
                 grid.forEachIndexed { rowIndex, row ->
@@ -234,13 +249,25 @@ fun OddEmojiScreen(controller: oddEmojiController = oddEmojiController) {
 
                 Text("Level: $level", fontSize = 18.sp)
                 Text("Errors: $errors", fontSize = 18.sp, color = Color.Red)
+                Text("Score: $score", fontSize = 18.sp, color = Color(0xFF2E7D32))
 
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Button(onClick = {
                     controller.resetGame()
                     isGameStarted.value = false
-                }) {
+                },
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .height(46.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.White,
+                        contentColor = Color.Black
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.elevation(4.dp),
+                    border = BorderStroke(1.dp, Color.Black)
+                ) {
                     Text("Back to Menu")
                 }
             }
@@ -255,6 +282,7 @@ fun OddEmojiScreen(controller: oddEmojiController = oddEmojiController) {
                             Text("Final level: $level")
                             Text("Errors made: $errors")
                             Text("Average time: ${controller.getAverageTime()} ms")
+                            Text("Final score: ${controller.getFinalScore()}")
                         }
                     },
                     confirmButton = {

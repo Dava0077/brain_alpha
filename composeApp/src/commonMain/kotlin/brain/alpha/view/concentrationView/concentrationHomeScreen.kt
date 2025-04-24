@@ -48,49 +48,63 @@ fun concentrationHomeScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(70.dp)
-                    .background(Color(0xFF222937), shape = RoundedCornerShape(4.dp))
-                    .border(BorderStroke(2.dp, Color(0xFF4CE3E8))))
-            {
+                    .background(Color(0xFFEFEFEF), shape = RoundedCornerShape(4.dp))
+                    .border(BorderStroke(2.dp, Color(0xFFB0BEC5)))
+            ) {
+
                 IconButton(
-                    onClick = { /* Dummy action */ },
+                    onClick = { /* future user action */ },
                     modifier = Modifier
                         .align(Alignment.CenterStart)
                         .padding(start = 8.dp)
-                        .size(55.dp)
+                        .size(48.dp)
                 ) {
-                    Image(painter = painterResource(Res.drawable.user), contentDescription = "User")
+                    Image(
+                        painter = painterResource(Res.drawable.user),
+                        contentDescription = "Usuario"
+                    )
                 }
                 Image(
                     painter = painterResource(Res.drawable.logo),
                     contentDescription = null,
                     modifier = Modifier
-                        .size(120.dp)
+                        .size(100.dp)
                         .align(Alignment.Center)
-                        .scale(1.5f)
+                        .scale(1.2f)
                 )
                 IconButton(
-                    onClick = { brain.alpha.controller.LoginController.buttonSettings() },
+                    onClick = { /* future settings action */ },
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .padding(end = 8.dp)
-                        .size(55.dp)
+                        .size(48.dp)
                 ) {
-                    Image(painter = painterResource(Res.drawable.ajustes), contentDescription = "Settings")
+                    Image(
+                        painter = painterResource(Res.drawable.ajustes),
+                        contentDescription = "Ajustes"
+                    )
                 }
+
             }
             Spacer(modifier = Modifier.height(5.dp)) // Espacio tras el logo
+
+            Spacer (modifier = Modifier.height(30.dp))
 
             Button(
                 onClick = {controller.goHome()},
                 modifier = Modifier
                     .align(Alignment.End)
+                    .padding(8.dp)
                     .height(46.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color.White,
+                    contentColor = Color.Black
+                ),
                 shape = RoundedCornerShape(12.dp),
                 elevation = ButtonDefaults.elevation(4.dp),
-                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+                border = BorderStroke(1.dp, Color.Black)
             ){
-                Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
+                Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
             }
 
             Spacer(modifier = Modifier.height(30.dp))

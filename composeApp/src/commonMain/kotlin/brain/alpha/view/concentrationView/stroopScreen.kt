@@ -151,7 +151,7 @@ fun StroopScreen(controller: stroopController = stroopController) {
                     onDismissRequest = {},
                     title = {
                         Text(
-                            text = "¡Juego terminado!",
+                            text = Strings.t("insST1"),
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF0647D7)
@@ -160,12 +160,12 @@ fun StroopScreen(controller: stroopController = stroopController) {
                     text = {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
-                                text = "Puntuación final:",
+                                text = Strings.t("insST2"),
                                 fontSize = 18.sp
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "$score puntos",
+                                text = "$score" + Strings.t("insST3"),
                                 fontSize = 28.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color(0xFF388E3C)
@@ -179,7 +179,7 @@ fun StroopScreen(controller: stroopController = stroopController) {
                             isGameStarted.value = true
                             showEndDialog.value = false
                         }) {
-                            Text("Volver a jugar", color = Color(0xFF0647D7))
+                            Text(Strings.t("insST4"), color = Color(0xFF0647D7))
                         }
                     },
                     dismissButton = {
@@ -188,7 +188,7 @@ fun StroopScreen(controller: stroopController = stroopController) {
                             isGameStarted.value = false
                             showEndDialog.value = false
                         }) {
-                            Text("Volver al inicio", color = Color(0xFF0647D7))
+                            Text(Strings.t("insST5"), color = Color(0xFF0647D7))
                         }
                     },
                     shape = RoundedCornerShape(12.dp)
@@ -220,17 +220,17 @@ fun StroopScreen(controller: stroopController = stroopController) {
                         .height(46.dp),
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = Color.White,
-                        contentColor = Color(0xFF455A64)
+                        contentColor = Color.Black
                     ),
                     shape = RoundedCornerShape(12.dp),
                     elevation = ButtonDefaults.elevation(4.dp),
-                    border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+                    border = BorderStroke(1.dp, Color.Black)
                 ) {
                     Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium)
                 }
 
                 if (!isGameStarted.value) {
-                    Text("Selecciona dificultad:", fontSize = 18.sp, fontWeight = FontWeight.Medium)
+                    Text(Strings.t("insST6"), fontSize = 18.sp, fontWeight = FontWeight.Medium)
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -253,16 +253,39 @@ fun StroopScreen(controller: stroopController = stroopController) {
                         controller.setDifficulty(selectedDifficulty.value)
                         controller.beginGame()
                         isGameStarted.value = true
-                    }) {
-                        Text("Iniciar juego")
+                    },
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .height(46.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color.White,
+                            contentColor = Color.Black
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = ButtonDefaults.elevation(4.dp),
+                        border = BorderStroke(1.dp, Color.Black)
+                    ) {
+                        Text(Strings.t("start_game"))
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Button(onClick = {
                         controller.showInstructions.value = true
-                    }) {
-                        Text("Instrucciones")
+                    },
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .height(46.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color.White,
+                            contentColor = Color.Black
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = ButtonDefaults.elevation(4.dp),
+                        border = BorderStroke(1.dp, Color.Black)
+
+                    ) {
+                        Text(Strings.t("instructions"))
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -272,8 +295,8 @@ fun StroopScreen(controller: stroopController = stroopController) {
 
 
                 // Game title and timer
-                Text("Prueba de Stroop", fontSize = 24.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Cursive)
-                Text("Tiempo restante: $timeLeft s", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(Strings.t("insST7"), fontSize = 24.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Cursive)
+                Text(Strings.t("insST8") + "$timeLeft" + Strings.t("insST9"), fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
                 // Progress bar
                 val totalTime by controller.totalTime
@@ -340,7 +363,7 @@ fun StroopScreen(controller: stroopController = stroopController) {
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = if (answerFeedback == true) "¡Correcto!" else "Incorrecto",
+                                text = if (answerFeedback == true) Strings.t("insST10") else Strings.t("insST11"),
                                 color = if (answerFeedback == true) Color.Green else Color.Red,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 20.sp,
@@ -388,38 +411,38 @@ fun StroopScreen(controller: stroopController = stroopController) {
                 Spacer(modifier = Modifier.height(25.dp))
 
                 // Score counter
-                Text("Puntuación: $score", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+                Text(Strings.t("insST12") + "$score", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
             }
 
         }
 
     }
 
-    if (showContinuePrompt.value) {
-        AlertDialog(
-            onDismissRequest = { showContinuePrompt.value = false },
-            title = { Text("¿Continuar partida?") },
-            text = { Text("Tienes una partida en curso. ¿Deseas continuarla o reiniciar desde cero?") },
-            confirmButton = {
-                TextButton(onClick = {
-                    showContinuePrompt.value = false
-                    controller.continueGame()         // ⏱️ Reactiva el timer
-                    isGameStarted.value = true
-                }) {
-                    Text("Continuar")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = {
-                    showContinuePrompt.value = false
-                    isGameStarted.value = false
-                    controller.beginGame() // Nueva partida
-                }) {
-                    Text("Reiniciar")
-                }
-            }
-        )
-    }
+//    if (showContinuePrompt.value) {
+//        AlertDialog(
+//            onDismissRequest = { showContinuePrompt.value = false },
+//            title = { Text("¿Continuar partida?") },
+//            text = { Text("Tienes una partida en curso. ¿Deseas continuarla o reiniciar desde cero?") },
+//            confirmButton = {
+//                TextButton(onClick = {
+//                    showContinuePrompt.value = false
+//                    controller.continueGame()         // ⏱️ Reactiva el timer
+//                    isGameStarted.value = true
+//                }) {
+//                    Text("Continuar")
+//                }
+//            },
+//            dismissButton = {
+//                TextButton(onClick = {
+//                    showContinuePrompt.value = false
+//                    isGameStarted.value = false
+//                    controller.beginGame() // Nueva partida
+//                }) {
+//                    Text("Reiniciar")
+//                }
+//            }
+//        )
+//    }
 
     DisposableEffect(Unit) {
         onDispose {
@@ -508,15 +531,15 @@ fun StroopInstructionsScreen(onBack: () -> Unit) {
             // Game explanation using styled text
             Text(
                 buildAnnotatedString {
-                    append(Strings.t("insST1"))
-                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(Strings.t("insST2")) }
-                    append(" en el que está escrita la palabra, no el nombre que aparece.\n\n")
+                    append(Strings.t("insST13"))
+                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(Strings.t("insST14")) }
+                    append(Strings.t("insST15"))
 
-                    append("Tienes ")
-                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append("30 segundos") }
-                    append(" para acertar la mayor cantidad posible.\n")
+                    append(Strings.t("insST16"))
+                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(Strings.t("insST17")) }
+                    append(Strings.t("insST18"))
 
-                    append("Concéntrate, ¡y buena suerte!")
+                    append(Strings.t("insST19"))
                 },
                 fontSize = 16.sp,
                 textAlign = TextAlign.Center,
@@ -531,15 +554,15 @@ fun StroopInstructionsScreen(onBack: () -> Unit) {
             Button(
                 onClick = onBack,
                 modifier = Modifier
-                    .height(48.dp)
-                    .width(200.dp),
+                    .padding(8.dp)
+                    .height(46.dp),
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color.White,
-                    contentColor = Color(0xFF455A64)
+                    contentColor = Color.Black
                 ),
                 shape = RoundedCornerShape(12.dp),
                 elevation = ButtonDefaults.elevation(4.dp),
-                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+                border = BorderStroke(1.dp, Color.Black)
             ) {
                 Text(Strings.t("start_game"), fontWeight = FontWeight.SemiBold)
             }
