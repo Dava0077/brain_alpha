@@ -1,6 +1,5 @@
 package brain.alpha.view.mentalAgilityView
 
-import androidx.compose.animation.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -9,16 +8,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
@@ -28,27 +23,23 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brain.alpha.controller.LoginController
-import brain.alpha.controller.logicController.wordSearchController
-import brain.alpha.controller.memoryController.simonController
 import brain.alpha.controller.mentalAgilityController.clickNumberController
-import brain.alpha.model.mentalAgilityModel.clickNumberModel
-import brain.alpha.model.shared.Difficulty
 import brain.alpha.strings.Strings
-import brain.alpha.view.logicView.InstructionsWordSearch
 import brainalpha.composeapp.generated.resources.*
 import brainalpha.composeapp.generated.resources.Res
 import brainalpha.composeapp.generated.resources.ajustes
 import brainalpha.composeapp.generated.resources.fondoMental
 import brainalpha.composeapp.generated.resources.logo
 import brainalpha.composeapp.generated.resources.user
-import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
+
 val showInstructions by clickNumberController.showInstructions
 
 @Composable
-fun clickNumberScreen(controller: clickNumberController,
-                      onNavigateToHome: () -> Unit) {
-
+fun clickNumberScreen(
+    controller: clickNumberController,
+    onNavigateToHome: () -> Unit
+) {
     // Show instructions first
     if (showInstructions) {
         InstructionsClickNumber(
@@ -57,7 +48,6 @@ fun clickNumberScreen(controller: clickNumberController,
         )
         return
     }
-
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
@@ -72,14 +62,14 @@ fun clickNumberScreen(controller: clickNumberController,
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
+            // Header
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(70.dp)
                     .background(Color(0xFF222937), shape = RoundedCornerShape(4.dp))
                     .border(BorderStroke(2.dp, Color(0xFF4CE3E8)))
-            )
-            {
+            ) {
                 IconButton(
                     onClick = { /* Dummy action */ },
                     modifier = Modifier
@@ -107,10 +97,11 @@ fun clickNumberScreen(controller: clickNumberController,
                     Image(painter = painterResource(Res.drawable.ajustes), contentDescription = "Settings")
                 }
             }
-            Spacer(modifier = Modifier.height(5.dp)) // Espacio tras el logo
+
+            Spacer(modifier = Modifier.height(5.dp))
 
             Button(
-                onClick = {controller.goHome()},
+                onClick = { controller.goHome() },
                 modifier = Modifier
                     .align(Alignment.End)
                     .height(46.dp),
@@ -118,7 +109,7 @@ fun clickNumberScreen(controller: clickNumberController,
                 shape = RoundedCornerShape(12.dp),
                 elevation = ButtonDefaults.elevation(4.dp),
                 border = BorderStroke(1.dp, Color(0xFFB0BEC5))
-            ){
+            ) {
                 Text("⬅ Volver", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
             }
 
@@ -134,64 +125,74 @@ fun clickNumberScreen(controller: clickNumberController,
 
             Spacer(modifier = Modifier.height(30.dp))
 
+            // Contenido del juego o pantalla inicial
+            if (!clickNumberController.isGameStarted) {
+                // Pantalla inicial
+                Text(
+                    text = "Click The Number",
+                    fontSize = 24.sp,
+                    modifier = Modifier.padding(bottom = 20.dp)
+                )
+                Button(
+                    onClick = { clickNumberController.startGame() },
+                    modifier = Modifier.padding(bottom = 20.dp)
+                ) {
+                    Text("Iniciar Juego")
+                }
+            } else {
+                // UI del juego
+                // Temporizador
+                Text(
+                    text = "Tiempo restante: ${clickNumberController.timeLeft}s",
+                    fontSize = 18.sp,
+                    modifier = Modifier.padding(bottom = 10.dp)
+                )
 
-        }
-        Column(
-            modifier = Modifier.fillMaxSize().padding(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            // Temporizador
-            Text(
-                text = "Tiempo restante: ${clickNumberController.timeLeft}s",
-                fontSize = 18.sp,
-                modifier = Modifier.padding(bottom = 10.dp)
-            )
+                // Instrucción del juego
+                Text(
+                    text = clickNumberController.instructionMessage,
+                    fontSize = 20.sp,
+                    modifier = Modifier.padding(bottom = 10.dp)
+                )
 
-            // Instrucción del juego
-            Text(
-                text = clickNumberController.instructionMessage,
-                fontSize = 20.sp,
-                modifier = Modifier.padding(bottom = 10.dp)
-            )
+                // Mensaje de resultado
+                Text(
+                    text = clickNumberController.resultMessage,
+                    fontSize = 18.sp,
+                    modifier = Modifier.padding(bottom = 10.dp)
+                )
 
-            // Mensaje de resultado
-            Text(
-                text = clickNumberController.resultMessage,
-                fontSize = 18.sp,
-                modifier = Modifier.padding(bottom = 10.dp)
-            )
-
-            // Cuadrícula de botones
-            if (!clickNumberController.gameOver) {
-                for (row in 0 until 4) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        for (col in 0 until 4) {
-                            val index = row * 4 + col
-                            val number = clickNumberController.numbers.getOrNull(index) ?: 0
-                            Button(
-                                onClick = { clickNumberController.handleButtonClick(number) },
-                                modifier = Modifier.size(60.dp)
-                            ) {
-                                Text(text = number.toString())
+                // Cuadrícula de botones
+                if (!clickNumberController.gameOver && clickNumberController.numbers.isNotEmpty()) {
+                    for (row in 0 until 4) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            for (col in 0 until 4) {
+                                val index = row * 4 + col
+                                val number = clickNumberController.numbers.getOrElse(index) { 0 }
+                                Button(
+                                    onClick = { clickNumberController.handleButtonClick(number) },
+                                    modifier = Modifier.size(60.dp)
+                                ) {
+                                    Text(text = number.toString())
+                                }
                             }
                         }
+                        Spacer(modifier = Modifier.height(10.dp))
                     }
-                    Spacer(modifier = Modifier.height(10.dp))
                 }
             }
         }
     }
 }
+
 @Composable
 fun InstructionsClickNumber(onStart: () -> Unit, controller: clickNumberController) {
     Box(modifier = Modifier.fillMaxSize()) {
-
         // Background image
         Image(
-            painter = painterResource(Res.drawable.fondoMemory),
+            painter = painterResource(Res.drawable.fondoMental),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
@@ -209,8 +210,8 @@ fun InstructionsClickNumber(onStart: () -> Unit, controller: clickNumberControll
                     .fillMaxWidth()
                     .height(70.dp)
                     .background(Color(0xFF222937), shape = RoundedCornerShape(4.dp))
-                    .border(BorderStroke(2.dp, Color(0xFF4CE3E8))))
-            {
+                    .border(BorderStroke(2.dp, Color(0xFF4CE3E8)))
+            ) {
                 IconButton(
                     onClick = { /* Dummy user action */ },
                     modifier = Modifier
@@ -250,7 +251,7 @@ fun InstructionsClickNumber(onStart: () -> Unit, controller: clickNumberControll
             Spacer(modifier = Modifier.height(5.dp))
             // Back Button (same design as in game)
             Button(
-                onClick = {controller.goHomeLogic()},
+                onClick = { controller.goHomeLogic() },
                 modifier = Modifier
                     .align(Alignment.End)
                     .height(46.dp),
@@ -258,7 +259,7 @@ fun InstructionsClickNumber(onStart: () -> Unit, controller: clickNumberControll
                 shape = RoundedCornerShape(12.dp),
                 elevation = ButtonDefaults.elevation(4.dp),
                 border = BorderStroke(1.dp, Color(0xFFB0BEC5))
-            ){
+            ) {
                 Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
             }
 
@@ -284,13 +285,13 @@ fun InstructionsClickNumber(onStart: () -> Unit, controller: clickNumberControll
                 Text(
                     buildAnnotatedString {
                         append(Strings.t("insW1"))
-                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                        withStyle(androidx.compose.ui.text.SpanStyle(fontWeight = FontWeight.Bold)) {
                             append(Strings.t("insW2"))
                         }
                         append(Strings.t("insW3") + "\n\n")
 
                         append(Strings.t("insW4"))
-                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                        withStyle(androidx.compose.ui.text.SpanStyle(fontWeight = FontWeight.Bold)) {
                             append(Strings.t("insW5"))
                         }
                         append(" .\n")
@@ -303,7 +304,6 @@ fun InstructionsClickNumber(onStart: () -> Unit, controller: clickNumberControll
                     lineHeight = 24.sp
                 )
             }
-
 
             Spacer(modifier = Modifier.height(40.dp))
 
@@ -319,80 +319,6 @@ fun InstructionsClickNumber(onStart: () -> Unit, controller: clickNumberControll
                 border = BorderStroke(1.dp, Color(0xFFB0BEC5))
             ) {
                 Text(Strings.t("start_game"), fontWeight = FontWeight.Medium, color = Color.Black)
-            }
-        }
-    }
-}
-
-@Composable
-fun GameView() {
-    Column(
-        modifier = Modifier.fillMaxSize().padding(20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        if (!clickNumberController.isGameStarted) {
-            // Pantalla inicial
-            Text(
-                text = "Click The Number",
-                fontSize = 24.sp,
-                modifier = Modifier.padding(bottom = 20.dp)
-            )
-            Button(
-                onClick = { clickNumberController.startGame() },
-                modifier = Modifier.padding(bottom = 20.dp)
-            ) {
-                Text("Iniciar Juego")
-            }
-        } else {
-            // Temporizador
-            Text(
-                text = "Tiempo restante: ${clickNumberController.timeLeft}s",
-                fontSize = 18.sp,
-                modifier = Modifier.padding(bottom = 10.dp)
-            )
-
-            // Instrucción del juego
-            Text(
-                text = clickNumberController.instructionMessage,
-                fontSize = 20.sp,
-                modifier = Modifier.padding(bottom = 10.dp)
-            )
-
-            // Mensaje de resultado
-            Text(
-                text = clickNumberController.resultMessage,
-                fontSize = 18.sp,
-                modifier = Modifier.padding(bottom = 10.dp)
-            )
-
-            // Cuadrícula de botones
-            if (!clickNumberController.gameOver) {
-                for (row in 0 until 4) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        for (col in 0 until 4) {
-                            val index = row * 4 + col
-                            val number = clickNumberController.numbers.getOrNull(index) ?: 0
-                            Button(
-                                onClick = { clickNumberController.handleButtonClick(number) },
-                                modifier = Modifier.size(60.dp)
-                            ) {
-                                Text(text = number.toString())
-                            }
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(10.dp))
-                }
-            }
-
-            // Botón Atrás
-            Button(
-                onClick = { clickNumberController.resetGame() },
-                modifier = Modifier.padding(top = 20.dp)
-            ) {
-                Text("Atrás")
             }
         }
     }
