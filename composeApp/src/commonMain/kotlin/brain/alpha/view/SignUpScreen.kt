@@ -175,24 +175,24 @@ fun SignUpScreen(
                 }
             }
 
-            // Success alert dialog
-            if (showSuccessDialog) {
-                AlertDialog(
-                    onDismissRequest = {},
-                    title = { Text("Verifica tu correo electrónico") },
-                    text = {
-                        Text("Hemos enviado un enlace de confirmación a tu email. Debes verificarlo antes de iniciar sesión.")
-                    },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            showSuccessDialog = false
-                            onGoToLogin()
-                        }) {
-                            Text("OK")
-                        }
-                    }
-                )
-            }
+//            // Success alert dialog "TO DO"
+//            if (showSuccessDialog) {
+//                AlertDialog(
+//                    onDismissRequest = {},
+//                    title = { Text("Verifica tu correo electrónico") },
+//                    text = {
+//                        Text("Hemos enviado un enlace de confirmación a tu email. Debes verificarlo antes de iniciar sesión.")
+//                    },
+//                    confirmButton = {
+//                        TextButton(onClick = {
+//                            showSuccessDialog = false
+//                            onGoToLogin()
+//                        }) {
+//                            Text("OK")
+//                        }
+//                    }
+//                )
+//            }
         }
     }
 }

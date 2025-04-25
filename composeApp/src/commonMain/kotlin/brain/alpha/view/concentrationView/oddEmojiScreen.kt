@@ -274,14 +274,20 @@ fun OddEmojiScreen(controller: oddEmojiController = oddEmojiController) {
             if (showEndDialog.value) {
                 AlertDialog(
                     onDismissRequest = {},
-                    title = { Text(Strings.t("insST1"), fontSize = 24.sp, fontWeight = FontWeight.Bold) },
+                    title = {
+                        Column(modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally)
+                        {
+                            Text(Strings.t("insST1"), fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                        }
+                            },
                     text = {
                         Column(modifier = Modifier.fillMaxWidth(),
                             horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(Strings.t("insOS5") + "$level")
-                            Text(Strings.t("insOS6") + "$errors")
-                            Text(Strings.t("insOS7") + "${controller.getAverageTime()} ms")
-                            Text(Strings.t("insOS8") + "${controller.getFinalScore()}")
+                            Text(Strings.t("insOS5") + "$level", fontWeight = FontWeight.Bold)
+                            Text(Strings.t("insOS6") + "$errors", fontWeight = FontWeight.Bold)
+                            Text(Strings.t("insOS7") + "${controller.getAverageTime()} ms", fontWeight = FontWeight.Bold)
+                            Text(Strings.t("insOS8") + "${controller.getFinalScore()}", fontWeight = FontWeight.Bold)
                         }
                     },
                     confirmButton = {
