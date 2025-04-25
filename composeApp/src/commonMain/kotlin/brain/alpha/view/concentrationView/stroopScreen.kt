@@ -63,7 +63,7 @@ fun StroopScreen(controller: stroopController = stroopController) {
         if (isGameOver) showEndDialog.value = true
     }
 
-    val selectedDifficulty = remember { mutableStateOf(Difficulty.MEDIUM) }
+    val selectedDifficulty = remember { mutableStateOf(Difficulty.EASY) }
 
     val showContinuePrompt = remember { mutableStateOf(false) }
 
@@ -87,7 +87,7 @@ fun StroopScreen(controller: stroopController = stroopController) {
     ) {
         // Background image
         Image(
-            painter = painterResource(Res.drawable.stroopTestBG),
+            painter = painterResource(Res.drawable.fondoConcentracion),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
@@ -458,7 +458,7 @@ fun StroopInstructionsScreen(onBack: () -> Unit) {
 
         // Background image
         Image(
-            painter = painterResource(Res.drawable.stroopTestBG),
+            painter = painterResource(Res.drawable.fondoConcentracion),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop

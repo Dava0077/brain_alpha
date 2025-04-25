@@ -105,7 +105,7 @@ object Strings {
             "insST3" to "puntos",
             "insST4" to "Volver a jugar",
             "insST5" to "Volver al inicio",
-            "insST6" to "Selecciona dificultad:",
+            "insST6" to "Selecciona dificultad ",
             "insST7" to "Prueba de Stroop",
             "insST8" to "Tiempo restante: ",
             "insST9" to " segundos",
@@ -122,6 +122,22 @@ object Strings {
             "insST19" to "Concéntrate, ¡y buena suerte!",
             //ODDEMOJI SCREEN
             "title_oddEmoji" to "EMOJI RARO",
+            "insOS1" to "Nivel: ",
+            "insOS2" to "Errores: ",
+            "insOS3" to "Puntuación: ",
+            "insOS4" to "Encuentra el emoji diferente!",
+            "insOS5" to "Nivel final: ",
+            "insOS6" to "Errores hechos: ",
+            "insOS7" to "Tiempo promedio: ",
+            "insOS8" to "Puntuación final: ",
+            "insS09" to "Debes seleccionar el ",
+            "insS10" to "emoji diferente.\n ",
+            "insS11" to "Tienes ",
+            "insS12" to " un tiempo limitado",
+            "insS13" to " para superar el nivel.\n",
+            "insS14" to " Concéntrate, !y buena suerte!"
+
+
 
 
 
@@ -245,6 +261,20 @@ object Strings {
 
             //ODDEMOJI SCREEN
             "title_oddEmoji" to "ODD EMOJI",
+            "insOS1" to "Level: ",
+            "insOS2" to "Errors: ",
+            "insOS3" to "Score: ",
+            "insOS4" to "Find the odd emoji!",
+            "insOS5" to "Final level: ",
+            "insOS6" to "Errors made: ",
+            "insOS7" to "Average time: ",
+            "insOS8" to "Final score: ",
+            "insS09" to "You have to pick the ",
+            "insS10" to "odd emoji.\n ",
+            "insS11" to "You have ",
+            "insS12" to " a limited time",
+            "insS13" to " to clear the level.\n",
+            "insS14" to " Focus, and good luck!"
 
 
         )

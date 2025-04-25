@@ -33,7 +33,7 @@ fun concentrationHomeScreen(
     ) {
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
-            painter = painterResource(Res.drawable.stroopTestBG),
+            painter = painterResource(Res.drawable.fondoConcentracion),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
