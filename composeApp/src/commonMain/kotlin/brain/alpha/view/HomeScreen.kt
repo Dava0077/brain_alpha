@@ -82,7 +82,7 @@ fun HomeScreen(
                 ) {
                     // Left user icon
                     IconButton(
-                        onClick = { controller.buttonUsername() },
+                        onClick = { controller.navigateTo("profile") },
                         modifier = Modifier
                             .align(Alignment.CenterStart)
                             .padding(start = 8.dp)
