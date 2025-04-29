@@ -18,8 +18,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import brain.alpha.controller.LoginController
 import brain.alpha.model.UserSession
+import brain.alpha.services.SupabaseClientProvider
 import brain.alpha.strings.Strings
 import brainalpha.composeapp.generated.resources.*
+import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.DrawableResource
@@ -48,6 +50,15 @@ fun HomeScreen(
     onNavigateToConcentration: () -> Unit,
     onNavigateToAgility: () -> Unit
 ) {
+    LaunchedEffect(Unit) {
+        val user = SupabaseClientProvider.client.auth.currentUserOrNull()
+        if (user != null) {
+            UserSession.setUserId(user.id)
+            println("✅ Sesión restaurada correctamente: ${user.email}")
+        } else {
+            println("⚠ Usuario no logueado")
+        }
+    }
     val displayName = UserSession.getDisplayName() // Show guest or username
     val showConfirmDialog = remember { mutableStateOf(false) }
 

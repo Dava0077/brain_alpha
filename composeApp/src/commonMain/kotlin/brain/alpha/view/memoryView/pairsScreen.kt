@@ -32,6 +32,8 @@ import androidx.compose.ui.text.withStyle
 import brain.alpha.controller.memoryController.pairsController
 import brain.alpha.model.UserSession
 import brain.alpha.model.shared.Difficulty
+import brain.alpha.services.GameSessionService
+import brain.alpha.services.SupabaseClientProvider
 import brain.alpha.strings.Strings
 import brainalpha.composeapp.generated.resources.*
 
@@ -307,6 +309,20 @@ fun couplesScreen(
                     fontWeight = FontWeight.Medium,
                     color = Color(0xFF2E7D32)
                 )
+                LaunchedEffect(score) {
+                    val userId = runCatching { UserSession.getUserId() }.getOrNull()
+                    if (userId != null) {
+                        GameSessionService.savePairGameResult(
+                            userId = userId,
+                            gameId = "24bc262b-ab64-4c71-9c45-8d4fa04a549e",
+                            score = score,
+                            supabase = SupabaseClientProvider.client
+                        )
+                    } else {
+                        println("⚠ Usuario no logueado, no se puede guardar la partida")
+                        // Puedes mostrar Snackbar o alerta en UI si quieres
+                    }
+                }
             }
         }
     }

@@ -4,6 +4,8 @@ import androidx.compose.runtime.*
 import brain.alpha.controller.AuthController
 import brain.alpha.model.UserSession
 import brain.alpha.model.UserSession.clear
+import brain.alpha.services.SupabaseClientProvider
+import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -54,6 +56,10 @@ object LoginController {
             isLoading = false
             result.onSuccess {
                 clear()
+                val user = SupabaseClientProvider.client.auth.currentUserOrNull()
+                if (user != null) {
+                    UserSession.setUserId(user.id)
+                }
                 navigateTo("home")
             }.onFailure { error ->
                 val message = when {
@@ -127,5 +133,7 @@ object LoginController {
     fun buttonSettings() {
         navigateTo("settings")
     }
-    fun buttonUsername() {}
+    fun buttonUsername() {
+        navigateTo("profile")
+    }
 }
