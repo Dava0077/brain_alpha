@@ -1,12 +1,14 @@
 package brain.alpha.model.logicModel
 
 import androidx.compose.runtime.mutableStateOf
+import brain.alpha.model.shared.Difficulty
 import kotlin.random.Random
 
 object wordSearchModel {
     private const val GRID_SIZE = 10
     private val grid = Array(GRID_SIZE) { CharArray(GRID_SIZE) { '-' } }
     private val wordsToFind = mutableListOf<String>()
+    var difficulty: Difficulty = Difficulty.EASY
     private val allWords = listOf(
         "KOTLIN", "JAVA", "PYTHON", "CODE", "PROGRAM", "ALPHA", "BRAIN", "MATH", "LOGIC", "GAME",
         "DATA", "STRING", "ARRAY", "LOOP", "CLASS", "METHOD", "OBJECT", "FUN", "TEST", "DEBUG"

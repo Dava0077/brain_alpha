@@ -2,6 +2,7 @@ package brain.alpha
 
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
+import brain.alpha.controller.LeaderboardController
 import brain.alpha.controller.LoginController
 import brain.alpha.controller.SettingsController
 import brain.alpha.controller.UserProfileController
@@ -76,8 +77,8 @@ fun App() {
         LoginController.navigateTo = { route -> currentScreen = route }
         //SETTINGS
         SettingsController.navigateTo = { route -> currentScreen = route }
-        //USER PROFILE
-        UserProfileController.navigateTo = { route -> currentScreen = route }
+        UserProfileController.navigateTo = {route -> currentScreen = route}
+        LeaderboardController.navigateTo = {route -> currentScreen = route}
 
         //MEMORY GAMES
         memoryHomeController.navigateTo = { route -> currentScreen = route }
@@ -137,10 +138,13 @@ fun App() {
             "settings" -> SettingsScreen(
                 controller = SettingsController
             )
-
-            //USER PROFILE
+            //PROFILE
             "profile" -> UserProfileScreen(
-                onBack = { currentScreen = "home" }
+                onBack = {currentScreen = "home"}
+            )
+            //LEADERBOARD
+            "leaderboard" -> leaderboardScreen(
+                controller = LeaderboardController
             )
             //MEMORY
             "memory" -> memoryHomeScreen(

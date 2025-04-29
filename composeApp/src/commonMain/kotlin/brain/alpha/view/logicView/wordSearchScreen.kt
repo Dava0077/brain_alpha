@@ -69,15 +69,14 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
             }
         }
     }
-
-    LaunchedEffect(gameStarted, controller.isGameFinished()) {
+    LaunchedEffect(validatedCells.size) {
         if (gameStarted && controller.isGameFinished()) {
-            showDialog = "win"
             gameFinished = true
+            showDialog = "win"
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+   Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(Res.drawable.fondoLogic),
             contentDescription = null,
@@ -307,53 +306,6 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                         Text(Strings.t("validate"), color = Color.Black)
                     }
                 }
-            }
-
-            if (showDialog != null) {
-                AlertDialog(
-                    onDismissRequest = { showDialog = null },
-                    title = { Text(if (showDialog == "win") Strings.t("you_win") else Strings.t("you_lose")) },
-                    text = { Text(if (showDialog == "win") Strings.t("congrats") else Strings.t("times_up")) },
-                    buttons = {
-                        Row(
-                            modifier = Modifier.padding(8.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Button(
-                                onClick = {
-                                    scope.launch {
-                                        isLoading = true
-                                        withContext(Dispatchers.Default) {
-                                            controller.configureGame(selectedDifficulty.value)
-                                            controller.startGame()
-                                        }
-                                        selectedCells.clear()
-                                        validatedCells.clear()
-                                        timeLeft = 60
-                                        elapsedTime = 0
-                                        gameStarted = true
-                                        gameFinished = false
-                                        showDialog = null
-                                        isLoading = false
-                                        timerTrigger++
-                                    }
-                                },
-                                colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
-                            ) {
-                                Text(Strings.t("replay"), color = Color.Black)
-                            }
-                            Button(
-                                onClick = {
-                                    onNavigateToHome()
-                                    showDialog = null
-                                },
-                                colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
-                            ) {
-                                Text(Strings.t("return_home"), color = Color.Black)
-                            }
-                        }
-                    }
-                )
             }
         }
     }

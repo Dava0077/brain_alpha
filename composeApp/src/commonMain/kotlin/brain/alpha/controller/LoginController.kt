@@ -86,6 +86,10 @@ object LoginController {
         clear()
         navigateTo("home")
     }
+    fun goLeaderboard(){
+        clear()
+        navigateTo("leaderboard")
+    }
 
     /**
      * Navigates to sign-up screen and clears form state.

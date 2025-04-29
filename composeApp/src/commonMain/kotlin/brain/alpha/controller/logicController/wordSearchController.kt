@@ -55,7 +55,7 @@ object wordSearchController {
         }
     }
     private fun getRandomWords(range: IntRange): List<String> {
-        val dictionary = listOf("GATO", "PERRO", "CASA", "SOL", "LUNA", "FUEGO", "TIERRA", "AGUA", "FLOR", "MONTAÑA", "BOSQUE", "RÍO", "CIELO", "NUBE", "CAMINO")
+        val dictionary = listOf("GATO", "PERRO", "CASA", "SOL", "LUNA", "FUEGO", "TIERRA", "AGUA", "FLOR", "PARAISO", "BOSQUE", "RIO", "CIELO", "NUBE", "CAMINO")
         return dictionary.shuffled().take(range.random())
     }
     private fun setupGrid(
@@ -101,5 +101,37 @@ object wordSearchController {
         model.generateGame(currentWords)
         model.gameStarted.value = true
         model.clearFoundWords()
+    }
+    fun calculateScore(seconds: Int): Int{
+        val baseScore = when (model.difficulty){
+            Difficulty.EASY ->{
+                when{
+                    seconds <= 30 -> 10
+                    seconds <= 60 -> 7
+                    seconds <= 90 -> 5
+                    else -> 3
+                }
+            }Difficulty.MEDIUM ->{
+                when{
+                    seconds <= 60 -> 10
+                    seconds <= 90 -> 7
+                    seconds <= 120 -> 5
+                    else ->3
+                }
+            }Difficulty.HARD ->{
+                when{
+                    seconds <= 90 -> 10
+                    seconds <= 120 -> 7
+                    seconds <= 150 -> 5
+                    else ->3
+                }
+            }
+        }
+        val multiplier = when (model.difficulty){
+            Difficulty.EASY -> 1
+            Difficulty.MEDIUM -> 2
+            Difficulty.HARD -> 3
+        }
+        return baseScore * multiplier
     }
 }

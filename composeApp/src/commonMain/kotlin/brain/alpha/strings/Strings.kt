@@ -8,6 +8,7 @@ object Strings {
         "es" to mapOf(
             //GENERAL
             "play" to "JUGAR",
+            "leaderboard" to "CLASSIFICACIÓN",
             "play_again" to "JUGAR DE NUEVO",
             "restart" to "REINICIAR",
             "charging" to "CARGANDO...",
@@ -146,6 +147,7 @@ object Strings {
         "en" to mapOf(
             //GENERAL
             "play" to "PLAY",
+            "leaderboard" to "LEADERBOARD",
             "play_again" to "PLAY AGAIN",
             "restart" to "RESTART",
             "charging" to "CHARGING...",

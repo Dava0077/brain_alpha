@@ -11,6 +11,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -137,6 +138,20 @@ fun HomeScreen(
                             .align(Alignment.CenterStart)
                             .padding(start = 72.dp)
                     )
+                }
+                Spacer(modifier = Modifier.height(5.dp))
+
+                Button(
+                    onClick = {controller.goLeaderboard()},
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .height(46.dp),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF222937)),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.elevation(4.dp),
+                    border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+                ){
+                    Text(Strings.t("leaderboard"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
                 }
 
                 Spacer(modifier = Modifier.height(70.dp))
