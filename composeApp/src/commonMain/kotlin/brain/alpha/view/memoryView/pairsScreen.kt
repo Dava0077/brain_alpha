@@ -48,6 +48,8 @@ fun couplesScreen(
     var gameStarted by remember { mutableStateOf(controller.hasStarted()) }
     var gameFinished by remember { mutableStateOf(false) }
     var elapsedTime by remember { mutableStateOf(0) }
+    val min = (elapsedTime / 60).toString().padStart(2, '0')
+    val sec = (elapsedTime % 60).toString().padStart(2, '0')
     var gameLost by remember { mutableStateOf(false) }
     var selectedDifficulty by remember { mutableStateOf(Difficulty.EASY) }
     val displayName = UserSession.getDisplayName() // Show guest or username
@@ -224,7 +226,7 @@ fun couplesScreen(
 
 
             Text(
-                text = "${Strings.t("time")} $elapsedTime",
+                text = "${Strings.t("time")} $min:$sec",
                 fontSize = 20.sp,
                 color = Color.Black,
                 fontFamily = FontFamily.SansSerif,

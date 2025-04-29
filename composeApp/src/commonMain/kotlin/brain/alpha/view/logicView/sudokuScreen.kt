@@ -38,6 +38,8 @@ import kotlinx.coroutines.delay
 fun sudokuScreen(controller: sudokuController, onNavigateToHome: () -> Unit) {
     val gameStarted by remember { derivedStateOf { !controller.showInstructions.value && controller.hasStarted() } }
     var elapsedTime by remember { mutableStateOf(0) }
+    val min = (elapsedTime / 60).toString().padStart(2, '0')
+    val sec = (elapsedTime % 60).toString().padStart(2, '0')
     var gameLost by remember { mutableStateOf(false) }
     var timerTrigger by remember { mutableStateOf(0) }
     var selectedRow by remember { mutableStateOf(-1) }
@@ -46,8 +48,6 @@ fun sudokuScreen(controller: sudokuController, onNavigateToHome: () -> Unit) {
     val showInstructions by controller.showInstructions
     val selectedDifficulty = remember { mutableStateOf(controller.getDifficulty()) }
     val model = sudokuModel
-    val minutes = elapsedTime / 60
-    val seconds = elapsedTime % 60
     val displayName = UserSession.getDisplayName()
 
     if (showInstructions) {
@@ -171,7 +171,7 @@ fun sudokuScreen(controller: sudokuController, onNavigateToHome: () -> Unit) {
 
             Spacer(modifier = Modifier.height(10.dp))
             Text(
-                text = "${Strings.t("time")} $elapsedTime",
+                text = "${Strings.t("time")} $min:$sec",
                 fontSize = 20.sp,
                 color = Color.Black
             )
