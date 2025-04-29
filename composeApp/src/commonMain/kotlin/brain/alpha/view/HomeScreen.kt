@@ -82,7 +82,7 @@ fun HomeScreen(
                 ) {
                     // Left user icon
                     IconButton(
-                        onClick = { controller.buttonUsername() },
+                        onClick = { controller.navigateTo("profile") },
                         modifier = Modifier
                             .align(Alignment.CenterStart)
                             .padding(start = 8.dp)
@@ -128,7 +128,7 @@ fun HomeScreen(
                         }
                     }
 
-                    // Display greeting with user name
+                    // Display greeting with username
                     Text(
                         text = Strings.t("hi") +"$displayName!",
                         color = Color.White,
@@ -139,6 +139,7 @@ fun HomeScreen(
                     )
                 }
 
+                Spacer(modifier = Modifier.height(70.dp))
                 Spacer(modifier = Modifier.height(70.dp))
 
                 Text(

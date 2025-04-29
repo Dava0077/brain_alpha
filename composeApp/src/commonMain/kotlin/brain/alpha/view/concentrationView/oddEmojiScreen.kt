@@ -2,7 +2,6 @@
 
 package brain.alpha.view.concentrationViews
 
-import androidx.compose.animation.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -40,6 +39,9 @@ fun OddEmojiScreen(controller: oddEmojiController = oddEmojiController) {
     val isGameOver by controller.isGameOver
     val showInstructions by controller.showInstructions
     val difficulty = remember { mutableStateOf(Difficulty.MEDIUM) }
+    val score by controller.score
+    val timeLeft by controller.timeLeft
+    val timeProgress = controller.getTimeProgress()
     val showEndDialog = remember { mutableStateOf(false) }
     val isGameStarted = remember { mutableStateOf(false) }
 
@@ -55,7 +57,7 @@ fun OddEmojiScreen(controller: oddEmojiController = oddEmojiController) {
     Box(modifier = Modifier.fillMaxSize()) {
 
         Image(
-            painter = painterResource(Res.drawable.stroopTestBG),
+            painter = painterResource(Res.drawable.fondoConcentracion),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
@@ -144,7 +146,7 @@ fun OddEmojiScreen(controller: oddEmojiController = oddEmojiController) {
                 }
 
                 if (!isGameStarted.value) {
-                    Text("Select difficulty:", fontSize = 18.sp, fontWeight = FontWeight.Medium)
+                    Text(Strings.t("insST6"), fontSize = 18.sp, fontWeight = FontWeight.Medium)
 
                     Spacer(modifier = Modifier.height(8.dp))
 
@@ -180,7 +182,7 @@ fun OddEmojiScreen(controller: oddEmojiController = oddEmojiController) {
                         border = BorderStroke(1.dp, Color.Black)
 
                     ) {
-                        Text("Start Game")
+                        Text(Strings.t("start_game"))
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -199,7 +201,7 @@ fun OddEmojiScreen(controller: oddEmojiController = oddEmojiController) {
                         elevation = ButtonDefaults.elevation(4.dp),
                         border = BorderStroke(1.dp, Color.Black)
                     ) {
-                        Text("Instructions")
+                        Text(Strings.t("instructions"))
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -207,7 +209,19 @@ fun OddEmojiScreen(controller: oddEmojiController = oddEmojiController) {
                 }
 
                 // Game running
-                Text("Find the odd emoji!", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                Text(Strings.t("insOS4"), fontSize = 24.sp, fontWeight = FontWeight.Bold)
+
+                Text(Strings.t("insST8") + "$timeLeft" + Strings.t("insST9"), fontSize = 18.sp, color = Color(0xFF1565C0))
+
+                LinearProgressIndicator(
+                    progress = timeProgress,
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .height(12.dp)
+                        .padding(top = 4.dp),
+                    color = Color(0xFF4CAF50),
+                    backgroundColor = Color.LightGray
+                )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -232,29 +246,48 @@ fun OddEmojiScreen(controller: oddEmojiController = oddEmojiController) {
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                Text("Level: $level", fontSize = 18.sp)
-                Text("Errors: $errors", fontSize = 18.sp, color = Color.Red)
+                Text(Strings.t("insOS1") + "$level", fontSize = 18.sp)
+                Text(Strings.t("insOS2") + "$errors", fontSize = 18.sp, color = Color.Red)
+                Text(Strings.t("insOS3") + "$score", fontSize = 18.sp, color = Color(0xFF2E7D32))
 
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Button(onClick = {
                     controller.resetGame()
                     isGameStarted.value = false
-                }) {
-                    Text("Back to Menu")
+                },
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .height(46.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.White,
+                        contentColor = Color.Black
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.elevation(4.dp),
+                    border = BorderStroke(1.dp, Color.Black)
+                ) {
+                    Text(Strings.t("insST5"))
                 }
             }
 
             if (showEndDialog.value) {
                 AlertDialog(
                     onDismissRequest = {},
-                    title = { Text("Game Over", fontSize = 24.sp, fontWeight = FontWeight.Bold) },
+                    title = {
+                        Column(modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally)
+                        {
+                            Text(Strings.t("insST1"), fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                        }
+                            },
                     text = {
                         Column(modifier = Modifier.fillMaxWidth(),
                             horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("Final level: $level")
-                            Text("Errors made: $errors")
-                            Text("Average time: ${controller.getAverageTime()} ms")
+                            Text(Strings.t("insOS5") + "$level", fontWeight = FontWeight.Bold)
+                            Text(Strings.t("insOS6") + "$errors", fontWeight = FontWeight.Bold)
+                            Text(Strings.t("insOS7") + "${controller.getAverageTime()} ms", fontWeight = FontWeight.Bold)
+                            Text(Strings.t("insOS8") + "${controller.getFinalScore()}", fontWeight = FontWeight.Bold)
                         }
                     },
                     confirmButton = {
@@ -263,7 +296,7 @@ fun OddEmojiScreen(controller: oddEmojiController = oddEmojiController) {
                             isGameStarted.value = false
                             showEndDialog.value = false
                         }) {
-                            Text("Restart")
+                            Text(Strings.t("insST4"))
                         }
                     },
                     dismissButton = {
@@ -272,7 +305,7 @@ fun OddEmojiScreen(controller: oddEmojiController = oddEmojiController) {
                             isGameStarted.value = false
                             showEndDialog.value = false
                         }) {
-                            Text("Exit")
+                            Text(Strings.t("insST5"))
                         }
                     },
                     shape = RoundedCornerShape(12.dp)
@@ -288,7 +321,7 @@ fun OddInstructionsScreen(onBack: () -> Unit) {
 
         // Background image
         Image(
-            painter = painterResource(Res.drawable.stroopTestBG),
+            painter = painterResource(Res.drawable.fondoConcentracion),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
@@ -361,15 +394,14 @@ fun OddInstructionsScreen(onBack: () -> Unit) {
             // Game explanation using styled text
             Text(
                 buildAnnotatedString {
-                    append("Debes seleccionar el ")
-                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append("emoji") }
-                    append(" que es diferente dentro de la cuadrícula.\n\n")
+                    append(Strings.t("insS09"))
+                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(Strings.t("insS10")) }
 
-                    append("Tienes ")
-                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append("30 segundos") }
-                    append(" para superar el nivel.\n")
+                    append(Strings.t("insS11"))
+                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(Strings.t("insS12")) }
+                    append(Strings.t("insS13"))
 
-                    append("Concéntrate, ¡y buena suerte!")
+                    append(Strings.t("insS14"))
                 },
                 fontSize = 16.sp,
                 textAlign = TextAlign.Center,
@@ -384,17 +416,17 @@ fun OddInstructionsScreen(onBack: () -> Unit) {
             Button(
                 onClick = onBack,
                 modifier = Modifier
-                    .height(48.dp)
-                    .width(200.dp),
+                    .padding(8.dp)
+                    .height(46.dp),
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color.White,
-                    contentColor = Color(0xFF455A64)
+                    contentColor = Color.Black
                 ),
                 shape = RoundedCornerShape(12.dp),
                 elevation = ButtonDefaults.elevation(4.dp),
-                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+                border = BorderStroke(1.dp, Color.Black)
             ) {
-                Text(Strings.t("start_game"), fontWeight = FontWeight.SemiBold)
+                Text(Strings.t("insST6"), fontWeight = FontWeight.SemiBold)
             }
         }
     }
