@@ -24,6 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brain.alpha.controller.LoginController
 import brain.alpha.controller.mentalAgilityController.clickNumberController
+
+import brain.alpha.model.shared.Difficulty
 import brain.alpha.strings.Strings
 import brainalpha.composeapp.generated.resources.*
 import brainalpha.composeapp.generated.resources.Res
@@ -129,10 +131,56 @@ fun clickNumberScreen(
             if (!clickNumberController.isGameStarted) {
                 // Pantalla inicial
                 Text(
-                    text = "Click The Number",
+                    text = "",
                     fontSize = 24.sp,
                     modifier = Modifier.padding(bottom = 20.dp)
                 )
+
+                // Selector de dificultad
+                Text(
+                    text = "Selecciona la dificultad:",
+                    fontSize = 18.sp,
+                    modifier = Modifier.padding(bottom = 10.dp)
+                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.padding(bottom = 20.dp)
+                ) {
+                    Button(
+                        onClick = { controller.setDifficulty(Difficulty.EASY) },
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = if (clickNumberController.currentDifficulty == Difficulty.EASY) Color.Green else Color.Gray
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = ButtonDefaults.elevation(4.dp),
+                        border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+                    ) {
+                        Text("Fácil", color = Color.White)
+                    }
+                    Button(
+                        onClick = { controller.setDifficulty(Difficulty.MEDIUM) },
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = if (clickNumberController.currentDifficulty == Difficulty.MEDIUM) Color.Yellow else Color.Gray
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = ButtonDefaults.elevation(4.dp),
+                        border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+                    ) {
+                        Text("Medio", color = Color.Black)
+                    }
+                    Button(
+                        onClick = { controller.setDifficulty(Difficulty.HARD) },
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = if (clickNumberController.currentDifficulty == Difficulty.HARD) Color.Red else Color.Gray
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = ButtonDefaults.elevation(4.dp),
+                        border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+                    ) {
+                        Text("Difícil", color = Color.White)
+                    }
+                }
+
                 Button(
                     onClick = { clickNumberController.startGame() },
                     modifier = Modifier.padding(bottom = 20.dp)
@@ -141,9 +189,11 @@ fun clickNumberScreen(
                 }
             } else {
                 // UI del juego
-                // Temporizador
+                // Temporizador (formato MM:SS)
+                val minutes = clickNumberController.timeLeft / 60
+                val seconds = clickNumberController.timeLeft % 60
                 Text(
-                    text = "Tiempo restante: ${clickNumberController.timeLeft}s",
+                    text = "Tiempo restante: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}",
                     fontSize = 18.sp,
                     modifier = Modifier.padding(bottom = 10.dp)
                 )
@@ -183,6 +233,60 @@ fun clickNumberScreen(
                     }
                 }
             }
+        }
+
+        // Ventana emergente cuando el juego termina
+        if (clickNumberController.showGameOverDialog) {
+            AlertDialog(
+                onDismissRequest = { /* No permitir cerrar haciendo clic fuera */ },
+                title = {
+                    Text(
+                        text = "¡Juego Terminado!",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                },
+                text = {
+                    Text(
+                        text = "Puntuación obtenida: ${clickNumberController.score}",
+                        fontSize = 18.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                },
+                buttons = {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        Button(
+                            onClick = { clickNumberController.goHome() },
+                            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow),
+                            shape = RoundedCornerShape(12.dp),
+                            elevation = ButtonDefaults.elevation(4.dp),
+                            border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+                        ) {
+                            Text("Volver al Menú", color = Color.Black)
+                        }
+                        Button(
+                            onClick = { clickNumberController.restartGame() },
+                            colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+                            shape = RoundedCornerShape(12.dp),
+                            elevation = ButtonDefaults.elevation(4.dp),
+                            border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+                        ) {
+                            Text("Jugar de Nuevo", color = Color.Black)
+                        }
+                    }
+                },
+                modifier = Modifier
+                    .background(Color.White, shape = RoundedCornerShape(16.dp))
+                    .padding(16.dp)
+            )
         }
     }
 }
