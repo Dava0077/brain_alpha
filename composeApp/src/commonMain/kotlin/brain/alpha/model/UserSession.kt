@@ -89,4 +89,13 @@ object UserSession {
     fun getDisplayName(): String {
         return username.value ?: "Usuario"
     }
+    private var currentUserId: String? = null
+
+    fun setUserId(id: String) {
+        currentUserId = id
+    }
+
+    fun getUserId(): String {
+        return currentUserId ?: throw IllegalStateException("Usuario no logueado")
+    }
 }

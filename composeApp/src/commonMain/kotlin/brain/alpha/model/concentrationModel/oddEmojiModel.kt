@@ -12,6 +12,7 @@ class OddEmojiModel {
     private val levelTimes: MutableList<Long> = mutableListOf()
     private var levelStartTime: Long = 0
 
+    var score: Int = 0
     var gridSize: Int = 3
     var correctEmoji: String = "😀"
     var oddEmoji: String = "😃"
@@ -25,6 +26,7 @@ class OddEmojiModel {
         currentLevel = 1
         errors = 0
         levelTimes.clear()
+        score = 0
         generateLevel()
     }
 
@@ -54,8 +56,10 @@ class OddEmojiModel {
 
         val isCorrect = x == oddPosition.first && y == oddPosition.second
         if (isCorrect) {
+            score +=100
             currentLevel++
         } else {
+            score -=20
             errors++
         }
         return isCorrect
@@ -72,5 +76,15 @@ class OddEmojiModel {
             Difficulty.HARD -> 12
         }
         return currentLevel > maxLevels || errors >= 3
+    }
+
+    fun getFinalScore(): Int {
+        val avgTime = getAverageTime()
+        val bonus = when {
+            avgTime < 2000 -> 100
+            avgTime < 4000 -> 50
+            else -> 0
+        }
+        return score + bonus
     }
 }

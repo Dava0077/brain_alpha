@@ -4,6 +4,7 @@ package brain.alpha.controller.concentrationController
 import androidx.compose.runtime.*
 import brain.alpha.model.shared.Difficulty
 import brain.alpha.model.concentrationModel.OddEmojiModel
+import kotlinx.coroutines.*
 
 object oddEmojiController {
 
@@ -27,14 +28,30 @@ object oddEmojiController {
     var showInstructions = mutableStateOf(false)
     var isAnswering = false
 
+    var score = mutableStateOf(0)
+        private set
+
+    var timeLeft = mutableStateOf(30)
+    private var timerJob: Job? = null
+    private var timeLimit = 30
+    private var currentDifficulty: Difficulty = Difficulty.EASY
+
     fun startGame(difficulty: Difficulty) {
         model.startGame(difficulty)
+        currentDifficulty = difficulty
+        timeLimit = when (difficulty) {
+            Difficulty.EASY -> 30
+            Difficulty.MEDIUM -> 15
+            Difficulty.HARD -> 10
+        }
         updateState()
         isGameOver.value = false
+        startTimer()
     }
 
     fun checkSelection(row: Int, col: Int) {
         if (isGameOver.value) return
+        timerJob?.cancel()
 
         val correct = model.checkSelection(row, col)
         updateState()
@@ -44,11 +61,16 @@ object oddEmojiController {
         } else if (correct) {
             model.generateLevel()
             updateState()
+            startTimer()
         }
     }
 
     fun getAverageTime(): Long {
         return model.getAverageTime()
+    }
+
+    fun getTimeProgress(): Float {
+        return timeLeft.value.toFloat() / timeLimit
     }
 
     fun resetGame() {
@@ -86,5 +108,35 @@ object oddEmojiController {
         grid.value = model.grid
         level.value = model.currentLevel
         errors.value = model.errors
+        score.value = model.score
+    }
+
+    fun getFinalScore(): Int {
+        return model.getFinalScore()
+    }
+
+    private fun startTimer() {
+        timerJob?.cancel()
+        timeLeft.value = timeLimit
+        timerJob = CoroutineScope(Dispatchers.Default).launch {
+            while (timeLeft.value > 0) {
+                delay(1000)
+                timeLeft.value -= 1
+            }
+            withContext(Dispatchers.Main) {
+                handleTimeout()
+            }
+        }
+    }
+
+    private fun handleTimeout() {
+        model.errors++
+        if (model.isGameOver()) {
+            isGameOver.value = true
+        } else {
+            model.generateLevel()
+            updateState()
+            startTimer()
+        }
     }
 }

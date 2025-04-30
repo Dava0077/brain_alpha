@@ -131,13 +131,13 @@ fun logicHomeScreen(
                     CategoryItem(
                         "SUDOKU",
                         Res.drawable.logica,
-                        Color.White,
+                        Color.Gray,
                         onNavigateToSudoku
                     )
                     CategoryItem(
                         Strings.t("title_wordSearch"),
                         Res.drawable.sopaLetras,
-                        Color.White,
+                        Color.Gray,
                         onNavigateToWordS
                     )
                 }
@@ -167,6 +167,7 @@ fun CategoryItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
+
         ) {
             Image(
                 painter = painterResource(image),

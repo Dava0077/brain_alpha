@@ -53,7 +53,7 @@ object stroopModel {
     // Last answer correctness (for optional external use)
     var lastAnswerCorrect by mutableStateOf<Boolean?>(null)
 
-    var currentDifficulty by mutableStateOf(Difficulty.MEDIUM)
+    var currentDifficulty by mutableStateOf(Difficulty.EASY)
         private set
 
     var hasStartedGame by mutableStateOf(false)

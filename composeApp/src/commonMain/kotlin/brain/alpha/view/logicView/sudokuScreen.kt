@@ -34,26 +34,22 @@ import brain.alpha.model.shared.Difficulty
 import brain.alpha.view.memoryView.InstructionsCouples
 import kotlinx.coroutines.delay
 
-
 @Composable
-fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
-    val gameStarted by remember { derivedStateOf { !controller.showInstructions.value } }
-    val model = sudokuModel
+fun sudokuScreen(controller: sudokuController, onNavigateToHome: () -> Unit) {
+    val gameStarted by remember { derivedStateOf { !controller.showInstructions.value && controller.hasStarted() } }
     var elapsedTime by remember { mutableStateOf(0) }
+    val min = (elapsedTime / 60).toString().padStart(2, '0')
+    val sec = (elapsedTime % 60).toString().padStart(2, '0')
+    var gameLost by remember { mutableStateOf(false) }
     var timerTrigger by remember { mutableStateOf(0) }
     var selectedRow by remember { mutableStateOf(-1) }
     var selectedCol by remember { mutableStateOf(-1) }
     var gridVersion by remember { mutableStateOf(0) }
     val showInstructions by controller.showInstructions
-    val minutes = elapsedTime / 60
-    val seconds = elapsedTime % 60
-    val min = minutes.toString().padStart(2, '0')
-    val sec = seconds.toString().padStart(2, '0')
-    val displayName = UserSession.getDisplayName() // Show guest or username
+    val selectedDifficulty = remember { mutableStateOf(controller.getDifficulty()) }
+    val model = sudokuModel
+    val displayName = UserSession.getDisplayName()
 
-
-
-    // Show instructions first
     if (showInstructions) {
         InstructionsSudoku(
             onStart = { controller.beginGame() },
@@ -63,11 +59,22 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
     }
 
     LaunchedEffect(timerTrigger) {
-        if (gameStarted) {
+        if (controller.hasStarted()) {
             elapsedTime = 0
-            while (controller.hasStarted() && !controller.isBoardComplete()) {
+            gameLost = false
+            val timeLimit = when (model.difficulty) {
+                Difficulty.EASY -> 180
+                Difficulty.MEDIUM -> 240
+                Difficulty.HARD -> 300
+            }
+
+            while (!controller.isBoardComplete() && elapsedTime < timeLimit) {
                 delay(1000)
                 elapsedTime++
+            }
+
+            if (!controller.isBoardComplete() && elapsedTime >= timeLimit) {
+                gameLost = true
             }
         }
     }
@@ -93,73 +100,51 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
                     .border(BorderStroke(2.dp, Color(0xFF4CE3E8)))
             ) {
                 IconButton(
-                    onClick = { /* Dummy action */ },
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .padding(start = 8.dp)
-                        .size(55.dp)
+                    onClick = { /* Dummy */ },
+                    modifier = Modifier.align(Alignment.CenterStart).padding(start = 8.dp).size(55.dp)
                 ) {
                     Image(painter = painterResource(Res.drawable.user), contentDescription = "User")
                 }
                 Image(
                     painter = painterResource(Res.drawable.logo),
                     contentDescription = null,
-                    modifier = Modifier
-                        .size(120.dp)
-                        .align(Alignment.Center)
-                        .scale(1.5f)
+                    modifier = Modifier.align(Alignment.Center).size(120.dp).scale(1.5f)
+                )
+                Text(
+                    text = displayName,
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    modifier = Modifier.align(Alignment.CenterStart).padding(start = 72.dp)
                 )
                 IconButton(
                     onClick = { brain.alpha.controller.LoginController.buttonSettings() },
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .padding(end = 8.dp)
-                        .size(55.dp)
+                    modifier = Modifier.align(Alignment.CenterEnd).padding(end = 8.dp).size(55.dp)
                 ) {
                     Image(painter = painterResource(Res.drawable.ajustes), contentDescription = "Settings")
                 }
-                Text(
-                    text = "$displayName",
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .padding(start = 72.dp)
-                )
             }
-            Spacer(modifier = Modifier.height(5.dp)) // Espacio tras el logo
 
             Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
-
-            ){
+            ) {
                 Button(
-                    onClick = {controller.toggleInstructions(true)},
-                    modifier = Modifier
-                        .height(46.dp),
+                    onClick = { controller.toggleInstructions(true) },
+                    modifier = Modifier.height(46.dp),
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
-                    shape = RoundedCornerShape(12.dp),
-                    elevation = ButtonDefaults.elevation(4.dp),
                     border = BorderStroke(1.dp, Color(0xFFB0BEC5))
-                ){
-                    Text(Strings.t("instructions"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
+                ) {
+                    Text(Strings.t("instructions"), color = Color.Black)
                 }
                 Button(
                     onClick = { controller.goHomeLogic() },
-                    modifier = Modifier
-                        .height(46.dp),
+                    modifier = Modifier.height(46.dp),
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
-                    shape = RoundedCornerShape(12.dp),
-                    elevation = ButtonDefaults.elevation(4.dp),
                     border = BorderStroke(1.dp, Color(0xFFB0BEC5))
                 ) {
-                    Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
+                    Text(Strings.t("back"), color = Color.Black)
                 }
             }
-
-            val selectedDifficulty = remember { mutableStateOf(controller.getDifficulty()) }
 
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -174,46 +159,38 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
                                 selectedDifficulty.value = level
                                 controller.setDifficulty(level)
                             },
-                            enabled = !controller.hasStarted() // deshabilitar si ya empezó
+                            enabled = !controller.hasStarted()
                         )
-                        Text(text = Strings.translateDifficulty(level)) // si tienes traducción
+                        Text(Strings.translateDifficulty(level))
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("SUDOKU", fontSize = 40.sp, color = Color.Black)
 
-            Text(
-                text = "SUDOKU",
-                fontSize = 40.sp,
-                color = Color.Black,
-                fontFamily = FontFamily.SansSerif,
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.height(15.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = "${Strings.t("time")} $min:$sec",
                 fontSize = 20.sp,
-                color = Color.Black,
-                fontFamily = FontFamily.SansSerif,
-                textAlign = TextAlign.Center
+                color = Color.Black
             )
-            Spacer(modifier = Modifier.height(10.dp))
 
-            if (!gameStarted) {
+            if (!controller.hasStarted()) {
+                Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
                         controller.startGame()
                         timerTrigger++
+                        gridVersion++
+                        gameLost = false
                     },
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
                 ) {
                     Text(Strings.t("play"), color = Color.Black)
                 }
-            } else {
-                // Sudoku Grid
-                key(gridVersion){
+            } else if (!gameLost) {
+                key(gridVersion) {
                     Column {
                         for (row in 0 until 9) {
                             Row {
@@ -251,9 +228,8 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
                     }
                 }
 
-                if (controller.hasStarted() && selectedRow in 0..8 && selectedCol in 0..8) {
+                if (selectedRow in 0..8 && selectedCol in 0..8) {
                     Spacer(modifier = Modifier.height(16.dp))
-
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         for (num in 1..9) {
                             Button(
@@ -282,8 +258,8 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(16.dp))
 
+                Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
                         controller.startGame()
@@ -294,9 +270,9 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
                     },
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
                 ) {
-                    Text(if (model.started) Strings.t("restart") else Strings.t("play"))
-
+                    Text(Strings.t("restart"), color = Color.Black)
                 }
+
                 if (controller.isBoardComplete()) {
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -311,23 +287,31 @@ fun sudokuScreen(controller: sudokuController,onNavigateToHome: () -> Unit) {
                     )
 
                     if (isValid) {
+                        val score = controller.calculateScore(elapsedTime)
                         Spacer(modifier = Modifier.height(8.dp))
-                        Button(
-                            onClick = {
-                                controller.startGame()
-                                selectedRow = -1
-                                selectedCol = -1
-                            },
-                            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
-                        ) {
-                            Text(Strings.t("play_again"), color = Color.White)
-                        }
+                        Text(
+                            text = Strings.t("your_score") + " $score " + Strings.t("neurons"),
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color(0xFF2E7D32)
+                        )
+
                     }
                 }
+
+            } else {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = Strings.t("time_up"),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Red
+                )
             }
         }
     }
 }
+
 @Composable
 fun InstructionsSudoku(onStart: () -> Unit, controller: sudokuController) {
     val displayName = UserSession.getDisplayName() // Show guest or username

@@ -8,6 +8,7 @@ object Strings {
         "es" to mapOf(
             //GENERAL
             "play" to "JUGAR",
+            "leaderboard" to "CLASSIFICACIÓN",
             "play_again" to "JUGAR DE NUEVO",
             "restart" to "REINICIAR",
             "charging" to "CARGANDO...",
@@ -98,9 +99,47 @@ object Strings {
             "insW5" to "MEJOR!!",
             "insW7" to "Información de la dificultad:\t\n - Fácil: 5-8 palabras\n - Medio: 10-15 palabras\n - Dificil: 20-25 palabras",
             "insW6" to "Concéntrate, ¡y buena suerte!",
-            //STROOP
-            "insST1" to "Debes seleccionar el",
-            "insST2" to "color",
+            //STROOP SCREEN
+            "title_stroop" to "STROOP",
+            "insST1" to "!Juego terminado!",
+            "insST2" to "Puntuación final:",
+            "insST3" to "puntos",
+            "insST4" to "Volver a jugar",
+            "insST5" to "Volver al inicio",
+            "insST6" to "Selecciona dificultad ",
+            "insST7" to "Prueba de Stroop",
+            "insST8" to "Tiempo restante: ",
+            "insST9" to " segundos",
+            "insST10" to "Correcto!",
+            "insST11" to "Incorrect",
+            "insST12" to "Puntuación:",
+            "insST13" to "Debes seleccionar el",
+            "insST14" to " color",
+            "insST15" to " en el que está escrita la palabra, no el nombre que aparece.\n" +
+                    "\n",
+            "insST16" to "Tienes",
+            "insST17" to " 30 segundos",
+            "insST18" to " para acertar la mayor cantidad posible.\n",
+            "insST19" to "Concéntrate, ¡y buena suerte!",
+            //ODDEMOJI SCREEN
+            "title_oddEmoji" to "EMOJI RARO",
+            "insOS1" to "Nivel: ",
+            "insOS2" to "Errores: ",
+            "insOS3" to "Puntuación: ",
+            "insOS4" to "Encuentra el emoji diferente!",
+            "insOS5" to "Nivel final: ",
+            "insOS6" to "Errores hechos: ",
+            "insOS7" to "Tiempo promedio: ",
+            "insOS8" to "Puntuación final: ",
+            "insS09" to "Debes seleccionar el ",
+            "insS10" to "emoji diferente.\n ",
+            "insS11" to "Tienes ",
+            "insS12" to " un tiempo limitado",
+            "insS13" to " para superar el nivel.\n",
+            "insS14" to " Concéntrate, !y buena suerte!"
+
+
+
 
 
 
@@ -108,6 +147,7 @@ object Strings {
         "en" to mapOf(
             //GENERAL
             "play" to "PLAY",
+            "leaderboard" to "LEADERBOARD",
             "play_again" to "PLAY AGAIN",
             "restart" to "RESTART",
             "charging" to "CHARGING...",
@@ -198,9 +238,45 @@ object Strings {
             "insW5" to "BETTER!!",
             "insW7" to "Difficulty information:\t\n - Easy: 5-8 words\n - Medium: 10-15 words\n - Hard: 20-25 words",
             "insW6" to "Focus, and good luck!",
-            //STROOP
-            "insST1" to "You have to select the",
-            "insST2" to "color",
+            //STROOP SCREEN
+            "title_stroop" to "STROOP",
+            "insST1" to "!Game finished!",
+            "insST2" to "Final Score:",
+            "insST3" to "points",
+            "insST4" to "Play again",
+            "insST5" to "Back to start",
+            "insST6" to "Select difficulty",
+            "insST7" to "Stroop Test",
+            "insST8" to "Time left: ",
+            "insST9" to " seconds",
+            "insST10" to "Correct!",
+            "insST11" to "Incorrect",
+            "insST12" to "Score:",
+            "insST13" to "You have to select the",
+            "insST14" to " color",
+            "insST15" to " in which the word is written, not the name that appears.\n" +
+                    "\n",
+            "insST16" to "You have",
+            "insST17" to " 30 seconds",
+            "insST18" to " to get as many right as possible. \n",
+            "insST19" to "Focus, and good luck!",
+
+            //ODDEMOJI SCREEN
+            "title_oddEmoji" to "ODD EMOJI",
+            "insOS1" to "Level: ",
+            "insOS2" to "Errors: ",
+            "insOS3" to "Score: ",
+            "insOS4" to "Find the odd emoji!",
+            "insOS5" to "Final level: ",
+            "insOS6" to "Errors made: ",
+            "insOS7" to "Average time: ",
+            "insOS8" to "Final score: ",
+            "insS09" to "You have to pick the ",
+            "insS10" to "odd emoji.\n ",
+            "insS11" to "You have ",
+            "insS12" to " a limited time",
+            "insS13" to " to clear the level.\n",
+            "insS14" to " Focus, and good luck!"
 
 
         )

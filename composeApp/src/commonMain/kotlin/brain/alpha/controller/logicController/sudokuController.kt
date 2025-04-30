@@ -1,6 +1,7 @@
 package brain.alpha.controller.logicController
 
 import androidx.compose.runtime.mutableStateOf
+import brain.alpha.controller.memoryController.pairsController
 import brain.alpha.model.logicModel.sudokuModel
 import brain.alpha.model.shared.Difficulty
 
@@ -97,9 +98,46 @@ object sudokuController {
 
         return true
     }
+
     fun goHomeLogic(){
         navigateTo("logic")
         showInstructions.value = false
         model.started = false
+    }
+    fun calculateScore(seconds: Int): Int {
+        val baseScore = when (model.difficulty) {
+            Difficulty.EASY -> {
+                when {
+                    seconds <= 150 -> 10
+                    seconds <= 210 -> 7
+                    seconds <= 300 -> 5
+                    else -> 3
+                }
+            }
+            Difficulty.MEDIUM -> {
+                when {
+                    seconds <= 240 -> 10
+                    seconds <= 330 -> 7
+                    seconds <= 450 -> 5
+                    else -> 3
+                }
+            }
+            Difficulty.HARD -> {
+                when {
+                    seconds <= 360 -> 10
+                    seconds <= 480 -> 7
+                    seconds <= 600 -> 5
+                    else -> 3
+                }
+            }
+        }
+
+        val multiplier = when (model.difficulty) {
+            Difficulty.EASY -> 1
+            Difficulty.MEDIUM -> 2
+            Difficulty.HARD -> 3
+        }
+
+        return baseScore * multiplier
     }
 }

@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -62,17 +63,17 @@ fun LoginScreen(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
-                    Spacer(modifier = Modifier.height(44.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
                     // App logo
                     Image(painter = painterResource(Res.drawable.logo),
                         contentDescription = "App Logo",
-                        modifier = Modifier.size(210.dp, 78.dp))
+                        modifier = Modifier.size(210.dp, 210.dp))
 
-                    Spacer(modifier = Modifier.height(50.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
                     // Avatar icon
-                    Image(painter = painterResource(Res.drawable.avatar),
+                    Image(painter = painterResource(Res.drawable.user),
                         contentDescription = "Avatar",
                         modifier = Modifier.size(87.dp, 88.dp))
 
@@ -163,7 +164,7 @@ fun LoginScreen(
                     // Divider with "o"
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                         Divider(modifier = Modifier.weight(1f), color = Color.LightGray)
-                        Text(" o ", color = Color.Gray)
+                        Text(" Si no tienes cuenta, registrate ", color = Color.Black, fontSize = 14.sp)
                         Divider(modifier = Modifier.weight(1f), color = Color.LightGray)
                     }
 
@@ -176,7 +177,7 @@ fun LoginScreen(
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text("SIGN UP", color = Color.White)
+                        Text("REGISTRARSE", color = Color.White)
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))

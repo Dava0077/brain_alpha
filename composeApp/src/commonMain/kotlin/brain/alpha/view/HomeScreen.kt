@@ -11,14 +11,17 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import brain.alpha.controller.LoginController
 import brain.alpha.model.UserSession
+import brain.alpha.services.SupabaseClientProvider
 import brain.alpha.strings.Strings
 import brainalpha.composeapp.generated.resources.*
+import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.DrawableResource
@@ -47,6 +50,15 @@ fun HomeScreen(
     onNavigateToConcentration: () -> Unit,
     onNavigateToAgility: () -> Unit
 ) {
+    LaunchedEffect(Unit) {
+        val user = SupabaseClientProvider.client.auth.currentUserOrNull()
+        if (user != null) {
+            UserSession.setUserId(user.id)
+            println("✅ Sesión restaurada correctamente: ${user.email}")
+        } else {
+            println("⚠ Usuario no logueado")
+        }
+    }
     val displayName = UserSession.getDisplayName() // Show guest or username
     val showConfirmDialog = remember { mutableStateOf(false) }
 
@@ -82,7 +94,7 @@ fun HomeScreen(
                 ) {
                     // Left user icon
                     IconButton(
-                        onClick = { controller.buttonUsername() },
+                        onClick = { controller.navigateTo("profile") },
                         modifier = Modifier
                             .align(Alignment.CenterStart)
                             .padding(start = 8.dp)
@@ -128,7 +140,7 @@ fun HomeScreen(
                         }
                     }
 
-                    // Display greeting with user name
+                    // Display greeting with username
                     Text(
                         text = Strings.t("hi") +"$displayName!",
                         color = Color.White,
@@ -138,7 +150,22 @@ fun HomeScreen(
                             .padding(start = 72.dp)
                     )
                 }
+                Spacer(modifier = Modifier.height(5.dp))
 
+                Button(
+                    onClick = {controller.goLeaderboard()},
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .height(46.dp),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF222937)),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.elevation(4.dp),
+                    border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+                ){
+                    Text(Strings.t("leaderboard"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
+                }
+
+                Spacer(modifier = Modifier.height(70.dp))
                 Spacer(modifier = Modifier.height(70.dp))
 
                 Text(

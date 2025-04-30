@@ -2,9 +2,10 @@ package brain.alpha
 
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
-import brain.alpha.view.LoginScreen
+import brain.alpha.controller.LeaderboardController
 import brain.alpha.controller.LoginController
 import brain.alpha.controller.SettingsController
+import brain.alpha.controller.UserProfileController
 import brain.alpha.controller.concentrationController.concentrationHomeController
 import brain.alpha.controller.concentrationController.oddEmojiController
 import brain.alpha.controller.concentrationController.stroopController
@@ -19,9 +20,7 @@ import brain.alpha.controller.mentalAgilityController.mentalHomeController
 import brain.alpha.controller.mentalAgilityController.mentalMathController
 import brain.alpha.model.UserSession
 import brain.alpha.services.SupabaseClientProvider
-import brain.alpha.view.HomeScreen
-import brain.alpha.view.SettingsScreen
-import brain.alpha.view.SignUpScreen
+import brain.alpha.view.*
 import brain.alpha.view.concentrationView.concentrationHomeScreen
 import brain.alpha.view.concentrationViews.OddEmojiScreen
 import brain.alpha.view.concentrationViews.StroopScreen
@@ -78,6 +77,8 @@ fun App() {
         LoginController.navigateTo = { route -> currentScreen = route }
         //SETTINGS
         SettingsController.navigateTo = { route -> currentScreen = route }
+        UserProfileController.navigateTo = {route -> currentScreen = route}
+        LeaderboardController.navigateTo = {route -> currentScreen = route}
 
         //MEMORY GAMES
         memoryHomeController.navigateTo = { route -> currentScreen = route }
@@ -136,6 +137,14 @@ fun App() {
             //SETTINGS
             "settings" -> SettingsScreen(
                 controller = SettingsController
+            )
+            //PROFILE
+            "profile" -> UserProfileScreen(
+                onBack = {currentScreen = "home"}
+            )
+            //LEADERBOARD
+            "leaderboard" -> leaderboardScreen(
+                controller = LeaderboardController
             )
             //MEMORY
             "memory" -> memoryHomeScreen(
