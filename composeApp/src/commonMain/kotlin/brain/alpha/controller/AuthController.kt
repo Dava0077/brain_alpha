@@ -2,7 +2,9 @@ package brain.alpha.controller
 
 import brain.alpha.model.UserSession
 import brain.alpha.services.SupabaseClientProvider
+import io.github.jan.supabase.auth.OtpType
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.providers.OAuthProvider
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.postgrest.postgrest
@@ -150,6 +152,37 @@ object AuthController {
         }
     }
 
+    //Delete user function
+//    suspend fun deleteAccount(): Result<Unit> = withContext(Dispatchers.Default) {
+//        runCatching {
+//            SupabaseClientProvider.client.auth.
+//            UserSession.clear()
+//        }
+//    }
+
+    suspend fun verifyCurrentPassword(email: String, password: String): Result<Unit> = withContext(Dispatchers.Default) {
+        runCatching {
+            SupabaseClientProvider.client.auth.signInWith(Email) {
+                this.email = email
+                this.password = password
+            }
+        }
+    }
+
+    suspend fun resendVerification(email: String): Result<Unit> = withContext(Dispatchers.Default) {
+        runCatching {
+            SupabaseClientProvider.client.auth.resendEmail(
+                type = OtpType.Email.EMAIL,
+                email = email
+            )
+        }
+    }
+
+    suspend fun signInWithGoogle(): Result<Unit> = withContext(Dispatchers.Default) {
+        runCatching {
+            SupabaseClientProvider.client.auth.signInWith<Unit, Unit>(OAuthProvider.Google)
+        }
+    }
 
 }
 

@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -41,23 +42,32 @@ fun UserProfileScreen(onBack: () -> Unit) {
     val scaffoldState = rememberScaffoldState()
     var showLogoutConfirm by remember { mutableStateOf(false) }
 
+
+    val userId = UserSession.userId.value
+    val username = UserSession.username.value ?: "Usuario"
+    val email = UserSession.email.value ?: "Email desconocido"
+
+    var isEmailVerified by remember { mutableStateOf(true) }
+    var progressList by remember { mutableStateOf<List<UserProgressEntry>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(true) }
+
+    var currentPassword by remember { mutableStateOf(TextFieldValue()) }
+    var showDialog by remember { mutableStateOf<String?>(null) }
+    var inputValue by remember { mutableStateOf(TextFieldValue()) }
+
+    //var showDeleteDialog by remember { mutableStateOf(false) }
+    var passwordValue by remember { mutableStateOf(TextFieldValue()) }
+
+
     Box(modifier = Modifier.fillMaxSize()) {
-
-        val userId = UserSession.userId.value
-        val username = UserSession.username.value ?: "Usuario"
-        val email = UserSession.email.value ?: "Email desconocido"
-
-        var progressList by remember { mutableStateOf<List<UserProgressEntry>>(emptyList()) }
-        var isLoading by remember { mutableStateOf(true) }
-
-        var showDialog by remember { mutableStateOf<String?>(null) }
-        var inputValue by remember { mutableStateOf(TextFieldValue()) }
 
         LaunchedEffect(userId) {
             userId?.let {
                 progressList = loadUserProgress(it)
                 isLoading = false
             }
+            val user = SupabaseClientProvider.client.auth.currentUserOrNull()
+            isEmailVerified = user?.emailConfirmedAt != null
         }
 
         Scaffold(
@@ -99,6 +109,22 @@ fun UserProfileScreen(onBack: () -> Unit) {
 
                 Text(username, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 Text(email, fontSize = 14.sp, color = Color.Gray)
+
+                if (!isEmailVerified) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(
+                        onClick = {
+                            coroutineScope.launch {
+                                val result = AuthController.resendVerification(email)
+                                val msg = if (result.isSuccess) "Verificación reenviada" else "Error al reenviar"
+                                scaffoldState.snackbarHostState.showSnackbar(msg)
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7))
+                    ) {
+                        Text("Reenviar verificación", color = Color.White)
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -157,6 +183,15 @@ fun UserProfileScreen(onBack: () -> Unit) {
                 ) {
                     Text(Strings.t("log_out"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
                 }
+
+//                //Delete button
+//                Button(
+//                    onClick = { showDeleteDialog = true },
+//                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.DarkGray),
+//                    modifier = Modifier.align(Alignment.CenterHorizontally)
+//                ) {
+//                    Text("Eliminar cuenta", color = Color.White)
+//                }
             }
         }
 
@@ -185,38 +220,91 @@ fun UserProfileScreen(onBack: () -> Unit) {
             )
         }
 
+        //Delete dialog
+//        if (showDeleteDialog) {
+//            AlertDialog(
+//                onDismissRequest = { showDeleteDialog = false },
+//                title = { Text("Eliminar cuenta") },
+//                text = { Text("¿Estás seguro? Esta acción no se puede deshacer.") },
+//                confirmButton = {
+//                    TextButton(onClick = {
+//                        coroutineScope.launch {
+//                            val result = AuthController.deleteAccount()
+//                            if (result.isSuccess) {
+//                                scaffoldState.snackbarHostState.showSnackbar("Cuenta eliminada")
+//                                onBack()
+//                            } else {
+//                                scaffoldState.snackbarHostState.showSnackbar("Error al eliminar cuenta")
+//                            }
+//                        }
+//                        showDeleteDialog = false
+//                    }) {
+//                        Text("Sí, eliminar")
+//                    }
+//                },
+//                dismissButton = {
+//                    TextButton(onClick = { showDeleteDialog = false }) {
+//                        Text("Cancelar")
+//                    }
+//                }
+//            )
+//        }
+
         showDialog?.let { field ->
             AlertDialog(
                 onDismissRequest = {
                     showDialog = null
                     inputValue = TextFieldValue()
+                    currentPassword = TextFieldValue()
                 },
                 title = {
                     Text(Strings.t("change_$field"))
                 },
                 text = {
-                    OutlinedTextField(
-                        value = inputValue,
-                        onValueChange = { inputValue = it },
-                        label = { Text(Strings.t("new_$field")) },
-                        singleLine = true,
-                        textStyle = LocalTextStyle.current.copy(fontSize = 16.sp)
-                    )
+                    Column {
+                        OutlinedTextField(
+                            value = inputValue,
+                            onValueChange = { inputValue = it },
+                            label = { Text(Strings.t("new_$field")) },
+                            singleLine = true,
+                            textStyle = LocalTextStyle.current.copy(fontSize = 16.sp)
+                        )
+                        if (field == "email" || field == "password") {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            OutlinedTextField(
+                                value = passwordValue,
+                                onValueChange = { passwordValue = it },
+                                label = { Text(Strings.t("current_password")) },
+                                singleLine = true,
+                                visualTransformation = PasswordVisualTransformation(),
+                                textStyle = LocalTextStyle.current.copy(fontSize = 16.sp)
+                            )
+                        }
+                    }
                 },
                 confirmButton = {
                     TextButton(onClick = {
-                        if (inputValue.text.isNotBlank()) {
-                            coroutineScope.launch {
-                                updateUserField(field, inputValue.text)
-                                scaffoldState.snackbarHostState.showSnackbar(Strings.t("update_successful"))
-                            }
-                        } else {
-                            coroutineScope.launch {
+                        coroutineScope.launch {
+                            if (inputValue.text.isBlank()) {
                                 scaffoldState.snackbarHostState.showSnackbar(Strings.t("field_cannot_be_empty"))
+                                return@launch
                             }
+
+                            if (field == "email" || field == "password") {
+                                val email = UserSession.email.value ?: return@launch
+                                val result = AuthController.verifyCurrentPassword(email, passwordValue.text)
+                                if (result.isFailure) {
+                                    scaffoldState.snackbarHostState.showSnackbar(Strings.t("invalid_password"))
+                                    return@launch
+                                }
+                            }
+
+                            updateUserField(field, inputValue.text)
+                            scaffoldState.snackbarHostState.showSnackbar(Strings.t("update_successful"))
+                            showDialog = null
+                            inputValue = TextFieldValue()
+                            currentPassword = TextFieldValue()
                         }
-                        showDialog = null
-                        inputValue = TextFieldValue()
                     }) {
                         Text(Strings.t("confirm"))
                     }
@@ -225,6 +313,7 @@ fun UserProfileScreen(onBack: () -> Unit) {
                     TextButton(onClick = {
                         showDialog = null
                         inputValue = TextFieldValue()
+                        currentPassword = TextFieldValue()
                     }) {
                         Text(Strings.t("cancel"))
                     }
@@ -237,6 +326,8 @@ fun UserProfileScreen(onBack: () -> Unit) {
 suspend fun updateUserField(field: String, value: String) {
     val client = SupabaseClientProvider.client
     val userId = UserSession.userId.value ?: return
+
+
 
     withContext(Dispatchers.Default) {
         when (field) {
@@ -271,6 +362,16 @@ suspend fun updateUserField(field: String, value: String) {
             else -> {}
         }
     }
+}
+
+suspend fun verifyCurrentPassword(password: String): Boolean {
+    val email = UserSession.email.value ?: return false
+    return runCatching {
+        SupabaseClientProvider.client.auth.signInWith(io.github.jan.supabase.auth.providers.builtin.Email) {
+            this.email = email
+            this.password = password
+        }
+    }.isSuccess
 }
 
 suspend fun loadUserProgress(userId: String): List<UserProgressEntry> {
