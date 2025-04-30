@@ -2,6 +2,8 @@ package brain.alpha.view
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -16,6 +18,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brain.alpha.controller.LeaderboardController
 import brain.alpha.model.UserSession
+import brain.alpha.services.GameSession
+import brain.alpha.services.GameSessionService
+import brain.alpha.services.GameSessionWithUser
+import brain.alpha.services.SupabaseClientProvider
 import brain.alpha.strings.Strings
 import brainalpha.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
@@ -33,6 +39,17 @@ fun leaderboardScreen(controller: LeaderboardController) {
 
     var expandedCategory by remember { mutableStateOf<String?>(null) }
     var expandedGame by remember { mutableStateOf<String?>(null) }
+    val leaderboard = remember { mutableStateListOf<GameSessionWithUser>() } // ✅
+
+    LaunchedEffect(Unit) {
+        val results = GameSessionService.showPairGameResult(
+            supabase = SupabaseClientProvider.client,
+            gameId = "24bc262b-ab64-4c71-9c45-8d4fa04a549e"
+        )
+        println("Results: $results")
+        leaderboard.clear()
+        leaderboard.addAll(results)
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -114,12 +131,17 @@ fun leaderboardScreen(controller: LeaderboardController) {
                     }
                 ) {
                     games.forEach { game ->
+                        val gameId = when (game) {
+                            "Juego de Parejas" -> "24bc262b-ab64-4c71-9c45-8d4fa04a549e"
+                            else -> "" // Placeholder para otros juegos
+                        }
                         ExpandableGame(
                             title = game,
                             isExpanded = expandedGame == game,
                             onExpandToggle = {
                                 expandedGame = if (expandedGame == game) null else game
-                            }
+                            },
+                            gameId = gameId
                         )
                     }
                 }
@@ -154,32 +176,46 @@ fun ExpandableCategory(
         }
     }
 }
-
 @Composable
 fun ExpandableGame(
     title: String,
     isExpanded: Boolean,
-    onExpandToggle: () -> Unit
+    onExpandToggle: () -> Unit,
+    gameId: String
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, top = 4.dp)
-            .border(1.dp, Color.LightGray, RoundedCornerShape(6.dp))
-            .clickable { onExpandToggle() }
-            .padding(8.dp)
-    ) {
-        Text(
-            text = title,
-            fontSize = 16.sp
-        )
-        if (isExpanded) {
-            Text(
-                text = "Clasificación vendrá aquí...",
-                fontSize = 14.sp,
-                color = Color.Gray,
-                modifier = Modifier.padding(start = 8.dp, top = 4.dp)
+    // Usamos remember y mutableStateListOf para mantener el estado del leaderboard entre recomposiciones
+    val leaderboard = remember { mutableStateListOf<GameSessionWithUser>() }
+
+    LaunchedEffect(isExpanded) {
+        if (isExpanded && gameId.isNotBlank()) {
+            val results = GameSessionService.showPairGameResult(
+                supabase = SupabaseClientProvider.client,
+                gameId = "24bc262b-ab64-4c71-9c45-8d4fa04a549e"
             )
+            println("Results: $results")  // Verifica los resultados antes de agregarlos
+            leaderboard.clear()
+            leaderboard.addAll(results)
+        }
+    }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(title, fontWeight = FontWeight.Bold)
+        Button(onClick = { onExpandToggle() }) {
+            Text(if (isExpanded) "Cerrar" else "Expandir")
+        }
+
+        if (isExpanded) {
+            // Mostrar los resultados del leaderboard
+            LazyColumn {
+                items(leaderboard) { entry ->
+                    Text(entry.name)
+                    Text(entry.score.toString())
+                    Text(entry.difficulty)
+                      // Si usas 'email' en lugar de 'name', cámbialo aquí
+                }
+            }
         }
     }
 }
+
+

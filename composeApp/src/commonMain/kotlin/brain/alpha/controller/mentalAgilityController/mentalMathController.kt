@@ -1,12 +1,12 @@
 package brain.alpha.controller.mentalAgilityController
 
+import brain.alpha.model.shared.Difficulty
 import model.mentalMathModel
 
 
-object mentalMathController{
-    private val model= mentalMathModel
+object mentalMathController {
+    private val model = mentalMathModel
     lateinit var navigateTo: (String) -> Unit
-
 
     fun startGame(onQuestionGenerated: (mentalMathModel.Question) -> Unit) {
         if (!model.isGameOver()) {
@@ -23,21 +23,27 @@ object mentalMathController{
         val isCorrect = model.checkAnswer(userAnswer, timeTaken)
         val correctAnswer = if (!isCorrect) {
             "La respuesta correcta era ${model.getCurrentCorrectAnswer()}"
-        } else {
-            null
-        }
+        } else null
         onAnswerChecked(isCorrect, model.score, correctAnswer)
     }
 
     fun resetGame() {
         model.resetGame()
     }
-    fun goHome(){
+
+    fun setDifficulty(level: Difficulty) {
+        model.setDifficulty(level)
+    }
+
+    fun getDifficulty(): Difficulty = model.getDifficulty()
+    fun getTimeLimit(): Int = model.getTimeLimit()
+
+    fun goHome() {
         navigateTo("agility")
     }
 
     fun isGameOver(): Boolean = model.isGameOver()
     fun getScore(): Int = model.score
     fun getTotalQuestions(): Int = model.totalQuestions
-    fun getCurrentQuestionNumber(): Int = model.currentQuestion + 1 // Para mostrar el número correcto
+    fun getCurrentQuestionNumber(): Int = model.currentQuestion + 1
 }

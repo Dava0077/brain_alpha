@@ -35,8 +35,7 @@ object GameSessionController {
     suspend fun registerGameSession(
         gameName: String,
         difficulty: String,
-        score: Long,
-        sessionDuration: Long,
+        score: Int,
         timeAvg: Double? = null,
         timeLeft: Double? = null
     ): Result<Unit> = withContext(Dispatchers.Default) {
@@ -58,7 +57,6 @@ object GameSessionController {
                     put("user_id", userId)
                     put("game_id", gameId)
                     put("score", score)
-                    put("session_duration", sessionDuration)
                     put("difficulty", difficulty)
                     put("time_avg", timeAvg)
                     put("time_left", timeLeft)
@@ -138,7 +136,7 @@ object GameSessionController {
     }
 
     // Crea o actualiza la entrada de progreso del usuario
-    private suspend fun upsertUserProgress(userId: String, gameId: String, score: Long) {
+    private suspend fun upsertUserProgress(userId: String, gameId: String, score: Int) {
         // Supabase upsert emulado
         val existing = SupabaseClientProvider.client.postgrest["user_progress"]
             .select {
