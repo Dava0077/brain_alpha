@@ -10,6 +10,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import brain.alpha.model.mentalAgilityModel.clickNumberModel
+import brain.alpha.model.shared.Difficulty
+
 
 object clickNumberController {
     var numbers by mutableStateOf(listOf<Int>())
@@ -30,9 +32,18 @@ object clickNumberController {
     val showInstructions = mutableStateOf(true)
     var isGameStarted by mutableStateOf(false)
         private set
+    var showGameOverDialog by mutableStateOf(false)
+        private set
+    var currentDifficulty by mutableStateOf(Difficulty.EASY) // Dificultad por defecto: Fácil
+        private set
 
     private var timerJob: Job? = null
     private val scope = CoroutineScope(Dispatchers.Main)
+
+    // Método para establecer la dificultad
+    fun setDifficulty(difficulty: Difficulty) {
+        currentDifficulty = difficulty
+    }
 
     fun beginClickGame() {
         showInstructions.value = false
@@ -44,7 +55,13 @@ object clickNumberController {
         isGameStarted = true
         gameOver = false
         score = 0
-        timeLeft = 30
+        // Establecer el tiempo según la dificultad
+        timeLeft = when (currentDifficulty) {
+            Difficulty.EASY -> 90 // 1:30 minutos
+            Difficulty.MEDIUM -> 60 // 1:00 minuto
+            Difficulty.HARD -> 30 // 30 segundos
+        }
+        showGameOverDialog = false
         clickNumberModel.startGame()
         numbers = clickNumberModel.getNumbers()
         targetNumber = clickNumberModel.targetNumber
@@ -83,32 +100,44 @@ object clickNumberController {
                 instructionMessage = "¡Tiempo terminado!"
                 resultMessage = "Aciertos: $score"
                 isGameStarted = false
+                showGameOverDialog = true
             }
         }
     }
 
-    // Reinicia el juego (botón Atrás)
+    // Reinicia el juego (botón Atrás o "Jugar de Nuevo")
     fun resetGame() {
         timerJob?.cancel()
         timerJob = null
         isGameStarted = false
         gameOver = false
         score = 0
-        timeLeft = 30
+        timeLeft = when (currentDifficulty) {
+            Difficulty.EASY -> 90
+            Difficulty.MEDIUM -> 60
+            Difficulty.HARD -> 30
+        }
         numbers = emptyList()
         targetNumber = 0
         instructionMessage = ""
         resultMessage = ""
+        showGameOverDialog = false
+    }
+
+    // Metodo para reiniciar el juego desde la ventana emergente
+    fun restartGame() {
+        resetGame()
+        startGame()
     }
 
     fun goHomeLogic() {
-        resetGame() // Reinicia el estado del juego
+        resetGame()
         navigateTo("logic")
         wordSearchController.showInstructions.value = true
     }
 
     fun goHome() {
-        resetGame() // Reinicia el estado del juego
+        resetGame()
         navigateTo("agility")
     }
 }
