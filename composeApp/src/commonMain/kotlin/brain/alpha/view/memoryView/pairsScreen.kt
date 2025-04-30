@@ -29,6 +29,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
+import brain.alpha.controller.GameSessionController
 import brain.alpha.controller.memoryController.pairsController
 import brain.alpha.model.UserSession
 import brain.alpha.model.shared.Difficulty
@@ -313,12 +314,10 @@ fun couplesScreen(
                     LaunchedEffect(score) {
                         val userId = runCatching { UserSession.getUserId() }.getOrNull()
                         if (userId != null) {
-                            GameSessionService.savePairGameResult(
-                                userId = userId,
-                                gameId = "24bc262b-ab64-4c71-9c45-8d4fa04a549e",
+                            GameSessionController.registerGameSession(
+                                gameName = "24bc262b-ab64-4c71-9c45-8d4fa04a549e",
                                 score = score,
                                 difficulty = selectedDifficulty.name,
-                                supabase = SupabaseClientProvider.client
                             )
                             println("✅ Partida guardada correctamente: Score $score | Dificultad $selectedDifficulty")
                             sessionSaved = true
