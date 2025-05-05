@@ -19,9 +19,12 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import brain.alpha.controller.GameSessionController
 import brain.alpha.controller.logicController.wordSearchController
 import brain.alpha.model.UserSession
 import brain.alpha.model.shared.Difficulty
+import brain.alpha.services.GameSessionService
+import brain.alpha.services.SupabaseClientProvider
 import brain.alpha.strings.Strings
 import brainalpha.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
@@ -49,8 +52,25 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
     var timerTrigger by remember { mutableStateOf(0) }
     val min = (elapsedTime / 60).toString().padStart(2, '0')
     val sec = (elapsedTime % 60).toString().padStart(2, '0')
-    val selectedDifficulty = remember { mutableStateOf(Difficulty.EASY) }
+    var selectedDifficulty by remember { mutableStateOf(Difficulty.EASY) }
     val displayName = UserSession.getDisplayName() // Show guest or username
+    var sessionSaved by remember { mutableStateOf(false) }
+    val userId = runCatching { UserSession.getUserId() }.getOrNull()
+    val totalScore = remember { mutableStateOf(0) }
+
+    LaunchedEffect(userId) {
+        if (userId != null) {
+            val total = GameSessionController.getTotalScore(
+                userId = userId,
+                gameId = "d15d1344-df81-41d5-87f0-c468668be2d8",
+                supabase = SupabaseClientProvider.client
+            )
+            println("🧠 Score obtenido del servidor: $total")
+            totalScore.value = total
+        }
+    }
+
+
 
     if (showInstructions) {
         InstructionsWordSearch(
@@ -60,7 +80,7 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
         return
     }
 
-    LaunchedEffect(gameStarted) {
+    LaunchedEffect(timerTrigger) {
         if (gameStarted) {
             elapsedTime = 0
             while (!controller.isGameFinished()) {
@@ -139,6 +159,17 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                 ) {
                     Text(Strings.t("instructions"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
                 }
+
+                Text(
+                    text = "🧠 ${totalScore.value} " + Strings.t("neurons"),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    modifier = Modifier
+                        .background(Color.White, shape = RoundedCornerShape(8.dp))
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+
                 Button(
                     onClick = { controller.goHomeLogic() },
                     modifier = Modifier.height(46.dp),
@@ -155,9 +186,9 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                 Difficulty.values().forEach { difficulty ->
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         RadioButton(
-                            selected = selectedDifficulty.value == difficulty,
+                            selected = selectedDifficulty == difficulty,
                             onClick = {
-                                selectedDifficulty.value = difficulty
+                                selectedDifficulty = difficulty
                                 controller.configureGame(difficulty)
                             },
                             enabled = !gameStarted
@@ -179,7 +210,7 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                         scope.launch {
                             isLoading = true
                             withContext(Dispatchers.Default) {
-                                controller.configureGame(selectedDifficulty.value)
+                                controller.configureGame(selectedDifficulty)
                                 controller.startGame()
                             }
                             selectedCells.clear()
@@ -187,6 +218,7 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                             timeLeft = 60
                             gameStarted = true
                             gameFinished = false
+                            sessionSaved = false
                             isLoading = false
                             timerTrigger++
                         }
@@ -273,6 +305,38 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                         }
                     }
                 }
+                if (gameFinished) {
+                    val score = controller.calculateScore(elapsedTime)
+
+                    Text(
+                        text = Strings.t("your_score") + " $score " + Strings.t("neurons"),
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xFF2E7D32)
+                    )
+                    val scope = rememberCoroutineScope()
+                    if (gameFinished && !sessionSaved) {
+                        sessionSaved = true
+                        scope.launch {
+                            val userId = runCatching { UserSession.getUserId() }.getOrNull()
+                            if (userId != null) {
+                                GameSessionController.registerGameSession(
+                                    gameId = "d15d1344-df81-41d5-87f0-c468668be2d8",
+                                    score = score,
+                                    difficulty = selectedDifficulty.name,
+                                ).onSuccess {
+                                    println("✅ Partida guardada correctamente: Score $score | Dificultad $selectedDifficulty")
+                                    totalScore.value += score
+
+                                }.onFailure {
+                                    println("❌ Error guardando partida: ${it.message}")
+                                }
+                            } else {
+                                println("⚠ Usuario no logueado, no se puede guardar la partida")
+                            }
+                        }
+                    }
+                }
 
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -280,8 +344,21 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                     Button(
                         onClick = {
                             controller.resetSelection()
+                            controller.configureGame(selectedDifficulty) // reinicia palabras si es necesario
+                            controller.startGame()
+
                             selectedCells.clear()
+                            validatedCells.clear()
                             selectionDirection = null
+                            elapsedTime = 0
+                            timeLeft = 60
+                            timerTrigger++
+
+
+                            gameFinished = false
+                            gameStarted = true
+                            sessionSaved = false
+                            showDialog = null
                         },
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
                     ) {

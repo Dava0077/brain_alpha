@@ -27,12 +27,14 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
+import brain.alpha.controller.GameSessionController
 import brain.alpha.controller.concentrationController.stroopController
 import brain.alpha.model.UserSession
 import brain.alpha.model.logicModel.sudokuModel
 import brain.alpha.model.shared.Difficulty
 import brain.alpha.view.memoryView.InstructionsCouples
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun sudokuScreen(controller: sudokuController, onNavigateToHome: () -> Unit) {
@@ -46,9 +48,11 @@ fun sudokuScreen(controller: sudokuController, onNavigateToHome: () -> Unit) {
     var selectedCol by remember { mutableStateOf(-1) }
     var gridVersion by remember { mutableStateOf(0) }
     val showInstructions by controller.showInstructions
-    val selectedDifficulty = remember { mutableStateOf(controller.getDifficulty()) }
+    var selectedDifficulty by remember { mutableStateOf(Difficulty.EASY) }
     val model = sudokuModel
     val displayName = UserSession.getDisplayName()
+    var sessionSaved by remember { mutableStateOf(false) }
+
 
     if (showInstructions) {
         InstructionsSudoku(
@@ -132,17 +136,21 @@ fun sudokuScreen(controller: sudokuController, onNavigateToHome: () -> Unit) {
                     onClick = { controller.toggleInstructions(true) },
                     modifier = Modifier.height(46.dp),
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.elevation(4.dp),
                     border = BorderStroke(1.dp, Color(0xFFB0BEC5))
                 ) {
-                    Text(Strings.t("instructions"), color = Color.Black)
+                    Text(Strings.t("instructions"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
                 }
                 Button(
                     onClick = { controller.goHomeLogic() },
                     modifier = Modifier.height(46.dp),
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.elevation(4.dp),
                     border = BorderStroke(1.dp, Color(0xFFB0BEC5))
                 ) {
-                    Text(Strings.t("back"), color = Color.Black)
+                    Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
                 }
             }
 
@@ -154,9 +162,9 @@ fun sudokuScreen(controller: sudokuController, onNavigateToHome: () -> Unit) {
                 Difficulty.values().forEach { level ->
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         RadioButton(
-                            selected = selectedDifficulty.value == level,
+                            selected = selectedDifficulty == level,
                             onClick = {
-                                selectedDifficulty.value = level
+                                selectedDifficulty = level
                                 controller.setDifficulty(level)
                             },
                             enabled = !controller.hasStarted()
@@ -184,6 +192,7 @@ fun sudokuScreen(controller: sudokuController, onNavigateToHome: () -> Unit) {
                         timerTrigger++
                         gridVersion++
                         gameLost = false
+                        sessionSaved = false
                     },
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
                 ) {
@@ -267,6 +276,7 @@ fun sudokuScreen(controller: sudokuController, onNavigateToHome: () -> Unit) {
                         selectedCol = -1
                         gridVersion++
                         timerTrigger++
+                        sessionSaved = false
                     },
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
                 ) {
@@ -295,6 +305,27 @@ fun sudokuScreen(controller: sudokuController, onNavigateToHome: () -> Unit) {
                             fontWeight = FontWeight.Medium,
                             color = Color(0xFF2E7D32)
                         )
+                        val scope = rememberCoroutineScope()
+                        if (controller.isBoardComplete() && isValid && !sessionSaved) {
+                            sessionSaved = true
+                            scope.launch {
+                                val userId = runCatching { UserSession.getUserId() }.getOrNull()
+                                if (userId != null) {
+                                    GameSessionController.registerGameSession(
+                                        gameId = "b012b362-d7d3-49f7-b14b-bce8ea297453",
+                                        score = score,
+                                        difficulty = selectedDifficulty.name,
+                                    ).onSuccess {
+                                        println("✅ Partida guardada correctamente: Score $score | Dificultad $selectedDifficulty")
+
+                                    }.onFailure {
+                                        println("❌ Error guardando partida: ${it.message}")
+                                    }
+                                } else {
+                                    println("⚠ Usuario no logueado, no se puede guardar la partida")
+                                }
+                            }
+                        }
 
                     }
                 }

@@ -1,7 +1,9 @@
 package brain.alpha.controller
 
 import brain.alpha.model.UserSession
+import brain.alpha.services.GameSession
 import brain.alpha.services.SupabaseClientProvider
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.Order
 import kotlinx.coroutines.Dispatchers
@@ -218,4 +220,27 @@ object GameSessionController {
             )
         }
     }
+    suspend fun getTotalScore(userId: String, gameId: String, supabase: SupabaseClient): Int {
+        return try {
+            val response = supabase.postgrest["game_sessions"]
+                .select()
+                .decodeList<GameSession>()
+
+            println("🔍 Total partidas en DB: ${response.size}")
+            response.forEach {
+                println("📄 user=${it.user_id}, game=${it.game_id}, score=${it.score}")
+            }
+
+
+            val total = response.sumOf { it.score }
+            println("✅ Total de puntos obtenidos desde la base de datos: $total")
+            total
+        } catch (e: Exception) {
+            println("❌ Error al obtener puntuaciones: ${e.message}")
+            0
+        }
+    }
+
+
+
 }
