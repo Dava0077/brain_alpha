@@ -15,9 +15,13 @@ import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import brain.alpha.controller.GoogleAuthController
 import brain.alpha.controller.LoginController
+import brain.alpha.services.SupabaseClientProvider
 import brainalpha.composeapp.generated.resources.Res
 import brainalpha.composeapp.generated.resources.*
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.compose.auth.ComposeAuth
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 
@@ -182,6 +186,26 @@ fun LoginScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
+                    // Login with Google
+                    Button(
+                        onClick = {
+                            coroutineScope.launch {
+                                val result = GoogleAuthController.loginWithGoogle()
+                                result.onFailure {
+                                    scaffoldState.snackbarHostState.showSnackbar("Error al iniciar sesión con Google: ${it.message}")
+                                }
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth().height(40.dp),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text("Iniciar sesión con Google", color = Color.Black)
+                    }
+
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
                     // Guest login
                     TextButton(
                         onClick = {
@@ -272,3 +296,5 @@ fun LoginScreen(
         }
     }
 }
+
+
