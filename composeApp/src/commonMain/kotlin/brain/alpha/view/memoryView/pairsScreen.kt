@@ -37,7 +37,7 @@ import brain.alpha.services.GameSessionService
 import brain.alpha.services.SupabaseClientProvider
 import brain.alpha.strings.Strings
 import brainalpha.composeapp.generated.resources.*
-
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -290,6 +290,7 @@ fun couplesScreen(
                     selectedIndices = controller.getSelectedIndices()
                     gameStarted = true
                     gameFinished = false
+                    sessionSaved = false
                     gameLost = false
                     elapsedTime = 0
                     timerTrigger++ // fuerza reinicio del temporizador
@@ -310,20 +311,25 @@ fun couplesScreen(
                     fontWeight = FontWeight.Medium,
                     color = Color(0xFF2E7D32)
                 )
+                val scope = rememberCoroutineScope()
+
                 if (gameFinished && !sessionSaved) {
-                    LaunchedEffect(score) {
+                    sessionSaved = true
+                    scope.launch {
                         val userId = runCatching { UserSession.getUserId() }.getOrNull()
                         if (userId != null) {
                             GameSessionController.registerGameSession(
-                                gameName = "24bc262b-ab64-4c71-9c45-8d4fa04a549e",
+                                gameId = "24bc262b-ab64-4c71-9c45-8d4fa04a549e",
                                 score = score,
                                 difficulty = selectedDifficulty.name,
-                            )
-                            println("✅ Partida guardada correctamente: Score $score | Dificultad $selectedDifficulty")
-                            sessionSaved = true
+                            ).onSuccess {
+                                println("✅ Partida guardada correctamente: Score $score | Dificultad $selectedDifficulty")
+
+                            }.onFailure {
+                                println("❌ Error guardando partida: ${it.message}")
+                            }
                         } else {
                             println("⚠ Usuario no logueado, no se puede guardar la partida")
-                            // Puedes mostrar Snackbar o alerta en UI si quieres
                         }
                     }
                 }

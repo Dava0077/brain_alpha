@@ -33,24 +33,18 @@ object GameSessionController {
 
     // Registra una nueva partida y actualiza el progreso del usuario
     suspend fun registerGameSession(
-        gameName: String,
+        gameId: String, // usa directamente el ID
         difficulty: String,
         score: Int,
         timeAvg: Double? = null,
         timeLeft: Double? = null
     ): Result<Unit> = withContext(Dispatchers.Default) {
         runCatching {
-
             val allowedDifficulties = setOf("EASY", "MEDIUM", "HARD")
             require(score >= 0) { "El score no puede ser negativo." }
             require(difficulty.uppercase() in allowedDifficulties) { "Dificultad no válida." }
 
-            val userId = UserSession.userId.value
-                ?: throw IllegalStateException("Usuario no autenticado")
-            require(UserSession.userId.value == userId) { "Sesión inválida: userId no coincide." }
-
-            val gameId = getGameIdByName(gameName)
-                ?: throw IllegalStateException("Juego no encontrado: $gameName")
+            val userId = UserSession.userId.value ?: error("Usuario no autenticado")
 
             SupabaseClientProvider.client.postgrest["game_sessions"].insert(
                 buildJsonObject {
@@ -58,15 +52,15 @@ object GameSessionController {
                     put("game_id", gameId)
                     put("score", score)
                     put("difficulty", difficulty)
-                    put("time_avg", timeAvg)
-                    put("time_left", timeLeft)
+                    timeAvg?.let { put("time_avg", it) }
+                    timeLeft?.let { put("time_left", it) }
                 }
             )
 
-            // Actualiza user_progress
             upsertUserProgress(userId, gameId, score)
         }
     }
+
 
     // Consulta el leaderboard filtrado por juego, dificultad y orden
     suspend fun getLeaderboard(

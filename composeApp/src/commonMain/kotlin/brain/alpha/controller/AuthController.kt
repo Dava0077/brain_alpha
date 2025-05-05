@@ -180,7 +180,7 @@ object AuthController {
 
     suspend fun signInWithGoogle(): Result<Unit> = withContext(Dispatchers.Default) {
         runCatching {
-            SupabaseClientProvider.client.auth.signInWith<Unit, Unit>(OAuthProvider.Google)
+            //SupabaseClientProvider.client.auth.signInWith<Unit, Unit>(OAuthProvider.Google)
         }
     }
 
