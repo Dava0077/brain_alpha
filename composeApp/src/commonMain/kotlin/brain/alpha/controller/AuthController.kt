@@ -4,14 +4,18 @@ import brain.alpha.model.UserSession
 import brain.alpha.services.SupabaseClientProvider
 import io.github.jan.supabase.auth.OtpType
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.auth.providers.OAuthProvider
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.user.UserInfo
+import io.github.jan.supabase.compose.auth.ComposeAuth
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.result.PostgrestResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
+
 
 /**
  * AuthController.kt
@@ -178,11 +182,32 @@ object AuthController {
         }
     }
 
-    suspend fun signInWithGoogle(): Result<Unit> = withContext(Dispatchers.Default) {
-        runCatching {
-            SupabaseClientProvider.client.auth.signInWith<Unit, Unit>(OAuthProvider.Google)
-        }
-    }
+
+//    suspend fun signInWithGoogle(): Result<PostgrestResult> = withContext(Dispatchers.Default) {
+//        runCatching {
+//            val result = SupabaseClientProvider.client.auth.
+//
+//            val user = SupabaseClientProvider.client.auth.currentUserOrNull()
+//                ?: throw IllegalStateException("No se pudo obtener el usuario tras el login con Google.")
+//
+//            val username = user.userMetadata?.get("name")?.toString() ?: "Usuario"
+//
+//            UserSession.setSession(
+//                id = user.id,
+//                emailValue = user.email ?: "desconocido@correo.com",
+//                usernameValue = username
+//            )
+//
+//            // Opcional: sincroniza con tabla `users` si deseas asegurar consistencia
+//            SupabaseClientProvider.client.postgrest["users"].upsert(
+//                buildJsonObject {
+//                    put("id", user.id)
+//                    put("email", user.email ?: "")
+//                    put("name", username)
+//                }
+//            )
+//        }
+//    }
 
 }
 
