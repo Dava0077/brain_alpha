@@ -2,8 +2,13 @@ package brain.alpha.model.logicModel
 
 import androidx.compose.runtime.mutableStateOf
 import brain.alpha.model.shared.Difficulty
+import kotlinx.serialization.Serializable
 import kotlin.random.Random
 
+@Serializable
+data class GameSession(
+    val score: Int
+)
 object wordSearchModel {
     private const val GRID_SIZE = 10
     private val grid = Array(GRID_SIZE) { CharArray(GRID_SIZE) { '-' } }

@@ -7,6 +7,8 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
@@ -32,16 +34,18 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
+import brain.alpha.controller.GameSessionController
 import brain.alpha.controller.concentrationController.stroopController
 import brain.alpha.model.UserSession
 import brain.alpha.model.shared.Difficulty
 import brain.alpha.strings.Strings
+import kotlinx.coroutines.launch
 
 @Composable
 fun simonScreen(
     controller: simonController,
     ) {
-
+    var sessionSaved by remember { mutableStateOf(false) }
     val uiState by controller.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val showInstructions by controller.showInstructions
@@ -157,7 +161,7 @@ fun simonScreen(
                     Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
                 }
             }
-            val selectedDifficulty = remember { mutableStateOf(controller.getDifficulty()) }
+            var selectedDifficulty by remember { mutableStateOf(Difficulty.EASY) }
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -167,9 +171,9 @@ fun simonScreen(
                 Difficulty.values().forEach { level ->
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         RadioButton(
-                            selected = selectedDifficulty.value == level,
+                            selected = selectedDifficulty == level,
                             onClick = {
-                                selectedDifficulty.value = level
+                                selectedDifficulty = level
                                 controller.setDifficulty(level)
                             },
                             enabled = !controller.gameInProgress.value // ✅ desactiva cuando se juega
@@ -238,6 +242,7 @@ fun simonScreen(
 
                 Button(onClick = {
                     controller.onStartPressed()
+                    sessionSaved = false
                 },
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),) {
                     Text(if (uiState.gameOver) Strings.t("restart") else Strings.t("play"), color = Color.White)
@@ -249,6 +254,27 @@ fun simonScreen(
                         fontWeight = FontWeight.Medium,
                         color = Color(0xFF2E7D32)
                     )
+                    val scope = rememberCoroutineScope()
+                    if(uiState.gameOver && !sessionSaved){
+                        sessionSaved = false
+                        scope.launch {
+                            val userId = runCatching { UserSession.getUserId() }.getOrNull()
+                            if (userId != null) {
+                                GameSessionController.registerGameSession(
+                                    gameId = "2927d18f-b1ab-4376-990e-1275e5ba181e",
+                                    score = uiState.score,
+                                    difficulty = selectedDifficulty.name,
+                                ).onSuccess {
+                                    println("✅ Partida guardada correctamente: Score ${uiState.score} | Dificultad $selectedDifficulty")
+
+                                }.onFailure {
+                                    println("❌ Error guardando partida: ${it.message}")
+                                }
+                            } else {
+                                println("⚠ Usuario no logueado, no se puede guardar la partida")
+                            }
+                        }
+                    }
                 }
             }
         }
