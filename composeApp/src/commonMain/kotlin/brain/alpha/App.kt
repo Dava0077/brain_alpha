@@ -52,7 +52,14 @@ import view.mentalMathView
 fun App() {
     MaterialTheme {
         // Stores the current screen route
-        var currentScreen by remember { mutableStateOf("login") }
+        val currentScreenState = remember { mutableStateOf("login") }
+        val currentScreen by currentScreenState
+
+
+
+
+        //LOGIN
+        LoginController.navigateTo = { route -> currentScreenState.value = route }
 
 
         //Persistent log session
@@ -64,7 +71,9 @@ fun App() {
                 UserSession.setSession(
                     id = user.id,
                     emailValue = user.email ?: "desconocido@correo.com",
-                    usernameValue = user.userMetadata?.get("username")?.toString() ?: "Usuario"
+                    usernameValue = user.userMetadata?.get("username")?.toString()
+                        ?: user.email?.substringBefore('@')?.replaceFirstChar { it.uppercase() }
+                        ?: "Usuario"
                 )
                 LoginController.clear()
                 LoginController.navigateTo("home")
@@ -73,41 +82,40 @@ fun App() {
 
 
         // Assigns a navigation callback for use in controllers
-        //LOGIN
-        LoginController.navigateTo = { route -> currentScreen = route }
+
         //SETTINGS
-        SettingsController.navigateTo = { route -> currentScreen = route }
-        UserProfileController.navigateTo = {route -> currentScreen = route}
-        LeaderboardController.navigateTo = {route -> currentScreen = route}
+        SettingsController.navigateTo = { route -> currentScreenState.value = route }
+        UserProfileController.navigateTo = {route -> currentScreenState.value = route}
+        LeaderboardController.navigateTo = {route -> currentScreenState.value = route}
 
         //MEMORY GAMES
-        memoryHomeController.navigateTo = { route -> currentScreen = route }
-        pairsController.navigateTo = { route -> currentScreen = route }
-        simonController.navigateTo = { route -> currentScreen = route }
+        memoryHomeController.navigateTo = { route -> currentScreenState.value = route }
+        pairsController.navigateTo = { route -> currentScreenState.value = route }
+        simonController.navigateTo = { route -> currentScreenState.value = route }
 
         //MENTAL AGILTY
-        mentalMathController.navigateTo = { route -> currentScreen = route }
-        clickNumberController.navigateTo = { route -> currentScreen = route }
-        mentalHomeController.navigateTo = { route -> currentScreen = route }
+        mentalMathController.navigateTo = { route -> currentScreenState.value = route }
+        clickNumberController.navigateTo = { route -> currentScreenState.value = route }
+        mentalHomeController.navigateTo = { route -> currentScreenState.value = route }
 
         //CONCENTRATION
-        concentrationHomeController.navigateTo = { route -> currentScreen = route}
-        stroopController.navigateTo = { route -> currentScreen = route }
-        oddEmojiController.navigateTo = {route -> currentScreen = route}
+        concentrationHomeController.navigateTo = { route -> currentScreenState.value = route}
+        stroopController.navigateTo = { route -> currentScreenState.value = route }
+        oddEmojiController.navigateTo = {route -> currentScreenState.value = route}
 
         //LOGIC GAMES
-        sudokuController.navigateTo = { route -> currentScreen = route }
-        logicHomeController.navigateTo = { route -> currentScreen = route }
-        wordSearchController.navigateTo = { route -> currentScreen = route }
+        sudokuController.navigateTo = { route -> currentScreenState.value = route }
+        logicHomeController.navigateTo = { route -> currentScreenState.value = route }
+        wordSearchController.navigateTo = { route -> currentScreenState.value = route }
 
 
         // Controls which screen to display based on currentScreen
-        when (currentScreen) {
+        when (currentScreenState.value) {
             "login" -> {
                 LoginController.clear() // Clear fields on login screen load
                 LoginScreen(
                     controller = LoginController,
-                    onNavigateToSignUp = { currentScreen = "signup" }
+                    onNavigateToSignUp = { currentScreenState.value = "signup" }
                 )
             }
 
@@ -115,24 +123,24 @@ fun App() {
             "signup" -> SignUpScreen(
                 onSuccess = {
                     LoginController.clear() // Clear fields on successful signup
-                    currentScreen = "login"
+                    currentScreenState.value = "login"
                 },
                 onFailure = { errorMessage ->
                     println("Error de registro: $errorMessage")
                 },
                 onGoToLogin = {
                     LoginController.clear() // Clear fields if manually returning
-                    currentScreen = "login"
+                    currentScreenState.value = "login"
                 }
             )
 
             //HOME
             "home" -> HomeScreen(
                 controller = LoginController,
-                onNavigateToMemory = { currentScreen = "memory" },
-                onNavigateToLogic = { currentScreen = "logic" },
-                onNavigateToConcentration = { currentScreen = "concentration" },
-                onNavigateToAgility = { currentScreen = "agility" }
+                onNavigateToMemory = { currentScreenState.value = "memory" },
+                onNavigateToLogic = { currentScreenState.value = "logic" },
+                onNavigateToConcentration = { currentScreenState.value = "concentration" },
+                onNavigateToAgility = { currentScreenState.value = "agility" }
             )
             //SETTINGS
             "settings" -> SettingsScreen(
@@ -140,7 +148,7 @@ fun App() {
             )
             //PROFILE
             "profile" -> UserProfileScreen(
-                onBack = {currentScreen = "home"}
+                onBack = {currentScreenState.value = "home"}
             )
             //LEADERBOARD
             "leaderboard" -> leaderboardScreen(
@@ -161,17 +169,17 @@ fun App() {
             //MENTAL AGILITY
             "agility" -> mentalHomeScreen(
                 controller = mentalHomeController,
-                onNavigateToHome = {currentScreen = "home"},
-                onNavigateToMath = {currentScreen = "math"},
-                onNavigateToClick = {currentScreen = "click"}
+                onNavigateToHome = {currentScreenState.value = "home"},
+                onNavigateToMath = {currentScreenState.value = "math"},
+                onNavigateToClick = {currentScreenState.value = "click"}
             )
             "math" -> mentalMathView(
                 controller = mentalMathController,
-                onNavigateToHome = {currentScreen = "agility"}
+                onNavigateToHome = {currentScreenState.value = "agility"}
             )
             "click" -> clickNumberScreen(
                 controller = clickNumberController,
-                onNavigateToHome = {currentScreen = "agility"}
+                onNavigateToHome = {currentScreenState.value = "agility"}
             )
 
 
@@ -191,17 +199,17 @@ fun App() {
             //LOGIC
             "logic" -> logicHomeScreen(
                 controller = logicHomeController,
-                onNavigateToHome = {currentScreen = "home"},
-                onNavigateToSudoku = {currentScreen = "sudoku"},
-                onNavigateToWordS = {currentScreen = "wordS"}
+                onNavigateToHome = {currentScreenState.value = "home"},
+                onNavigateToSudoku = {currentScreenState.value = "sudoku"},
+                onNavigateToWordS = {currentScreenState.value = "wordS"}
             )
             "sudoku" -> sudokuScreen(
                 controller = sudokuController,
-                onNavigateToHome = {currentScreen = "logic"}
+                onNavigateToHome = {currentScreenState.value = "logic"}
             )
             "wordS" -> wordSearchScreen(
                 controller = wordSearchController,
-                onNavigateToHome = {currentScreen = "logic"}
+                onNavigateToHome = {currentScreenState.value = "logic"}
             )
         }
     }

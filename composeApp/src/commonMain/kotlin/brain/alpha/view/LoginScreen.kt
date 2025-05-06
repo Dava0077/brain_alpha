@@ -48,6 +48,22 @@ fun LoginScreen(
     var resetFeedback by remember { mutableStateOf<String?>(null) }
     var sendingReset by remember { mutableStateOf(false) }
 
+    val scope = rememberCoroutineScope()
+    val googleSignIn = GoogleAuthController.googleSignInAction(
+        scope = scope,
+        onSuccess = {  userInfo ->
+            println("✅ Google login success: ${userInfo.email}")
+
+            coroutineScope.launch {
+                scaffoldState.snackbarHostState.showSnackbar("Bienvenido, ${userInfo.email}")
+            }
+
+            LoginController.clear()
+            LoginController.navigateTo("home")
+        },
+        onError = { error -> println("Login ERROR: ${error.message}") }
+    )
+
 
     Scaffold(scaffoldState = scaffoldState) {
         Box {
@@ -188,14 +204,7 @@ fun LoginScreen(
 
                     // Login with Google
                     Button(
-                        onClick = {
-                            coroutineScope.launch {
-                                val result = GoogleAuthController.loginWithGoogle()
-                                result.onFailure {
-                                    scaffoldState.snackbarHostState.showSnackbar("Error al iniciar sesión con Google: ${it.message}")
-                                }
-                            }
-                        },
+                        onClick = { googleSignIn.startFlow() },
                         modifier = Modifier.fillMaxWidth().height(40.dp),
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
                         shape = RoundedCornerShape(8.dp)

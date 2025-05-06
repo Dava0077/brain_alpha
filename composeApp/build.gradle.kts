@@ -73,7 +73,7 @@ kotlin {
             implementation(platform("io.github.jan-tennert.supabase:bom:3.0.3"))
             implementation("io.github.jan-tennert.supabase:postgrest-kt")
             implementation("io.github.jan-tennert.supabase:auth-kt")
-            implementation("io.github.jan-tennert.supabase:compose-auth")
+            implementation("io.github.jan-tennert.supabase:compose-auth:3.1.4")
             implementation("io.github.jan-tennert.supabase:realtime-kt")
             implementation("io.ktor:ktor-client-cio:3.0.3")
 

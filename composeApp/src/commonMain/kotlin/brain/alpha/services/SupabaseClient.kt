@@ -16,17 +16,18 @@ object SupabaseClientProvider {
     val client: SupabaseClient by lazy {
         createSupabaseClient(
             supabaseUrl = "https://uzzuzjbavzntdbbrczla.supabase.co",
-            supabaseKey = "tu_clave_anon"
+            supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV6enV6amJhdnpudGRiYnJjemxhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDE4OTI1MjgsImV4cCI6MjA1NzQ2ODUyOH0.FBcwuReRKXlwxQuc-64u_o0DsRJcvlskqB3gq2yGn1g"
         ) {
             install(Auth) {
                 autoLoadFromStorage = true
                 flowType = FlowType.PKCE
 
+
             }
 
             install(ComposeAuth){
                 googleNativeLogin(
-                    serverClientId = "788528220622-5b573riarvub9ombp93v9klg3ohm99ag.apps.googleusercontent.com",
+                    serverClientId = "788528220622-f80rt9dfvbalp386fflrbs1i5dda56qj.apps.googleusercontent.com",
                     isSupported = true ,
                     associateLinkedAccounts = null,
                     handleSignOut = {
@@ -34,6 +35,7 @@ object SupabaseClientProvider {
                         UserSession.clear()
                     }
                 )
+
             }
 
             install(Postgrest)
