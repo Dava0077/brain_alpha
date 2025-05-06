@@ -24,6 +24,7 @@ import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.compose.auth.ComposeAuth
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
+import brain.alpha.model.UserSession
 
 
 /**
@@ -42,15 +43,24 @@ fun LoginScreen(
     onNavigateToSignUp: () -> Unit
 ) {
     val scaffoldState = rememberScaffoldState()
+    val googleLoginSuccess by LoginController.googleLoginSuccess.collectAsState()
+
+    LaunchedEffect(googleLoginSuccess) {
+        if (googleLoginSuccess) {
+            LoginController.clear()
+            LoginController.navigateTo("home")
+            LoginController.resetGoogleFlag()
+        }
+    }
+
     val coroutineScope = rememberCoroutineScope()
     var showResetDialog by remember { mutableStateOf(false) }
     var resetEmail by remember { mutableStateOf("") }
     var resetFeedback by remember { mutableStateOf<String?>(null) }
     var sendingReset by remember { mutableStateOf(false) }
 
-    val scope = rememberCoroutineScope()
     val googleSignIn = GoogleAuthController.googleSignInAction(
-        scope = scope,
+        scope = coroutineScope,
         onSuccess = {  userInfo ->
             println("✅ Google login success: ${userInfo.email}")
 
@@ -58,8 +68,8 @@ fun LoginScreen(
                 scaffoldState.snackbarHostState.showSnackbar("Bienvenido, ${userInfo.email}")
             }
 
-            LoginController.clear()
-            LoginController.navigateTo("home")
+            LoginController.googleLoginSuccess.value = true
+
         },
         onError = { error -> println("Login ERROR: ${error.message}") }
     )

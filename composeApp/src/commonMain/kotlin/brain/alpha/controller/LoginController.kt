@@ -8,6 +8,7 @@ import brain.alpha.services.SupabaseClientProvider
 import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 /**
@@ -36,6 +37,8 @@ object LoginController {
 
     // Navigation lambda set in App.kt
     lateinit var navigateTo: (String) -> Unit
+
+    val googleLoginSuccess = MutableStateFlow(false)
 
 
     /**
@@ -135,5 +138,9 @@ object LoginController {
     }
     fun buttonUsername() {
         navigateTo("profile")
+    }
+
+    fun resetGoogleFlag() {
+        googleLoginSuccess.value = false
     }
 }

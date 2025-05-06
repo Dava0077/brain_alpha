@@ -25,7 +25,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import brain.alpha.controller.GameSessionController
 import brain.alpha.controller.concentrationController.stroopController
+import brain.alpha.model.UserSession
 import brain.alpha.model.shared.Difficulty
 import brain.alpha.strings.Strings
 import brainalpha.composeapp.generated.resources.*
@@ -58,9 +60,32 @@ fun StroopScreen(controller: stroopController = stroopController) {
     val isGameStarted = remember { mutableStateOf(false) }
 
     val showEndDialog = remember { mutableStateOf(false) }
+    var sessionSaved by remember { mutableStateOf(false) }
 
     LaunchedEffect(isGameOver) {
-        if (isGameOver) showEndDialog.value = true
+        if (isGameOver) {
+            showEndDialog.value = true
+
+            if (!sessionSaved) {
+                sessionSaved = true
+                val userId = runCatching { UserSession.getUserId() }.getOrNull()
+                if (userId != null) {
+                    val difficulty = controller.getCurrentDifficulty()
+                    GameSessionController.registerGameSession(
+                        gameId = "f68da1b6-6e34-422c-be12-579991dbbc54", // UUID del StroopGame
+                        score = score,
+                        difficulty = difficulty.name,
+                        timeLeft = timeLeft.toDouble()
+                    ).onSuccess {
+                        println("✅ Partida Stroop guardada: Score $score | Dificultad $difficulty | TimeLeft $timeLeft")
+                    }.onFailure {
+                        println("❌ Error guardando Stroop: ${it.message}")
+                    }
+                } else {
+                    println("⚠ Usuario no logueado, partida no guardada")
+                }
+            }
+        }
     }
 
     val selectedDifficulty = remember { mutableStateOf(Difficulty.EASY) }
@@ -81,6 +106,10 @@ fun StroopScreen(controller: stroopController = stroopController) {
         StroopInstructionsScreen(onBack = { controller.showInstructions.value = false })
         return
     }
+
+
+
+
 
     Box(
         modifier = Modifier.fillMaxSize()
