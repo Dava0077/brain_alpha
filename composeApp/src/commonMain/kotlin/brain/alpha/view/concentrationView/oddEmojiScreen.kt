@@ -23,7 +23,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import brain.alpha.controller.GameSessionController
 import brain.alpha.controller.concentrationController.oddEmojiController
+import brain.alpha.model.UserSession
 import brain.alpha.model.shared.Difficulty
 import brain.alpha.strings.Strings
 import brainalpha.composeapp.generated.resources.*
@@ -44,6 +46,7 @@ fun OddEmojiScreen(controller: oddEmojiController = oddEmojiController) {
     val timeProgress = controller.getTimeProgress()
     val showEndDialog = remember { mutableStateOf(false) }
     val isGameStarted = remember { mutableStateOf(false) }
+    val sessionSaved = remember { mutableStateOf(false) }
 
     LaunchedEffect(isGameOver) {
         if (isGameOver) showEndDialog.value = true
@@ -269,47 +272,87 @@ fun OddEmojiScreen(controller: oddEmojiController = oddEmojiController) {
                 ) {
                     Text(Strings.t("insST5"))
                 }
+
+                if (showEndDialog.value) {
+                    AlertDialog(
+                        onDismissRequest = {},
+                        title = {
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            )
+                            {
+                                Text(Strings.t("insST1"), fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                            }
+                        },
+                        text = {
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(Strings.t("insOS5") + "$level", fontWeight = FontWeight.Bold)
+                                Text(Strings.t("insOS6") + "$errors", fontWeight = FontWeight.Bold)
+                                Text(
+                                    Strings.t("insOS7") + "${controller.getAverageTime()} ms",
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    Strings.t("insOS8") + "${controller.getFinalScore()}",
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        },
+                        confirmButton = {
+                            TextButton(onClick = {
+                                controller.resetGame()
+                                isGameStarted.value = false
+                                showEndDialog.value = false
+                            }) {
+                                Text(Strings.t("insST4"))
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = {
+                                controller.backToDifficultyMenu()
+                                isGameStarted.value = false
+                                showEndDialog.value = false
+                            }) {
+                                Text(Strings.t("insST5"))
+                            }
+                        },
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                }
             }
 
-            if (showEndDialog.value) {
-                AlertDialog(
-                    onDismissRequest = {},
-                    title = {
-                        Column(modifier = Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally)
-                        {
-                            Text(Strings.t("insST1"), fontSize = 24.sp, fontWeight = FontWeight.Bold)
+
+            LaunchedEffect(showEndDialog.value) {
+                if (showEndDialog.value && !sessionSaved.value) {
+                    sessionSaved.value = true
+
+                    val userId = runCatching { UserSession.getUserId() }.getOrNull()
+
+                    if (userId != null) {
+                        val score = controller.getFinalScore()
+                        val avgTime = controller.getAverageTime().toDouble()
+                        val difficulty = difficulty.value.name
+
+                        GameSessionController.registerGameSession(
+                            gameId = "498d59a6-7136-4676-9075-93d115d0395f",
+                            difficulty = difficulty,
+                            score = score,
+                            timeAvg = avgTime
+                        ).onSuccess {
+                            println("✅ Sesión guardada: score=$score, avgTime=$avgTime, difficulty=$difficulty")
+                        }.onFailure {
+                            println("❌ Error al guardar sesión: ${it.message}")
                         }
-                            },
-                    text = {
-                        Column(modifier = Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(Strings.t("insOS5") + "$level", fontWeight = FontWeight.Bold)
-                            Text(Strings.t("insOS6") + "$errors", fontWeight = FontWeight.Bold)
-                            Text(Strings.t("insOS7") + "${controller.getAverageTime()} ms", fontWeight = FontWeight.Bold)
-                            Text(Strings.t("insOS8") + "${controller.getFinalScore()}", fontWeight = FontWeight.Bold)
-                        }
-                    },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            controller.resetGame()
-                            isGameStarted.value = false
-                            showEndDialog.value = false
-                        }) {
-                            Text(Strings.t("insST4"))
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = {
-                            controller.backToDifficultyMenu()
-                            isGameStarted.value = false
-                            showEndDialog.value = false
-                        }) {
-                            Text(Strings.t("insST5"))
-                        }
-                    },
-                    shape = RoundedCornerShape(12.dp)
-                )
+                    } else {
+                        println("⚠ Usuario no logueado, sesión no guardada.")
+                    }
+
+
+                }
             }
         }
     }
