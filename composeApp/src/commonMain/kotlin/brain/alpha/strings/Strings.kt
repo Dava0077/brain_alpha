@@ -24,7 +24,7 @@ object Strings {
             "medium" to "Medio",
             "hard" to "Difícil",
             "your_score" to "Puntuación: ",
-            "neurons" to "\uD83C\uDF40 Neuronas",
+            "neurons" to "\uD83E\uDDE0 Neuronas",
             //HOME SCREEN
             "hi" to "Hola, ",
             "categories" to "CATEGORIAS",
@@ -165,7 +165,7 @@ object Strings {
             "medium" to "Medium",
             "hard" to "Hard",
             "your_score" to "Score: ",
-            "neurons" to "\uD83C\uDF40 Neuronas",
+            "neurons" to "\uD83E\uDDE0 Neuronas",
             //HOME SCREEN
             "hi" to "Hi, ",
             "categories" to "CATEGORIES",

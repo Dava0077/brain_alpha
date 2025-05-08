@@ -216,7 +216,7 @@ fun couplesScreen(
                         .padding(horizontal = 16.dp)
                 ) {
                     Text(
-                        text = "🧠 ${totalScore.value} " + Strings.t("neurons"),
+                        text = "${totalScore.value} " + Strings.t("neurons"),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         color = Color.White

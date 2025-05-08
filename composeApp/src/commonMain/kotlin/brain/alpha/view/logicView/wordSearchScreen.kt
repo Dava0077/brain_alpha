@@ -172,7 +172,7 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                 }
 
                 Text(
-                    text = "🧠 ${totalScore.value} " + Strings.t("neurons"),
+                    text = "${totalScore.value} " + Strings.t("neurons"),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black,
