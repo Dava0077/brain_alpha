@@ -34,7 +34,7 @@ enum class SortOption(val label: String) {
 fun LeaderboardScreen(controller: LeaderboardController) {
     val displayName = UserSession.getDisplayName()
     val categories = mapOf(
-        "memory_games" to listOf("pairs_game", "simon_game"),
+        "Memoria" to listOf("pairs_game", "simon_game"),
         "logic_games" to listOf("sudoku_game", "wordSearch_game"),
         "concentration_games" to listOf("stroopTest_game", "oddEmoji_game"),
         "mental_agility_games" to listOf("Mates", "click_number")
@@ -43,7 +43,7 @@ fun LeaderboardScreen(controller: LeaderboardController) {
     val ascending = remember { mutableStateOf(false) }
     val expandedCategory = remember { mutableStateOf<String?>(null) }
     val expandedGame = remember { mutableStateOf<String?>(null) }
-    val leaderboardData = remember { mutableStateOf<LeaderboardByDifficulty?>(null) }
+    val leaderboardMap = remember { mutableStateMapOf<String, LeaderboardByDifficulty>() }
     val sortOption = remember { mutableStateOf(SortOption.SCORE) }
     val sortBy = sortOption.value
 
@@ -59,12 +59,13 @@ fun LeaderboardScreen(controller: LeaderboardController) {
 
     // IDs de ejemplo para juegos
     val gameIdMap = mapOf(
-        "Pairs Game" to "24bc262b-ab64-4c71-9c45-8d4fa04a549e",
-        "Simon Game" to "2927d18f-b1ab-4376-990e-1275e5ba181e",
-        "Odd Emoji Game" to "498d59a6-7136-4676-9075-93d115d0395f",
-        "Sudoku Game" to "b012b362-d7d3-49f7-b14b-bce8ea297453",
-        "Word Search Game" to "d15d1344-df81-41d5-87f0-c468668be2d8",
-        "Click Number Game" to "ed29af2f-6346-4a55-bd4d-1b07c013d726",
+        "pairs_game" to "24bc262b-ab64-4c71-9c45-8d4fa04a549e",
+        "simon_game" to "2927d18f-b1ab-4376-990e-1275e5ba181e",
+        "oddEmoji_game" to "498d59a6-7136-4676-9075-93d115d0395f",
+        "sudoku_game" to "b012b362-d7d3-49f7-b14b-bce8ea297453",
+        "wordSearch_game" to "d15d1344-df81-41d5-87f0-c468668be2d8",
+        "click_number" to "ed29af2f-6346-4a55-bd4d-1b07c013d726",
+        "stroopTest_game" to "f68da1b6-6e34-422c-be12-579991dbbc54"
 
     )
 
@@ -136,24 +137,26 @@ fun LeaderboardScreen(controller: LeaderboardController) {
                 }
             ) {
                 games.forEach { game ->
+                    val gameId = gameIdMap[game] ?: return@forEach
+
                     ExpandableGame(
                         gameName = game,
+                        gameId = gameId,
                         isExpanded = expandedGame.value == game,
                         onExpandToggle = {
                             expandedGame.value = if (expandedGame.value == game) null else game
-                            if (expandedGame.value != null) {
+                            if (expandedGame.value != null && !leaderboardMap.containsKey(gameId)) {
                                 coroutineScope.launch {
-                                    val gameId = gameIdMap[game] ?: return@launch
                                     val data = GameSessionController.getLeaderboardGroupedByDifficultyById(
                                         gameId = gameId,
                                         orderBy = sortOption.value.name.lowercase(),
                                         ascending = ascending.value
                                     )
-                                    leaderboardData.value = data.getOrNull()
+                                    data.getOrNull()?.let { leaderboardMap[gameId] = it }
                                 }
                             }
                         },
-                        leaderboard = leaderboardData.value
+                        leaderboard = leaderboardMap[gameId]
                     )
                 }
             }
@@ -185,6 +188,7 @@ fun ExpandableCategory(
 @Composable
 fun ExpandableGame(
     gameName: String,
+    gameId: String,
     isExpanded: Boolean,
     onExpandToggle: () -> Unit,
     leaderboard: LeaderboardByDifficulty?
