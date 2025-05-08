@@ -44,15 +44,16 @@ object GoogleAuthController {
                                         put("email", user.email ?: "")
                                         put("name", user.userMetadata?.get("username")?.toString() ?: "GoogleUser")
                                     }
+
                                 )
                             } catch (_: Exception) {
                                 // Ignorar si ya existe
                             }
                         }
 
+
                         // ⬇️ Mueve esto aquí
                         LoginController.clear()
-                        LoginController.navigateTo("home")
 
                         // Callback extra si necesitas
                         onSuccess(user)
