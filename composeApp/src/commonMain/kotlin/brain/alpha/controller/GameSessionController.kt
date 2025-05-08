@@ -207,26 +207,33 @@ object GameSessionController {
         return items.firstOrNull()?.get("name")?.jsonPrimitive?.contentOrNull
     }
 
-    suspend fun getLeaderboardGroupedByDifficulty(gameName: String): Result<LeaderboardByDifficulty> = withContext(Dispatchers.Default) {
+    suspend fun getLeaderboardGroupedByDifficulty(
+        gameName: String,
+        orderBy: String = "score",
+        ascending: Boolean = false
+    ): Result<LeaderboardByDifficulty> = withContext(Dispatchers.Default) {
         runCatching {
-            val easy = getLeaderboard(gameName, "EASY").getOrThrow()
-            val medium = getLeaderboard(gameName, "MEDIUM").getOrThrow()
-            val hard = getLeaderboard(gameName, "HARD").getOrThrow()
+            val easy = getLeaderboard(gameName, "EASY", orderBy, ascending).getOrThrow()
+            val medium = getLeaderboard(gameName, "MEDIUM", orderBy, ascending).getOrThrow()
+            val hard = getLeaderboard(gameName, "HARD", orderBy, ascending).getOrThrow()
 
-            LeaderboardByDifficulty(
-                easy = easy,
-                medium = medium,
-                hard = hard
-            )
+            LeaderboardByDifficulty(easy = easy, medium = medium, hard = hard)
         }
     }
+
+
     suspend fun getTotalScore(userId: String, gameId: String, supabase: SupabaseClient): Int {
         return try {
             val response = supabase.postgrest["game_sessions"]
-                .select()
+                .select {
+                    filter {
+                        eq("user_id", userId)
+                        eq("game_id", gameId)
+                    }
+                }
                 .decodeList<GameSession>()
 
-            println("🔍 Total partidas en DB: ${response.size}")
+            println("🔍 Total partidas filtradas: ${response.size}")
             response.forEach {
                 println("📄 user=${it.user_id}, game=${it.game_id}, score=${it.score}")
             }
@@ -238,6 +245,60 @@ object GameSessionController {
         } catch (e: Exception) {
             println("❌ Error al obtener puntuaciones: ${e.message}")
             0
+        }
+    }
+
+    suspend fun getLeaderboardGroupedByDifficultyById(
+        gameId: String,
+        orderBy: String = "score",
+        ascending: Boolean = false
+    ): Result<LeaderboardByDifficulty> = withContext(Dispatchers.Default) {
+        runCatching {
+            val easy = getLeaderboardById(gameId, "EASY", orderBy, ascending).getOrThrow()
+            val medium = getLeaderboardById(gameId, "MEDIUM", orderBy, ascending).getOrThrow()
+            val hard = getLeaderboardById(gameId, "HARD", orderBy, ascending).getOrThrow()
+
+            LeaderboardByDifficulty(
+                easy = easy,
+                medium = medium,
+                hard = hard
+            )
+        }
+    }
+
+    private suspend fun getLeaderboardById(
+        gameId: String,
+        difficulty: String,
+        orderBy: String,
+        ascending: Boolean
+    ): Result<List<LeaderboardEntry>> = withContext(Dispatchers.Default) {
+        runCatching {
+            val orderType = if (ascending) Order.ASCENDING else Order.DESCENDING
+
+            val response = SupabaseClientProvider.client.postgrest["game_sessions"]
+                .select {
+                    filter {
+                        eq("game_id", gameId)
+                        eq("difficulty", difficulty)
+                    }
+                    order(orderBy, orderType)
+                    limit(20)
+                }
+
+            val sessions = response.decodeList<JsonObject>()
+
+            sessions.mapNotNull { item ->
+                val obj = item.jsonObject
+                val uid = obj["user_id"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null
+                val user = getUsernameById(uid)
+                LeaderboardEntry(
+                    username = user ?: "Usuario",
+                    score = obj["score"]?.jsonPrimitive?.long ?: 0,
+                    timeAvg = obj["time_avg"]?.jsonPrimitive?.doubleOrNull,
+                    timeLeft = obj["time_left"]?.jsonPrimitive?.doubleOrNull,
+                    playedAt = obj["played_at"]?.jsonPrimitive?.content ?: ""
+                )
+            }
         }
     }
 
