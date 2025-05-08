@@ -32,6 +32,7 @@ import brain.alpha.controller.concentrationController.stroopController
 import brain.alpha.model.UserSession
 import brain.alpha.model.logicModel.sudokuModel
 import brain.alpha.model.shared.Difficulty
+import brain.alpha.services.SupabaseClientProvider
 import brain.alpha.view.memoryView.InstructionsCouples
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -52,7 +53,31 @@ fun sudokuScreen(controller: sudokuController, onNavigateToHome: () -> Unit) {
     val model = sudokuModel
     val displayName = UserSession.getDisplayName()
     var sessionSaved by remember { mutableStateOf(false) }
+    val userId = runCatching { UserSession.getUserId() }.getOrNull()
+    val totalScore = remember { mutableStateOf(0) }
 
+    LaunchedEffect(userId) {
+        if (userId != null) {
+            val total = GameSessionController.getTotalScore(
+                userId = userId,
+                gameId = "b012b362-d7d3-49f7-b14b-bce8ea297453",
+                supabase = SupabaseClientProvider.client
+            )
+            println("🧠 Score obtenido del servidor: $total")
+            totalScore.value = total
+        }
+    }
+    LaunchedEffect(totalScore.value) {
+        if (!UserSession.isGuest.value) {
+            selectedDifficulty = when (totalScore.value) {
+                in 0..49 -> Difficulty.EASY
+                in 50..149 -> Difficulty.MEDIUM
+                else -> Difficulty.HARD
+            }
+            controller.setDifficulty(selectedDifficulty)
+            println("🎯 Dificultad autoasignada (usuario): $selectedDifficulty")
+        }
+    }
 
     if (showInstructions) {
         InstructionsSudoku(
@@ -67,9 +92,9 @@ fun sudokuScreen(controller: sudokuController, onNavigateToHome: () -> Unit) {
             elapsedTime = 0
             gameLost = false
             val timeLimit = when (model.difficulty) {
-                Difficulty.EASY -> 180
-                Difficulty.MEDIUM -> 240
-                Difficulty.HARD -> 300
+                Difficulty.EASY -> 600
+                Difficulty.MEDIUM -> 900
+                Difficulty.HARD -> 1200
             }
 
             while (!controller.isBoardComplete() && elapsedTime < timeLimit) {
@@ -142,6 +167,21 @@ fun sudokuScreen(controller: sudokuController, onNavigateToHome: () -> Unit) {
                 ) {
                     Text(Strings.t("instructions"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
                 }
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .height(46.dp)
+                        .background(Color.White, shape = RoundedCornerShape(12.dp))
+                        .border(BorderStroke(1.dp, Color(0xFFB0BEC5)), shape = RoundedCornerShape(12.dp))
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Text(
+                        text = "🧠 ${totalScore.value} " + Strings.t("neurons"),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.Black
+                    )
+                }
                 Button(
                     onClick = { controller.goHomeLogic() },
                     modifier = Modifier.height(46.dp),
@@ -153,26 +193,33 @@ fun sudokuScreen(controller: sudokuController, onNavigateToHome: () -> Unit) {
                     Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
                 }
             }
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(vertical = 16.dp)
-            ) {
-                Difficulty.values().forEach { level ->
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        RadioButton(
-                            selected = selectedDifficulty == level,
-                            onClick = {
-                                selectedDifficulty = level
-                                controller.setDifficulty(level)
-                            },
-                            enabled = !controller.hasStarted()
-                        )
-                        Text(Strings.translateDifficulty(level))
+            if (UserSession.isGuest.value) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.padding(vertical = 16.dp)
+                ) {
+                    Difficulty.values().forEach { level ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            RadioButton(
+                                selected = selectedDifficulty == level,
+                                onClick = {
+                                    selectedDifficulty = level
+                                    controller.setDifficulty(level)
+                                },
+                                enabled = !gameStarted
+                            )
+                            Text(text = Strings.translateDifficulty(level))
+                        }
                     }
                 }
             }
+            Text(
+                text = Strings.t("difficulty") + ": " + Strings.translateDifficulty(selectedDifficulty),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.Black
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
             Text("SUDOKU", fontSize = 40.sp, color = Color.Black)

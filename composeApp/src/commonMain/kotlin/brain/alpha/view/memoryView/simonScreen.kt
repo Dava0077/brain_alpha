@@ -38,6 +38,7 @@ import brain.alpha.controller.GameSessionController
 import brain.alpha.controller.concentrationController.stroopController
 import brain.alpha.model.UserSession
 import brain.alpha.model.shared.Difficulty
+import brain.alpha.services.SupabaseClientProvider
 import brain.alpha.strings.Strings
 import kotlinx.coroutines.launch
 
@@ -50,6 +51,35 @@ fun simonScreen(
     val coroutineScope = rememberCoroutineScope()
     val showInstructions by controller.showInstructions
     val displayName = UserSession.getDisplayName() // Show guest or username
+    val userId = runCatching { UserSession.getUserId() }.getOrNull()
+    val totalScore = remember { mutableStateOf(0) }
+    var selectedDifficulty by remember { mutableStateOf(Difficulty.EASY) }
+
+
+    LaunchedEffect(userId) {
+        if (userId != null) {
+            val total = GameSessionController.getTotalScore(
+                userId = userId,
+                gameId = "2927d18f-b1ab-4376-990e-1275e5ba181e",
+                supabase = SupabaseClientProvider.client
+            )
+            println("🧠 Score obtenido del servidor: $total")
+            totalScore.value = total
+        }
+    }
+
+    LaunchedEffect(totalScore.value) {
+        if (!UserSession.isGuest.value) {
+            selectedDifficulty = when (totalScore.value) {
+                in 0..49 -> Difficulty.EASY
+                in 50..149 -> Difficulty.MEDIUM
+                else -> Difficulty.HARD
+            }
+            controller.setDifficulty(selectedDifficulty)
+            println("🎯 Dificultad autoasignada para usuario: $selectedDifficulty")
+        }
+    }
+
 
 
     // Show instructions first
@@ -149,6 +179,21 @@ fun simonScreen(
                 ){
                     Text(Strings.t("instructions"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
                 }
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .height(46.dp)
+                        .background(Color(0xFF0647D7), shape = RoundedCornerShape(12.dp))
+                        .border(BorderStroke(1.dp, Color(0xFFB0BEC5)), shape = RoundedCornerShape(12.dp))
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Text(
+                        text = "🧠 ${totalScore.value} " + Strings.t("neurons"),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.White
+                    )
+                }
                 Button(
                     onClick = {controller.goHome()},
                     modifier = Modifier
@@ -161,27 +206,36 @@ fun simonScreen(
                     Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
                 }
             }
-            var selectedDifficulty by remember { mutableStateOf(Difficulty.EASY) }
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(vertical = 16.dp)
-            ) {
-                Difficulty.values().forEach { level ->
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        RadioButton(
-                            selected = selectedDifficulty == level,
-                            onClick = {
-                                selectedDifficulty = level
-                                controller.setDifficulty(level)
-                            },
-                            enabled = !controller.gameInProgress.value // ✅ desactiva cuando se juega
-                        )
-                        Text(text = Strings.translateDifficulty(level))
+            if (UserSession.isGuest.value) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.padding(vertical = 16.dp)
+                ) {
+                    Difficulty.values().forEach { level ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            RadioButton(
+                                selected = selectedDifficulty == level,
+                                onClick = {
+                                    selectedDifficulty = level
+                                    controller.setDifficulty(level)
+                                },
+                                enabled = !controller.gameInProgress.value
+                            )
+                            Text(text = Strings.translateDifficulty(level))
+                        }
                     }
                 }
             }
+
+
+            Text(
+                text = Strings.t("difficulty") + ": " + Strings.translateDifficulty(selectedDifficulty),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.Black
+            )
 
             Spacer(modifier = Modifier.height(30.dp)) // Espacio tras el logo
 
@@ -256,7 +310,6 @@ fun simonScreen(
                     )
                     val scope = rememberCoroutineScope()
                     if(uiState.gameOver && !sessionSaved){
-                        sessionSaved = false
                         scope.launch {
                             val userId = runCatching { UserSession.getUserId() }.getOrNull()
                             if (userId != null) {
@@ -265,6 +318,7 @@ fun simonScreen(
                                     score = uiState.score,
                                     difficulty = selectedDifficulty.name,
                                 ).onSuccess {
+                                    sessionSaved = false
                                     println("✅ Partida guardada correctamente: Score ${uiState.score} | Dificultad $selectedDifficulty")
 
                                 }.onFailure {

@@ -69,6 +69,17 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
             totalScore.value = total
         }
     }
+    LaunchedEffect(totalScore.value) {
+        if (!UserSession.isGuest.value) {
+            selectedDifficulty = when (totalScore.value) {
+                in 0..74 -> Difficulty.EASY
+                in 75..149 -> Difficulty.MEDIUM
+                else -> Difficulty.HARD
+            }
+            controller.configureGame(selectedDifficulty)
+            println("🎯 Dificultad autoasignada: $selectedDifficulty")
+        }
+    }
 
 
 
@@ -182,21 +193,29 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                 }
             }
 
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Difficulty.values().forEach { difficulty ->
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        RadioButton(
-                            selected = selectedDifficulty == difficulty,
-                            onClick = {
-                                selectedDifficulty = difficulty
-                                controller.configureGame(difficulty)
-                            },
-                            enabled = !gameStarted
-                        )
-                        Text(text = Strings.translateDifficulty(difficulty))
+            if (UserSession.isGuest.value) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Difficulty.values().forEach { difficulty ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            RadioButton(
+                                selected = selectedDifficulty == difficulty,
+                                onClick = {
+                                    selectedDifficulty = difficulty
+                                    controller.configureGame(difficulty)
+                                },
+                                enabled = !gameStarted
+                            )
+                            Text(text = Strings.translateDifficulty(difficulty))
+                        }
                     }
                 }
             }
+            Text(
+                text = Strings.t("difficulty") + ": " + Strings.translateDifficulty(selectedDifficulty),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.Black
+            )
 
             Spacer(modifier = Modifier.height(30.dp))
             Text(Strings.t("title_wordSearch"), fontSize = 40.sp, color = Color.Black, fontFamily = FontFamily.SansSerif, textAlign = TextAlign.Center)
