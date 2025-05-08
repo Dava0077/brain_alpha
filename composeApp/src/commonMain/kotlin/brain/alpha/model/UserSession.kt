@@ -95,7 +95,7 @@ object UserSession {
         currentUserId = id
     }
 
-    fun getUserId(): String {
-        return currentUserId ?: throw IllegalStateException("Usuario no logueado")
+    fun getUserId(): String? {
+        return if (isAuthenticated()) currentUserId else null
     }
 }

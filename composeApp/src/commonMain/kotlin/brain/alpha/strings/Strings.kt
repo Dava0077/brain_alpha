@@ -15,6 +15,7 @@ object Strings {
             "press_play" to "Presiona Jugar",
             "you_won" to "Has ganado: ",
             "time" to "Tiempo:",
+            "time_up" to "Tiempo agotado",
             "final_time" to "Tiempo final: ",
             "remaining_time" to "Tiempo restante: ",
             "back" to "⬅ Volver",
@@ -154,6 +155,8 @@ object Strings {
             "press_play" to "Press Play",
             "you_won" to "You won: ",
             "time" to "Time:",
+            "time_up" to "Time out",
+
             "final_time" to "Final time: ",
             "remaining_time" to "Remaining time: ",
             "back" to "⬅ Back",
