@@ -304,4 +304,95 @@ object GameSessionController {
 
 
 
+    suspend fun getGlobalLeaderboardByGameId(
+        gameId: String,
+        orderBy: String = "score",
+        ascending: Boolean = false
+    ): Result<LeaderboardByDifficulty> = withContext(Dispatchers.Default) {
+        runCatching {
+            val difficulties = listOf("EASY", "MEDIUM", "HARD")
+
+            val leaderboardByDiff = difficulties.associateWith { difficulty ->
+                val query = """
+                    select 
+                        user_id, 
+                        users.name, 
+                        difficulty, 
+                        sum(score) as score, 
+                        avg(time_avg) as time_avg, 
+                        avg(time_left) as time_left, 
+                        max(played_at) as played_at
+                    from game_sessions
+                    join users on users.id = game_sessions.user_id
+                    where game_id = '$gameId' and difficulty = '$difficulty'
+                    group by user_id, users.name, difficulty
+                    order by $orderBy ${if (ascending) "asc" else "desc"}
+                    limit 20
+                """.trimIndent()
+
+                val response = SupabaseClientProvider.client.postgrest["game_sessions"]
+                    .select(columns = io.github.jan.supabase.postgrest.query.Columns.raw(query))
+
+                val items = response.decodeList<JsonObject>()
+
+                items.mapNotNull { obj ->
+                    LeaderboardEntry(
+                        username = obj["name"]?.jsonPrimitive?.content ?: "Usuario",
+                        score = obj["score"]?.jsonPrimitive?.longOrNull ?: 0L,
+                        timeAvg = obj["time_avg"]?.jsonPrimitive?.doubleOrNull,
+                        timeLeft = obj["time_left"]?.jsonPrimitive?.doubleOrNull,
+                        playedAt = obj["played_at"]?.jsonPrimitive?.content ?: ""
+                    )
+                }
+            }
+
+            LeaderboardByDifficulty(
+                easy = leaderboardByDiff["EASY"] ?: emptyList(),
+                medium = leaderboardByDiff["MEDIUM"] ?: emptyList(),
+                hard = leaderboardByDiff["HARD"] ?: emptyList()
+            )
+        }
+    }
+
+    private suspend fun getGlobalLeaderboardByDifficulty(
+        gameId: String,
+        difficulty: String,
+        orderBy: String,
+        ascending: Boolean
+    ): Result<List<LeaderboardEntry>> = withContext(Dispatchers.Default) {
+        runCatching {
+            val query = """
+            select 
+                user_id, 
+                sum(score) as score, 
+                avg(time_avg) as time_avg, 
+                avg(time_left) as time_left, 
+                max(played_at) as played_at,
+                users(name)
+            from game_sessions
+            where game_id = '$gameId' and difficulty = '$difficulty'
+            group by user_id, users(name)
+            order by $orderBy ${if (ascending) "asc" else "desc"}
+            limit 20
+        """.trimIndent()
+
+            val response = SupabaseClientProvider.client.postgrest["game_sessions"]
+                .select(columns = io.github.jan.supabase.postgrest.query.Columns.raw(query))
+
+            val items = response.decodeList<JsonObject>()
+
+            items.mapNotNull { obj ->
+                LeaderboardEntry(
+                    username = obj["users"]?.jsonObject?.get("name")?.jsonPrimitive?.content ?: "Usuario",
+                    score = obj["score"]?.jsonPrimitive?.longOrNull ?: 0L,
+                    timeAvg = obj["time_avg"]?.jsonPrimitive?.doubleOrNull,
+                    timeLeft = obj["time_left"]?.jsonPrimitive?.doubleOrNull,
+                    playedAt = obj["played_at"]?.jsonPrimitive?.content ?: ""
+                )
+            }
+        }
+    }
+
+
+
 }
