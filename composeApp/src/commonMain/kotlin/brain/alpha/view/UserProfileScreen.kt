@@ -327,42 +327,41 @@ suspend fun updateUserField(field: String, value: String) {
     val client = SupabaseClientProvider.client
     val userId = UserSession.userId.value ?: return
 
-
-
     withContext(Dispatchers.Default) {
-        when (field) {
-            "name" -> {
-                client.postgrest["users"].update(
-                    buildJsonObject {
-                        put("name", value)
-                    }
-                ) {
-                    filter { eq("id", userId) }
+        try {
+            when (field) {
+                "name" -> {
+                    client.postgrest["users"].update(
+                        buildJsonObject { put("name", value) }
+                    ) { filter { eq("id", userId) } }
+
+                    UserSession.username.value = value
                 }
-                UserSession.username.value = value
+
+                "email" -> {
+                    client.auth.updateUser { email = value }
+
+                    client.postgrest["users"].update(
+                        buildJsonObject { put("email", value) }
+                    ) { filter { eq("id", userId) } }
+
+                    UserSession.email.value = value
+                }
+
+                "password" -> {
+                    client.auth.updateUser { password = value }
+                }
+
+                else -> println("⚠️ Campo no soportado: $field")
             }
-            "email" -> {
-                client.auth.updateUser {
-                    email = value
-                }
-                client.postgrest["users"].update(
-                    buildJsonObject {
-                        put("email", value)
-                    }
-                ) {
-                    filter { eq("id", userId) }
-                }
-                UserSession.email.value = value
-            }
-            "password" -> {
-                client.auth.updateUser {
-                    password = value
-                }
-            }
-            else -> {}
+        } catch (e: Exception) {
+            println("❌ Error al actualizar campo '$field': ${e.message}")
         }
     }
 }
+
+
+
 
 suspend fun verifyCurrentPassword(password: String): Boolean {
     val email = UserSession.email.value ?: return false
