@@ -34,10 +34,10 @@ enum class SortOption(val label: String) {
 fun LeaderboardScreen(controller: LeaderboardController) {
     val displayName = UserSession.getDisplayName()
     val categories = mapOf(
-        "Memoria" to listOf("pairs_game", "simon_game"),
-        "logic_games" to listOf("sudoku_game", "wordSearch_game"),
-        "concentration_games" to listOf("stroopTest_game", "oddEmoji_game"),
-        "mental_agility_games" to listOf("Mates", "click_number")
+        "memory_games" to listOf("pairs_game", "simon_game"),
+        "Logica" to listOf("sudoku_game", "wordSearch_game"),
+        "Concentracion" to listOf("stroopTest_game", "oddEmoji_game"),
+        "Agilidad Mental" to listOf("mental_math", "click_number")
     )
 
     val ascending = remember { mutableStateOf(false) }
@@ -65,6 +65,7 @@ fun LeaderboardScreen(controller: LeaderboardController) {
         "sudoku_game" to "b012b362-d7d3-49f7-b14b-bce8ea297453",
         "wordSearch_game" to "d15d1344-df81-41d5-87f0-c468668be2d8",
         "click_number" to "ed29af2f-6346-4a55-bd4d-1b07c013d726",
+        "mental_math" to "f017777c-f246-4770-bb73-a652a23e761d",
         "stroopTest_game" to "f68da1b6-6e34-422c-be12-579991dbbc54"
 
     )
@@ -121,7 +122,7 @@ fun LeaderboardScreen(controller: LeaderboardController) {
             }
 
             Button(onClick = { ascending.value = !ascending.value }) {
-                Text(if (ascending.value) "Ascendente" else "Descendente")
+                Text(if (ascending.value) "Asc" else "Desc")
             }
         }
 
@@ -137,7 +138,11 @@ fun LeaderboardScreen(controller: LeaderboardController) {
                 }
             ) {
                 games.forEach { game ->
-                    val gameId = gameIdMap[game] ?: return@forEach
+                    val gameId = gameIdMap[game]
+                    if (gameId.isNullOrBlank()) {
+                        println("⚠️ No se encontró gameId válido para '$game'.")
+                        return@forEach
+                    }
 
                     ExpandableGame(
                         gameName = game,
@@ -147,7 +152,7 @@ fun LeaderboardScreen(controller: LeaderboardController) {
                             expandedGame.value = if (expandedGame.value == game) null else game
                             if (expandedGame.value != null && !leaderboardMap.containsKey(gameId)) {
                                 coroutineScope.launch {
-                                    val data = GameSessionController.getLeaderboardGroupedByDifficultyById(
+                                    val data = GameSessionController.getGlobalLeaderboardByGameId(
                                         gameId = gameId,
                                         orderBy = sortOption.value.name.lowercase(),
                                         ascending = ascending.value
@@ -200,10 +205,14 @@ fun ExpandableGame(
                 Text(if (isExpanded) "Cerrar" else "Ver")
             }
         }
-        if (isExpanded && leaderboard != null) {
-            LeaderboardSection("Fácil", leaderboard.easy)
-            LeaderboardSection("Medio", leaderboard.medium)
-            LeaderboardSection("Difícil", leaderboard.hard)
+        if (isExpanded) {
+            if (leaderboard != null) {
+                LeaderboardSection("Fácil", leaderboard.easy)
+                LeaderboardSection("Medio", leaderboard.medium)
+                LeaderboardSection("Difícil", leaderboard.hard)
+            } else {
+                Text("Cargando o sin datos disponibles", color = Color.Gray, fontSize = 14.sp)
+            }
         }
     }
 }
