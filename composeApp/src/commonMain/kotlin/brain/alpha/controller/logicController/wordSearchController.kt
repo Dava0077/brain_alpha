@@ -22,6 +22,9 @@ object wordSearchController {
     fun hasStarted(): Boolean {
         return model.gameStarted.value
     }
+    fun setDifficulty(level: Difficulty) {
+        model.difficulty = level
+    }
 
     fun isGameFinished(): Boolean {
         return model.getWordsToFind().all { word -> model.isWordFound(word) }

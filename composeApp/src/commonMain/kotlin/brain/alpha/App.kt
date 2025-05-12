@@ -151,7 +151,7 @@ fun App() {
                 onBack = {currentScreenState.value = "home"}
             )
             //LEADERBOARD
-            "leaderboard" -> leaderboardScreen(
+            "leaderboard" -> LeaderboardScreen(
                 controller = LeaderboardController
             )
             //MEMORY

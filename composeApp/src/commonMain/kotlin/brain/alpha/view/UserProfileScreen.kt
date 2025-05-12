@@ -57,18 +57,31 @@ fun UserProfileScreen(onBack: () -> Unit) {
 
     //var showDeleteDialog by remember { mutableStateOf(false) }
     var passwordValue by remember { mutableStateOf(TextFieldValue()) }
+    val totalProgress = remember { mutableStateOf<List<UserProgressEntry>>(emptyList()) }
+
+    LaunchedEffect(userId) {
+        userId?.let {
+            val result = GameSessionController.getAllTotalScores(it)
+            result.onSuccess {
+                println("✅ TotalProgress: $it")
+                totalProgress.value = it
+            }.onFailure {
+                println("❌ Error al cargar progreso total")
+            }
+        }
+    }
 
 
     Box(modifier = Modifier.fillMaxSize()) {
-
-        LaunchedEffect(userId) {
+        /*LaunchedEffect(userId) {
             userId?.let {
-                progressList = loadUserProgress(it)
+                val progress = loadUserProgress(it)
+                println("🧠 Progreso cargado: $progress")  // ← DEBUG
+                progressList = progress
                 isLoading = false
             }
-            val user = SupabaseClientProvider.client.auth.currentUserOrNull()
-            isEmailVerified = user?.emailConfirmedAt != null
-        }
+        }*/
+
 
         Scaffold(
             scaffoldState = scaffoldState,
@@ -134,26 +147,22 @@ fun UserProfileScreen(onBack: () -> Unit) {
                     ActionButton(Strings.t("change_password")) { showDialog = "password" }
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
                     text = Strings.t("your_progress"),
-                    style = MaterialTheme.typography.h6,
-                    modifier = Modifier.align(Alignment.Start)
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(Modifier.height(8.dp))
 
-                if (isLoading) {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-                } else if (progressList.isEmpty()) {
-                    Text(Strings.t("no_progress"), modifier = Modifier.align(Alignment.CenterHorizontally))
-                } else {
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        items(progressList) { progress ->
-                            ProgressItem(progress)
-                        }
-                    }
+                totalProgress.value.forEach { entry ->
+                    Text(
+                        text = "${entry.gameName}: ${entry.score} puntos",
+                        fontSize = 14.sp,
+                        color = Color.DarkGray
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -327,42 +336,41 @@ suspend fun updateUserField(field: String, value: String) {
     val client = SupabaseClientProvider.client
     val userId = UserSession.userId.value ?: return
 
-
-
     withContext(Dispatchers.Default) {
-        when (field) {
-            "name" -> {
-                client.postgrest["users"].update(
-                    buildJsonObject {
-                        put("name", value)
-                    }
-                ) {
-                    filter { eq("id", userId) }
+        try {
+            when (field) {
+                "name" -> {
+                    client.postgrest["users"].update(
+                        buildJsonObject { put("name", value) }
+                    ) { filter { eq("id", userId) } }
+
+                    UserSession.username.value = value
                 }
-                UserSession.username.value = value
+
+                "email" -> {
+                    client.auth.updateUser { email = value }
+
+                    client.postgrest["users"].update(
+                        buildJsonObject { put("email", value) }
+                    ) { filter { eq("id", userId) } }
+
+                    UserSession.email.value = value
+                }
+
+                "password" -> {
+                    client.auth.updateUser { password = value }
+                }
+
+                else -> println("⚠️ Campo no soportado: $field")
             }
-            "email" -> {
-                client.auth.updateUser {
-                    email = value
-                }
-                client.postgrest["users"].update(
-                    buildJsonObject {
-                        put("email", value)
-                    }
-                ) {
-                    filter { eq("id", userId) }
-                }
-                UserSession.email.value = value
-            }
-            "password" -> {
-                client.auth.updateUser {
-                    password = value
-                }
-            }
-            else -> {}
+        } catch (e: Exception) {
+            println("❌ Error al actualizar campo '$field': ${e.message}")
         }
     }
 }
+
+
+
 
 suspend fun verifyCurrentPassword(password: String): Boolean {
     val email = UserSession.email.value ?: return false
@@ -374,9 +382,9 @@ suspend fun verifyCurrentPassword(password: String): Boolean {
     }.isSuccess
 }
 
-suspend fun loadUserProgress(userId: String): List<UserProgressEntry> {
+/*suspend fun loadUserProgress(userId: String): List<UserProgressEntry> {
     return GameSessionController.getUserProgress(userId).getOrElse { emptyList() }
-}
+}*/
 
 @Composable
 fun ActionButton(text: String, onClick: () -> Unit) {
@@ -390,6 +398,7 @@ fun ActionButton(text: String, onClick: () -> Unit) {
 
 @Composable
 fun ProgressItem(progress: UserProgressEntry) {
+    println("📄 Mostrando progreso: $progress")
     Card(
         modifier = Modifier
             .fillMaxWidth()

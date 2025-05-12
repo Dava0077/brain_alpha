@@ -22,7 +22,7 @@ data class LeaderboardEntry(
 data class UserProgressEntry(
     val gameName: String,
     val score: Long,
-    val lastPlayed: String
+    val lastPlayed: String=""
 )
 
 data class LeaderboardByDifficulty(
@@ -131,7 +131,9 @@ object GameSessionController {
         return items.firstOrNull()?.get("name")?.jsonPrimitive?.contentOrNull
     }
 
-    // Crea o actualiza la entrada de progreso del usuario
+
+
+// Crea o actualiza la entrada de progreso del usuario
     private suspend fun upsertUserProgress(userId: String, gameId: String, score: Int) {
         // Supabase upsert emulado
         val existing = SupabaseClientProvider.client.postgrest["user_progress"]
@@ -173,27 +175,34 @@ object GameSessionController {
         }
     }
 
-    suspend fun getUserProgress(userId: String): Result<List<UserProgressEntry>> = withContext(Dispatchers.Default) {
+    suspend fun getAllTotalScores(userId: String): Result<List<UserProgressEntry>> = withContext(Dispatchers.Default) {
         runCatching {
-            val response = SupabaseClientProvider.client.postgrest["user_progress"]
+            val response = SupabaseClientProvider.client.postgrest["game_sessions"]
                 .select {
                     filter { eq("user_id", userId) }
                 }
+                .decodeList<JsonObject>()
 
-            val progressItems = response.decodeList<JsonObject>()
+            println("📄 game_sessions encontradas: ${response.size}")
 
-            progressItems.mapNotNull { item ->
-                val gameId = item["game_id"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null
-                val gameName = getGameNameById(gameId) ?: "Juego desconocido"
+            response
+                .groupBy { it["game_id"]?.jsonPrimitive?.contentOrNull }
+                .mapNotNull { (gameId, partidas) ->
+                    if (gameId == null) return@mapNotNull null
 
-                UserProgressEntry(
-                    gameName = gameName,
-                    score = item["score"]?.jsonPrimitive?.long ?: 0,
-                    lastPlayed = item["last_played"]?.jsonPrimitive?.content ?: ""
-                )
-            }
+                    val gameName = getGameNameById(gameId) ?: "Juego desconocido"
+                    val totalScore = partidas.sumOf { it["score"]?.jsonPrimitive?.longOrNull ?: 0L }
+
+                    println("🎯 $gameName → totalScore=$totalScore")
+
+                    UserProgressEntry(gameName, totalScore)
+                }
+        }.onFailure {
+            println("❌ Error al calcular scores totales: ${it.message}")
         }
     }
+
+
 
     // Helper para obtener nombre de juego por ID
     private suspend fun getGameNameById(gameId: String): String? {
@@ -207,26 +216,34 @@ object GameSessionController {
         return items.firstOrNull()?.get("name")?.jsonPrimitive?.contentOrNull
     }
 
-    suspend fun getLeaderboardGroupedByDifficulty(gameName: String): Result<LeaderboardByDifficulty> = withContext(Dispatchers.Default) {
-        runCatching {
-            val easy = getLeaderboard(gameName, "EASY").getOrThrow()
-            val medium = getLeaderboard(gameName, "MEDIUM").getOrThrow()
-            val hard = getLeaderboard(gameName, "HARD").getOrThrow()
 
-            LeaderboardByDifficulty(
-                easy = easy,
-                medium = medium,
-                hard = hard
-            )
+    suspend fun getLeaderboardGroupedByDifficulty(
+        gameName: String,
+        orderBy: String = "score",
+        ascending: Boolean = false
+    ): Result<LeaderboardByDifficulty> = withContext(Dispatchers.Default) {
+        runCatching {
+            val easy = getLeaderboard(gameName, "EASY", orderBy, ascending).getOrThrow()
+            val medium = getLeaderboard(gameName, "MEDIUM", orderBy, ascending).getOrThrow()
+            val hard = getLeaderboard(gameName, "HARD", orderBy, ascending).getOrThrow()
+
+            LeaderboardByDifficulty(easy = easy, medium = medium, hard = hard)
         }
     }
+
+
     suspend fun getTotalScore(userId: String, gameId: String, supabase: SupabaseClient): Int {
         return try {
             val response = supabase.postgrest["game_sessions"]
-                .select()
+                .select {
+                    filter {
+                        eq("user_id", userId)
+                        eq("game_id", gameId)
+                    }
+                }
                 .decodeList<GameSession>()
 
-            println("🔍 Total partidas en DB: ${response.size}")
+            println("🔍 Total partidas filtradas: ${response.size}")
             response.forEach {
                 println("📄 user=${it.user_id}, game=${it.game_id}, score=${it.score}")
             }
@@ -238,6 +255,152 @@ object GameSessionController {
         } catch (e: Exception) {
             println("❌ Error al obtener puntuaciones: ${e.message}")
             0
+        }
+    }
+
+
+
+    private suspend fun getLeaderboardById(
+        gameId: String,
+        difficulty: String,
+        orderBy: String,
+        ascending: Boolean
+    ): Result<List<LeaderboardEntry>> = withContext(Dispatchers.Default) {
+        runCatching {
+            val orderType = if (ascending) Order.ASCENDING else Order.DESCENDING
+
+            val response = SupabaseClientProvider.client.postgrest["game_sessions"]
+                .select {
+                    filter {
+                        eq("game_id", gameId)
+                        eq("difficulty", difficulty)
+                    }
+                    order(orderBy, orderType)
+                    limit(20)
+                }
+
+            val sessions = response.decodeList<JsonObject>()
+
+            sessions.mapNotNull { item ->
+                val obj = item.jsonObject
+                val uid = obj["user_id"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null
+                val user = getUsernameById(uid)
+                LeaderboardEntry(
+                    username = user ?: "Usuario",
+                    score = obj["score"]?.jsonPrimitive?.long ?: 0,
+                    timeAvg = obj["time_avg"]?.jsonPrimitive?.doubleOrNull,
+                    timeLeft = obj["time_left"]?.jsonPrimitive?.doubleOrNull,
+                    playedAt = obj["played_at"]?.jsonPrimitive?.content ?: ""
+                )
+            }
+        }
+    }
+
+
+
+    suspend fun getGlobalLeaderboardByGameId(
+        gameId: String,
+        orderBy: String = "score",
+        ascending: Boolean = false
+    ): Result<LeaderboardByDifficulty> = withContext(Dispatchers.Default) {
+        runCatching {
+            val difficulties = listOf("EASY", "MEDIUM", "HARD")
+
+            val leaderboardByDiff = difficulties.associate { difficulty ->
+                val response = SupabaseClientProvider.client
+                    .postgrest.rpc(
+                        function = "leaderboard_global",
+                        parameters = buildJsonObject {
+                            put("p_game_id", gameId)
+                            put("p_difficulty", difficulty)
+                            put("p_orderby", orderBy)
+                            put("p_asc", ascending)
+                        }
+                    )
+
+                val items = response.decodeList<JsonObject>()
+
+                val entries = items.mapNotNull { obj ->
+                    LeaderboardEntry(
+                        username = obj["name"]?.jsonPrimitive?.content ?: "Usuario",
+                        score = obj["score"]?.jsonPrimitive?.longOrNull ?: 0L,
+                        timeAvg = obj["time_avg"]?.jsonPrimitive?.doubleOrNull,
+                        timeLeft = obj["time_left"]?.jsonPrimitive?.doubleOrNull,
+                        playedAt = obj["played_at"]?.jsonPrimitive?.content ?: ""
+                    )
+                }
+
+                println("🎯 Recibidas ${entries.size} entradas para dificultad $difficulty")
+                entries.forEach {
+                    println("   → ${it.username} - ${it.score}")
+                }
+                difficulty.uppercase() to entries
+
+            }
+
+            LeaderboardByDifficulty(
+                easy = leaderboardByDiff["EASY"] ?: emptyList(),
+                medium = leaderboardByDiff["MEDIUM"] ?: emptyList(),
+                hard = leaderboardByDiff["HARD"] ?: emptyList()
+            )
+        }
+    }
+
+    private suspend fun getGlobalLeaderboardByDifficulty(
+        gameId: String,
+        difficulty: String,
+        orderBy: String,
+        ascending: Boolean
+    ): Result<List<LeaderboardEntry>> = withContext(Dispatchers.Default) {
+        runCatching {
+            val query = """
+            select 
+                user_id, 
+                sum(score) as score, 
+                avg(time_avg) as time_avg, 
+                avg(time_left) as time_left, 
+                max(played_at) as played_at,
+                users(name)
+            from game_sessions
+            where game_id = '$gameId' and difficulty = '$difficulty'
+            group by user_id, users(name)
+            order by $orderBy ${if (ascending) "asc" else "desc"}
+            limit 20
+        """.trimIndent()
+
+            val response = SupabaseClientProvider.client.postgrest["game_sessions"]
+                .select(columns = io.github.jan.supabase.postgrest.query.Columns.raw(query))
+
+            val items = response.decodeList<JsonObject>()
+
+            items.mapNotNull { obj ->
+                LeaderboardEntry(
+                    username = obj["users"]?.jsonObject?.get("name")?.jsonPrimitive?.content ?: "Usuario",
+                    score = obj["score"]?.jsonPrimitive?.longOrNull ?: 0L,
+                    timeAvg = obj["time_avg"]?.jsonPrimitive?.doubleOrNull,
+                    timeLeft = obj["time_left"]?.jsonPrimitive?.doubleOrNull,
+                    playedAt = obj["played_at"]?.jsonPrimitive?.content ?: ""
+                )
+            }
+        }
+    }
+
+
+    suspend fun getLeaderboardGroupedByDifficultyById(
+        gameId: String,
+        orderBy: String = "score",
+        ascending: Boolean = false
+    ): Result<LeaderboardByDifficulty> = withContext(Dispatchers.Default) {
+        runCatching {
+            val easy = getLeaderboardById(gameId, "EASY", orderBy, ascending).getOrThrow()
+            val medium = getLeaderboardById(gameId, "MEDIUM", orderBy, ascending).getOrThrow()
+            val hard = getLeaderboardById(gameId, "HARD", orderBy, ascending).getOrThrow()
+
+            LeaderboardByDifficulty(
+                easy = easy,
+                medium = medium,
+                hard = hard
+            )
         }
     }
 

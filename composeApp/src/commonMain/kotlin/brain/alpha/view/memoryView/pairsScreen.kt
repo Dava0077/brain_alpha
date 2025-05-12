@@ -61,7 +61,32 @@ fun couplesScreen(
     val showInstructions by controller.showInstructions
     val pairCount = controller.getPairCount()
     val (rows, cols) = getGridDimensions(pairCount)
+    val userId = runCatching { UserSession.getUserId() }.getOrNull()
+    val totalScore = remember { mutableStateOf(0) }
     val shuffledCards = List(controller.getShuffledCardCount()) { index -> controller.getCardValue(index) }
+
+    LaunchedEffect(userId) {
+        if (userId != null) {
+            val total = GameSessionController.getTotalScore(
+                userId = userId,
+                gameId = "24bc262b-ab64-4c71-9c45-8d4fa04a549e",
+                supabase = SupabaseClientProvider.client
+            )
+            println("🧠 Score obtenido del servidor: $total")
+            totalScore.value = total
+        }
+    }
+    LaunchedEffect(totalScore.value) {
+        if (!UserSession.isGuest.value) {
+            selectedDifficulty = when (totalScore.value) {
+                in 0..49 -> Difficulty.EASY
+                in 50..149 -> Difficulty.MEDIUM
+                else -> Difficulty.HARD
+            }
+            controller.setDifficulty(selectedDifficulty)
+            println("🎯 Dificultad autoasignada: $selectedDifficulty")
+        }
+    }
 
 
     // Show instructions first
@@ -182,6 +207,22 @@ fun couplesScreen(
                 ){
                     Text(Strings.t("instructions"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
                 }
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .height(46.dp)
+                        .background(Color(0xFF0647D7), shape = RoundedCornerShape(12.dp))
+                        .border(BorderStroke(1.dp, Color(0xFFB0BEC5)), shape = RoundedCornerShape(12.dp))
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Text(
+                        text = "${totalScore.value} " + Strings.t("neurons"),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.White
+                    )
+                }
+
                 Button(
                     onClick = {controller.goHome()},
                     modifier = Modifier
@@ -194,25 +235,34 @@ fun couplesScreen(
                     Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
                 }
             }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(vertical = 16.dp)
-            ) {
-                Difficulty.values().forEach { difficulty ->
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        RadioButton(
-                            selected = selectedDifficulty == difficulty,
-                            onClick = {
-                                selectedDifficulty = difficulty
-                                controller.setDifficulty(difficulty) // <- necesitas este método
-                            },
-                            enabled = !gameStarted
-                        )
-                        Text(text = Strings.translateDifficulty(difficulty))
+            if (UserSession.isGuest.value) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.padding(vertical = 16.dp)
+                ) {
+                    Difficulty.values().forEach { difficulty ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            RadioButton(
+                                selected = selectedDifficulty == difficulty,
+                                onClick = {
+                                    selectedDifficulty = difficulty
+                                    controller.setDifficulty(difficulty)
+                                },
+                                enabled = !gameStarted
+                            )
+                            Text(text = Strings.translateDifficulty(difficulty))
+                        }
                     }
                 }
             }
+
+            Text(
+                text = Strings.t("difficulty") + ": " + Strings.translateDifficulty(selectedDifficulty),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.Black
+            )
 
 
 

@@ -11,139 +11,194 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import brain.alpha.controller.GameSessionController
 import brain.alpha.controller.LeaderboardController
 import brain.alpha.model.UserSession
-import brain.alpha.services.GameSession
-import brain.alpha.services.GameSessionService
-import brain.alpha.services.GameSessionWithUser
-import brain.alpha.services.SupabaseClientProvider
-import brain.alpha.strings.Strings
+import brain.alpha.controller.LeaderboardEntry
+import brain.alpha.controller.LeaderboardByDifficulty
 import brainalpha.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
+import kotlinx.coroutines.launch
+import kotlin.math.round
+
+enum class SortOption(val label: String) {
+    SCORE("Puntaje"),
+    TIME_AVG("Tiempo medio")
+}
+
 
 @Composable
-fun leaderboardScreen(controller: LeaderboardController) {
+fun LeaderboardScreen(controller: LeaderboardController) {
     val displayName = UserSession.getDisplayName()
-
-    val categories = listOf(
-        "Memoria" to listOf("Juego de parejas", "Simón dice"),
-        "Lógica" to listOf("Sudoku", "Sopa de letras"),
-        "Concentración" to listOf("Stroop test", "Adivinar emojis"),
-        "Agilidad Mental" to listOf("Mates", "Click number")
+    val categories = mapOf(
+        "Memoria" to listOf("pairs_game", "simon_game"),
+        "Logica" to listOf("sudoku_game", "wordSearch_game"),
+        "Concentracion" to listOf("stroopTest_game", "oddEmoji_game"),
+        "Agilidad Mental" to listOf("mental_math", "click_number")
     )
 
-    var expandedCategory by remember { mutableStateOf<String?>(null) }
-    var expandedGame by remember { mutableStateOf<String?>(null) }
-    val leaderboard = remember { mutableStateListOf<GameSessionWithUser>() } // ✅
+    val ascending = remember { mutableStateOf(false) }
+    val expandedCategory = remember { mutableStateOf<String?>(null) }
+    val expandedGame = remember { mutableStateOf<String?>(null) }
+    val leaderboardMap = remember { mutableStateMapOf<String, LeaderboardByDifficulty>() }
+    val sortOption = remember { mutableStateOf(SortOption.SCORE) }
+    val sortBy = sortOption.value
+    val reloadTrigger = remember { mutableStateOf(0) }
 
-    LaunchedEffect(Unit) {
-        val results = GameSessionService.showPairGameResult(
-            supabase = SupabaseClientProvider.client,
-            gameId = "24bc262b-ab64-4c71-9c45-8d4fa04a549e"
-        )
-        println("Results: $results")
-        leaderboard.clear()
-        leaderboard.addAll(results)
+    val coroutineScope = rememberCoroutineScope()
+
+    fun sort(entries: List<LeaderboardEntry>): List<LeaderboardEntry> {
+        return when (sortBy) {
+            SortOption.SCORE -> entries.sortedByDescending { it.score }
+            SortOption.TIME_AVG -> entries.sortedBy { it.timeAvg ?: Double.MAX_VALUE }
+        }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
+
+
+
+    // IDs de ejemplo para juegos
+    val gameIdMap = mapOf(
+        "pairs_game" to "24bc262b-ab64-4c71-9c45-8d4fa04a549e",
+        "simon_game" to "2927d18f-b1ab-4376-990e-1275e5ba181e",
+        "oddEmoji_game" to "498d59a6-7136-4676-9075-93d115d0395f",
+        "sudoku_game" to "b012b362-d7d3-49f7-b14b-bce8ea297453",
+        "wordSearch_game" to "d15d1344-df81-41d5-87f0-c468668be2d8",
+        "click_number" to "ed29af2f-6346-4a55-bd4d-1b07c013d726",
+        "mental_math" to "f017777c-f246-4770-bb73-a652a23e761d",
+        "stroopTest_game" to "f68da1b6-6e34-422c-be12-579991dbbc54"
+
+    )
+
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        // Top bar
+        Box(
+            modifier = Modifier.fillMaxWidth().height(70.dp)
+                .background(Color(0xFF222937), shape = RoundedCornerShape(4.dp))
+                .border(BorderStroke(2.dp, Color(0xFF4CE3E8)))
         ) {
+            IconButton(onClick = {}, modifier = Modifier.align(Alignment.CenterStart).padding(start = 8.dp).size(55.dp)) {
+                Image(painter = painterResource(Res.drawable.user), contentDescription = "User")
+            }
+            Image(painter = painterResource(Res.drawable.logo), contentDescription = null,
+                modifier = Modifier.align(Alignment.Center).size(120.dp).scale(1.5f))
+            Text(displayName, color = Color.White, fontSize = 16.sp,
+                modifier = Modifier.align(Alignment.CenterStart).padding(start = 72.dp))
+        }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(70.dp)
-                    .background(Color(0xFF222937), shape = RoundedCornerShape(4.dp))
-                    .border(BorderStroke(2.dp, Color(0xFF4CE3E8)))
-            ) {
-                IconButton(
-                    onClick = { },
-                    modifier = Modifier.align(Alignment.CenterStart).padding(start = 8.dp).size(55.dp)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = { controller.goHome() },
+            modifier = Modifier.align(Alignment.End),
+            colors = ButtonDefaults.buttonColors(backgroundColor = Color.DarkGray),
+            border = BorderStroke(1.dp, Color.Gray)
+        ) {
+            Text("Volver", color = Color.White)
+        }
+
+
+
+
+
+
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Text("Clasificación por juego", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+
+
+//        // 👇 DEBUG VISUAL: todas las entradas cargadas
+//        leaderboardMap.forEach { (gameId, leaderboard) ->
+//            Text("🧾 Leaderboard para juego: $gameId", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color.Magenta)
+//            leaderboard.easy.forEach {
+//                Text("🎮 EASY - ${it.username}: ${it.score}", fontSize = 13.sp)
+//            }
+//            leaderboard.medium.forEach {
+//                Text("🧠 MEDIUM - ${it.username}: ${it.score}", fontSize = 13.sp)
+//            }
+//            leaderboard.hard.forEach {
+//                Text("🔥 HARD - ${it.username}: ${it.score}", fontSize = 13.sp)
+//            }
+//            Spacer(Modifier.height(8.dp))
+//        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Text("Ordenar por:")
+            SortOption.values().forEach { option ->
+                Button(
+                    onClick = { sortOption.value = option
+                        reloadTrigger.value++ // 🟢 recarga al cambiar //
+                        },
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = if (sortOption.value == option) Color.Gray else Color.LightGray
+                    )
                 ) {
-                    Image(painter = painterResource(Res.drawable.user), contentDescription = "User")
+                    Text(option.label)
                 }
-                Image(
-                    painter = painterResource(Res.drawable.logo),
-                    contentDescription = null,
-                    modifier = Modifier.size(120.dp).align(Alignment.Center).scale(1.5f)
-                )
-                IconButton(
-                    onClick = { brain.alpha.controller.LoginController.buttonSettings() },
-                    modifier = Modifier.align(Alignment.CenterEnd).padding(end = 8.dp).size(55.dp)
-                ) {
-                    Image(painter = painterResource(Res.drawable.ajustes), contentDescription = "Settings")
-                }
-                Text(
-                    text = "$displayName",
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .padding(start = 72.dp)
-                )
+
             }
 
-            Spacer(modifier = Modifier.height(5.dp))
-
-            Button(
-                onClick = { controller.goHome() },
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .height(46.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF303030)),
-                shape = RoundedCornerShape(12.dp),
-                elevation = ButtonDefaults.elevation(4.dp),
-                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
-            ) {
-                Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
+            Button(onClick = { ascending.value = !ascending.value
+                reloadTrigger.value++ // 🟢 recarga al cambiar
+                 }) {
+                Text(if (ascending.value) "Asc" else "Desc")
             }
+        }
 
-            Spacer(modifier = Modifier.height(30.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
-            Text(
-                text = Strings.t("leaderboard"),
-                fontSize = 40.sp,
-                color = Color.Black,
-                fontFamily = FontFamily.SansSerif,
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            categories.forEach { (categoryName, games) ->
-                ExpandableCategory(
-                    title = categoryName,
-                    isExpanded = expandedCategory == categoryName,
-                    onExpandToggle = {
-                        expandedCategory = if (expandedCategory == categoryName) null else categoryName
-                        expandedGame = null
+        categories.forEach { (category, games) ->
+            ExpandableCategory(
+                title = category,
+                isExpanded = expandedCategory.value == category,
+                onExpandToggle = {
+                    expandedCategory.value = if (expandedCategory.value == category) null else category
+                    expandedGame.value = null
+                }
+            ) {
+                games.forEach { game ->
+                    val gameId = gameIdMap[game]
+                    if (gameId.isNullOrBlank()) {
+                        println("⚠️ No se encontró gameId válido para '$game'.")
+                        return@forEach
                     }
-                ) {
-                    games.forEach { game ->
-                        val gameId = when (game) {
-                            "Juego de Parejas" -> "24bc262b-ab64-4c71-9c45-8d4fa04a549e"
-                            else -> "" // Placeholder para otros juegos
-                        }
-                        ExpandableGame(
-                            title = game,
-                            isExpanded = expandedGame == game,
-                            onExpandToggle = {
-                                expandedGame = if (expandedGame == game) null else game
-                            },
-                            gameId = gameId
-                        )
-                    }
+
+                    ExpandableGame(
+                        gameName = game,
+                        gameId = gameId,
+                        isExpanded = expandedGame.value == game,
+                        onExpandToggle = {
+                            expandedGame.value = if (expandedGame.value == game) null else game
+                            if (expandedGame.value != null && !leaderboardMap.containsKey(gameId)) {
+                                coroutineScope.launch {
+                                    println("🔍 Intentando cargar leaderboard para juegoId=$gameId...")
+                                    val orderField = sortOption.value.name.lowercase()
+                                    println("📤 Solicitando leaderboard: gameId=$gameId, orderBy=$orderField, asc=${ascending.value}")
+                                    val data = GameSessionController.getGlobalLeaderboardByGameId(
+                                        gameId = gameId,
+                                        orderBy = orderField,
+                                        ascending = ascending.value
+                                    )
+                                    data.onFailure { error -> println("❌ Error al cargar leaderboard: ${error.message}") }
+                                    data.getOrNull()?.let {
+                                        println("✅ Leaderboard cargado con ${it.easy.size + it.medium.size + it.hard.size} entradas")
+                                        leaderboardMap[gameId] = it
+                                    }
+                                }
+                            }
+                        },
+                        leaderboard = leaderboardMap[gameId]
+                    )
                 }
             }
         }
@@ -158,61 +213,69 @@ fun ExpandableCategory(
     content: @Composable ColumnScope.() -> Unit
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
+        modifier = Modifier.fillMaxWidth()
+            .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp))
+            .padding(8.dp)
             .clickable { onExpandToggle() }
-            .padding(12.dp)
     ) {
-        Text(
-            text = title,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
-        )
+        Text(text = title, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         if (isExpanded) {
             Spacer(modifier = Modifier.height(8.dp))
             content()
         }
     }
 }
+
 @Composable
 fun ExpandableGame(
-    title: String,
+    gameName: String,
+    gameId: String,
     isExpanded: Boolean,
     onExpandToggle: () -> Unit,
-    gameId: String
+    leaderboard: LeaderboardByDifficulty?
 ) {
-    // Usamos remember y mutableStateListOf para mantener el estado del leaderboard entre recomposiciones
-    val leaderboard = remember { mutableStateListOf<GameSessionWithUser>() }
-
-    LaunchedEffect(isExpanded) {
-        if (isExpanded && gameId.isNotBlank()) {
-            val results = GameSessionService.showPairGameResult(
-                supabase = SupabaseClientProvider.client,
-                gameId = "24bc262b-ab64-4c71-9c45-8d4fa04a549e"
-            )
-            println("Results: $results")  // Verifica los resultados antes de agregarlos
-            leaderboard.clear()
-            leaderboard.addAll(results)
+    Column(modifier = Modifier.fillMaxWidth().padding(start = 12.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(gameName, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
+            Button(onClick = onExpandToggle) {
+                Text(if (isExpanded) "Cerrar" else "Ver")
+            }
+        }
+        if (isExpanded) {
+            if (leaderboard != null) {
+                LeaderboardSection("Fácil", leaderboard.easy)
+                LeaderboardSection("Medio", leaderboard.medium)
+                LeaderboardSection("Difícil", leaderboard.hard)
+            } else {
+                if (leaderboard == null) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp).padding(8.dp),
+                        color = Color.Gray
+                    )
+                }
+            }
         }
     }
+}
 
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(title, fontWeight = FontWeight.Bold)
-        Button(onClick = { onExpandToggle() }) {
-            Text(if (isExpanded) "Cerrar" else "Expandir")
-        }
-
-        if (isExpanded) {
-            // Mostrar los resultados del leaderboard
-            LazyColumn {
-                items(leaderboard) { entry ->
-                    Text(entry.name)
-                    Text(entry.score.toString())
-                    Text(entry.difficulty)
-                      // Si usas 'email' en lugar de 'name', cámbialo aquí
+@Composable
+fun LeaderboardSection(title: String, entries: List<LeaderboardEntry>) {
+    Text("• $title", fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.padding(top = 12.dp))
+    entries.forEachIndexed { i, entry ->
+        Card(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            elevation = 4.dp
+        ) {
+            Column(Modifier.padding(12.dp)) {
+                Text("#${i + 1} ${entry.username}", fontWeight = FontWeight.Bold)
+                Text("Puntos: ${entry.score}")
+                entry.timeAvg?.let {
+                    Text("Tiempo medio: ${round(it * 10) / 10} s")
                 }
+                entry.timeLeft?.let {
+                    Text("Tiempo restante: ${round(it * 10) / 10} s")
+                }
+                Text("Fecha: ${entry.playedAt.take(10)}")
             }
         }
     }

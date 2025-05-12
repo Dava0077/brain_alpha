@@ -1,5 +1,6 @@
 package brain.alpha.controller
 
+import brain.alpha.model.UserModel
 import brain.alpha.model.UserSession
 import brain.alpha.services.SupabaseClientProvider
 import io.github.jan.supabase.auth.OtpType
@@ -176,6 +177,18 @@ object AuthController {
                 email = email
             )
         }
+    }
+    suspend fun loadUserProfile(): UserModel? = withContext(Dispatchers.Default) {
+        val client = SupabaseClientProvider.client
+        val userId = client.auth.currentUserOrNull()?.id ?: return@withContext null
+
+        runCatching {
+            client.postgrest["users"]
+                .select {
+                    filter { eq("id", userId) }
+                }
+                .decodeSingle<UserModel>()
+        }.getOrNull()
     }
 
 
