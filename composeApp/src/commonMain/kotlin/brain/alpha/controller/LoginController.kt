@@ -2,10 +2,12 @@ package brain.alpha.controller
 
 import androidx.compose.runtime.*
 import brain.alpha.controller.AuthController
+import brain.alpha.model.UserModel
 import brain.alpha.model.UserSession
 import brain.alpha.model.UserSession.clear
 import brain.alpha.services.SupabaseClientProvider
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -62,7 +64,21 @@ object LoginController {
                 val user = SupabaseClientProvider.client.auth.currentUserOrNull()
                 if (user != null) {
                     UserSession.setUserId(user.id)
+
+                    val profile = SupabaseClientProvider.client
+                        .postgrest["users"]
+                        .select {
+                            filter { eq("id", user.id) }
+                        }
+                        .decodeSingle<UserModel>() // ← decodifica directamente
+
+                    UserSession.setSession(
+                        id = user.id,
+                        emailValue = profile.email,
+                        usernameValue = profile.name
+                    )
                 }
+
                 navigateTo("home")
             }.onFailure { error ->
                 val message = when {

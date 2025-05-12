@@ -1,6 +1,7 @@
 package brain.alpha.model
 
 import androidx.compose.runtime.mutableStateOf
+import kotlinx.serialization.Serializable
 
 
 /**
@@ -15,7 +16,12 @@ import androidx.compose.runtime.mutableStateOf
  * - Provide helpers to set/reset session data.
  * - Offer derived states like authentication status and display name.
  */
-
+@Serializable
+data class UserModel(
+    val id: String,
+    val name: String,
+    val email: String
+)
 
 object UserSession {
     // Indicates whether a user is logged in
