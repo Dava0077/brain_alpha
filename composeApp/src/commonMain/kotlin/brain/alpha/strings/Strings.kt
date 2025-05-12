@@ -25,6 +25,9 @@ object Strings {
             "hard" to "Difícil",
             "your_score" to "Puntuación: ",
             "neurons" to "\uD83E\uDDE0 Neuronas",
+            "profile_title" to "Usuario",
+            "no_progress" to "No hay progreso",
+            "your_progress" to "Tu progeso por juego",
             //HOME SCREEN
             "hi" to "Hola, ",
             "categories" to "CATEGORIAS",
@@ -156,7 +159,6 @@ object Strings {
             "you_won" to "You won: ",
             "time" to "Time:",
             "time_up" to "Time out",
-
             "final_time" to "Final time: ",
             "remaining_time" to "Remaining time: ",
             "back" to "⬅ Back",
@@ -166,6 +168,9 @@ object Strings {
             "hard" to "Hard",
             "your_score" to "Score: ",
             "neurons" to "\uD83E\uDDE0 Neuronas",
+            "profile_title" to "Profile",
+            "no_progress" to "There is no progress",
+            "your_progress" to "Your progress per game",
             //HOME SCREEN
             "hi" to "Hi, ",
             "categories" to "CATEGORIES",

@@ -22,7 +22,7 @@ data class LeaderboardEntry(
 data class UserProgressEntry(
     val gameName: String,
     val score: Long,
-    val lastPlayed: String
+    val lastPlayed: String=""
 )
 
 data class LeaderboardByDifficulty(
@@ -173,27 +173,34 @@ object GameSessionController {
         }
     }
 
-    suspend fun getUserProgress(userId: String): Result<List<UserProgressEntry>> = withContext(Dispatchers.Default) {
+    suspend fun getAllTotalScores(userId: String): Result<List<UserProgressEntry>> = withContext(Dispatchers.Default) {
         runCatching {
-            val response = SupabaseClientProvider.client.postgrest["user_progress"]
+            val response = SupabaseClientProvider.client.postgrest["game_sessions"]
                 .select {
                     filter { eq("user_id", userId) }
                 }
+                .decodeList<JsonObject>()
 
-            val progressItems = response.decodeList<JsonObject>()
+            println("📄 game_sessions encontradas: ${response.size}")
 
-            progressItems.mapNotNull { item ->
-                val gameId = item["game_id"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null
-                val gameName = getGameNameById(gameId) ?: "Juego desconocido"
+            response
+                .groupBy { it["game_id"]?.jsonPrimitive?.contentOrNull }
+                .mapNotNull { (gameId, partidas) ->
+                    if (gameId == null) return@mapNotNull null
 
-                UserProgressEntry(
-                    gameName = gameName,
-                    score = item["score"]?.jsonPrimitive?.long ?: 0,
-                    lastPlayed = item["last_played"]?.jsonPrimitive?.content ?: ""
-                )
-            }
+                    val gameName = getGameNameById(gameId) ?: "Juego desconocido"
+                    val totalScore = partidas.sumOf { it["score"]?.jsonPrimitive?.longOrNull ?: 0L }
+
+                    println("🎯 $gameName → totalScore=$totalScore")
+
+                    UserProgressEntry(gameName, totalScore)
+                }
+        }.onFailure {
+            println("❌ Error al calcular scores totales: ${it.message}")
         }
     }
+
+
 
     // Helper para obtener nombre de juego por ID
     private suspend fun getGameNameById(gameId: String): String? {
@@ -206,6 +213,7 @@ object GameSessionController {
         val items = response.decodeList<JsonObject>()
         return items.firstOrNull()?.get("name")?.jsonPrimitive?.contentOrNull
     }
+
 
     suspend fun getLeaderboardGroupedByDifficulty(
         gameName: String,
