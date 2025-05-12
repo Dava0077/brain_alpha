@@ -40,6 +40,8 @@ fun mentalMathView(
     var showOverlay by remember { mutableStateOf(false) }
     var overlayColor by remember { mutableStateOf(Color.Transparent) }
     var selectedDifficulty by remember { mutableStateOf(Difficulty.MEDIUM) }
+    var flashRed by remember { mutableStateOf(false) }
+
 
     // Timer effect
     LaunchedEffect(gameStarted, timeLeft) {
@@ -112,6 +114,7 @@ fun mentalMathView(
                         controller.setDifficulty(it)
                     }
                 }
+
             }
 
             Spacer(Modifier.height(16.dp))

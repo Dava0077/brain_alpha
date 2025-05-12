@@ -45,10 +45,16 @@ object mentalMathModel {
     }
 
     private fun calculatePoints(timeTaken: Double): Int {
+        val basePoints = when (difficulty) {
+            Difficulty.EASY -> 10
+            Difficulty.MEDIUM -> 15
+            Difficulty.HARD -> 20
+        }
+
         return when {
-            timeTaken < 3 -> 10
-            timeTaken < 6 -> 5
-            else -> 3
+            timeTaken < 3 -> basePoints + 5
+            timeTaken < 6 -> basePoints + 2
+            else -> basePoints
         }
     }
 
