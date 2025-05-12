@@ -34,7 +34,7 @@ enum class SortOption(val label: String) {
 fun LeaderboardScreen(controller: LeaderboardController) {
     val displayName = UserSession.getDisplayName()
     val categories = mapOf(
-        "memory_games" to listOf("pairs_game", "simon_game"),
+        "Memoria" to listOf("pairs_game", "simon_game"),
         "Logica" to listOf("sudoku_game", "wordSearch_game"),
         "Concentracion" to listOf("stroopTest_game", "oddEmoji_game"),
         "Agilidad Mental" to listOf("mental_math", "click_number")
@@ -46,6 +46,9 @@ fun LeaderboardScreen(controller: LeaderboardController) {
     val leaderboardMap = remember { mutableStateMapOf<String, LeaderboardByDifficulty>() }
     val sortOption = remember { mutableStateOf(SortOption.SCORE) }
     val sortBy = sortOption.value
+    val reloadTrigger = remember { mutableStateOf(0) }
+
+    val coroutineScope = rememberCoroutineScope()
 
     fun sort(entries: List<LeaderboardEntry>): List<LeaderboardEntry> {
         return when (sortBy) {
@@ -55,7 +58,7 @@ fun LeaderboardScreen(controller: LeaderboardController) {
     }
 
 
-    val coroutineScope = rememberCoroutineScope()
+
 
     // IDs de ejemplo para juegos
     val gameIdMap = mapOf(
@@ -97,9 +100,31 @@ fun LeaderboardScreen(controller: LeaderboardController) {
             Text("Volver", color = Color.White)
         }
 
+
+
+
+
+
+
         Spacer(modifier = Modifier.height(24.dp))
 
         Text("Clasificación por juego", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+
+
+//        // 👇 DEBUG VISUAL: todas las entradas cargadas
+//        leaderboardMap.forEach { (gameId, leaderboard) ->
+//            Text("🧾 Leaderboard para juego: $gameId", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color.Magenta)
+//            leaderboard.easy.forEach {
+//                Text("🎮 EASY - ${it.username}: ${it.score}", fontSize = 13.sp)
+//            }
+//            leaderboard.medium.forEach {
+//                Text("🧠 MEDIUM - ${it.username}: ${it.score}", fontSize = 13.sp)
+//            }
+//            leaderboard.hard.forEach {
+//                Text("🔥 HARD - ${it.username}: ${it.score}", fontSize = 13.sp)
+//            }
+//            Spacer(Modifier.height(8.dp))
+//        }
 
         Spacer(modifier = Modifier.height(12.dp))
 
@@ -111,7 +136,9 @@ fun LeaderboardScreen(controller: LeaderboardController) {
             Text("Ordenar por:")
             SortOption.values().forEach { option ->
                 Button(
-                    onClick = { sortOption.value = option },
+                    onClick = { sortOption.value = option
+                        reloadTrigger.value++ // 🟢 recarga al cambiar //
+                        },
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = if (sortOption.value == option) Color.Gray else Color.LightGray
                     )
@@ -121,7 +148,9 @@ fun LeaderboardScreen(controller: LeaderboardController) {
 
             }
 
-            Button(onClick = { ascending.value = !ascending.value }) {
+            Button(onClick = { ascending.value = !ascending.value
+                reloadTrigger.value++ // 🟢 recarga al cambiar
+                 }) {
                 Text(if (ascending.value) "Asc" else "Desc")
             }
         }
@@ -152,12 +181,19 @@ fun LeaderboardScreen(controller: LeaderboardController) {
                             expandedGame.value = if (expandedGame.value == game) null else game
                             if (expandedGame.value != null && !leaderboardMap.containsKey(gameId)) {
                                 coroutineScope.launch {
+                                    println("🔍 Intentando cargar leaderboard para juegoId=$gameId...")
+                                    val orderField = sortOption.value.name.lowercase()
+                                    println("📤 Solicitando leaderboard: gameId=$gameId, orderBy=$orderField, asc=${ascending.value}")
                                     val data = GameSessionController.getGlobalLeaderboardByGameId(
                                         gameId = gameId,
-                                        orderBy = sortOption.value.name.lowercase(),
+                                        orderBy = orderField,
                                         ascending = ascending.value
                                     )
-                                    data.getOrNull()?.let { leaderboardMap[gameId] = it }
+                                    data.onFailure { error -> println("❌ Error al cargar leaderboard: ${error.message}") }
+                                    data.getOrNull()?.let {
+                                        println("✅ Leaderboard cargado con ${it.easy.size + it.medium.size + it.hard.size} entradas")
+                                        leaderboardMap[gameId] = it
+                                    }
                                 }
                             }
                         },
@@ -211,7 +247,12 @@ fun ExpandableGame(
                 LeaderboardSection("Medio", leaderboard.medium)
                 LeaderboardSection("Difícil", leaderboard.hard)
             } else {
-                Text("Cargando o sin datos disponibles", color = Color.Gray, fontSize = 14.sp)
+                if (leaderboard == null) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp).padding(8.dp),
+                        color = Color.Gray
+                    )
+                }
             }
         }
     }
