@@ -7,8 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -34,14 +33,20 @@ import brainalpha.composeapp.generated.resources.fondoMental
 import brainalpha.composeapp.generated.resources.logo
 import brainalpha.composeapp.generated.resources.user
 import org.jetbrains.compose.resources.painterResource
-
-val showInstructions by clickNumberController.showInstructions
+import brain.alpha.controller.GameSessionController
+import brain.alpha.model.UserSession
+import kotlinx.coroutines.launch
 
 @Composable
 fun clickNumberScreen(
     controller: clickNumberController,
     onNavigateToHome: () -> Unit
 ) {
+
+    val showInstructions by controller.showInstructions
+    var sessionSaved by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
     // Show instructions first
     if (showInstructions) {
         InstructionsClickNumber(
@@ -287,10 +292,28 @@ fun clickNumberScreen(
                     .background(Color.White, shape = RoundedCornerShape(16.dp))
                     .padding(16.dp)
             )
+            if (!sessionSaved) {
+                sessionSaved = true
+                scope.launch {
+                    val userId = runCatching { UserSession.getUserId() }.getOrNull()
+                    if (userId != null) {
+                        GameSessionController.registerGameSession(
+                            gameId = "ed29af2f-6346-4a55-bd4d-1b07c013d726", // ID único del juego ClickNumber
+                            score = clickNumberController.score,
+                            difficulty = clickNumberController.currentDifficulty.name
+                        ).onSuccess {
+                            println("✅ Partida guardada: ${clickNumberController.score} puntos.")
+                        }.onFailure {
+                            println("❌ Error al guardar la partida: ${it.message}")
+                        }
+                    } else {
+                        println("⚠ Usuario no logueado, no se puede guardar la partida.")
+                    }
+                }
+            }
         }
     }
 }
-
 @Composable
 fun InstructionsClickNumber(onStart: () -> Unit, controller: clickNumberController) {
     Box(modifier = Modifier.fillMaxSize()) {
