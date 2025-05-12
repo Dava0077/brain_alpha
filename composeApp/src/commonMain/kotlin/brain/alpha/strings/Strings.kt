@@ -140,8 +140,15 @@ object Strings {
             "insS11" to "Tienes ",
             "insS12" to " un tiempo limitado",
             "insS13" to " para superar el nivel.\n",
-            "insS14" to " Concéntrate, !y buena suerte!"
-
+            "insS14" to " Concéntrate, !y buena suerte!",
+            "wordSearch_game" to "Sopa de letras",
+            "sudoku_game" to "Sudoku",
+            "simon_game" to "Simón dice",
+            "pairs_game" to "Juego de parejas",
+            "stroopTest_game" to "Test de Stroop",
+            "mental_math" to "Cálculo mental",
+            "oddEmoji_game" to "Emoji raro",
+            "click_number" to "Haz clic en el número"
 
 
 
@@ -284,7 +291,15 @@ object Strings {
             "insS11" to "You have ",
             "insS12" to " a limited time",
             "insS13" to " to clear the level.\n",
-            "insS14" to " Focus, and good luck!"
+            "insS14" to " Focus, and good luck!",
+            "wordSearch_game" to "Word Search",
+            "sudoku_game" to "Sudoku",
+            "simon_game" to "Simon Says",
+            "pairs_game" to "Pairs Game",
+            "stroopTest_game" to "Stroop Test",
+            "mental_math" to "Mental Math",
+            "oddEmoji_game" to "Odd Emoji",
+            "click_number" to "Click Number"
 
 
         )

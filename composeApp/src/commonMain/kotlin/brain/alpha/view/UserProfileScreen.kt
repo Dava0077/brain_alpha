@@ -8,6 +8,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brain.alpha.controller.AuthController
@@ -29,11 +33,14 @@ import brain.alpha.model.UserSession
 import brain.alpha.services.SupabaseClientProvider
 import brain.alpha.strings.Strings
 import brainalpha.composeapp.generated.resources.Res
+import brainalpha.composeapp.generated.resources.*
+import brainalpha.composeapp.generated.resources.iconoInt
 import brainalpha.composeapp.generated.resources.user
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -149,21 +156,74 @@ fun UserProfileScreen(onBack: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text(
-                    text = Strings.t("your_progress"),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 12.dp)
+                ) {
+                    Text(
+                        text = Strings.t("your_progress"),
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
 
-                Spacer(Modifier.height(8.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier.align(Alignment.CenterEnd),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        DifficultyLegendItem(Res.drawable.easy, Strings.t("easy"), size = 40.dp)
+                        DifficultyLegendItem(Res.drawable.medium, Strings.t("medium"), size = 50.dp)
+                        DifficultyLegendItem(Res.drawable.hard, Strings.t("hard"), size = 60.dp)
+
+                    }
+                }
+
+                Spacer(Modifier.height(10.dp))
+
 
                 totalProgress.value.forEach { entry ->
-                    Text(
-                        text = "${entry.gameName}: ${entry.score} puntos",
-                        fontSize = 14.sp,
-                        color = Color.DarkGray
-                    )
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = 4.dp,
+                        backgroundColor = Color(0xFFF2F2F2)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                painter = painterResource(Res.drawable.iconoInt),
+                                contentDescription = null,
+                                tint = Color(0xFF64B5F6),
+                                modifier = Modifier.size(24.dp)
+                            )
+
+                            Spacer(modifier = Modifier.width(12.dp))
+
+                            Column {
+                                Text(
+                                    text = Strings.t(entry.gameName),
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = Color.Black
+                                )
+                                Text(
+                                    text = "${entry.score} puntos",
+                                    fontSize = 14.sp,
+                                    color = Color.DarkGray
+                                )
+                            }
+                        }
+                    }
                 }
+
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -414,3 +474,21 @@ fun ProgressItem(progress: UserProgressEntry) {
         }
     }
 }
+@Composable
+fun DifficultyLegendItem(image: DrawableResource, label: String, size: Dp) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Image(
+            painter = painterResource(image),
+            contentDescription = label,
+            modifier = Modifier.size(size)
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = label,
+            fontSize = 12.sp,
+            color = Color.Gray
+        )
+    }
+}
+
+

@@ -133,6 +133,7 @@ object AuthController {
     suspend fun signOut() {
         auth.signOut()
         UserSession.clear()
+
     }
 
     /**
