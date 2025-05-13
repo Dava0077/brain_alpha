@@ -22,6 +22,7 @@ data class LeaderboardEntry(
 data class UserProgressEntry(
     val gameName: String,
     val score: Long,
+    val difficulty: String,
     val lastPlayed: String=""
 )
 
@@ -192,10 +193,15 @@ object GameSessionController {
 
                     val gameName = getGameNameById(gameId) ?: "Juego desconocido"
                     val totalScore = partidas.sumOf { it["score"]?.jsonPrimitive?.longOrNull ?: 0L }
+                    val difficulty = when {
+                        totalScore >= 150 -> "hard"
+                        totalScore >= 75 -> "medium"
+                        else -> "easy"
+                    }
 
                     println("🎯 $gameName → totalScore=$totalScore")
 
-                    UserProgressEntry(gameName, totalScore)
+                    UserProgressEntry(gameName, totalScore, difficulty)
                 }
         }.onFailure {
             println("❌ Error al calcular scores totales: ${it.message}")

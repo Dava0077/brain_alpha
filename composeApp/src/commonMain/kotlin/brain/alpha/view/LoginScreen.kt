@@ -3,8 +3,10 @@ package brain.alpha.view
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
@@ -21,7 +23,6 @@ import brain.alpha.services.SupabaseClientProvider
 import brainalpha.composeapp.generated.resources.Res
 import brainalpha.composeapp.generated.resources.*
 import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.compose.auth.ComposeAuth
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import brain.alpha.model.UserSession
@@ -50,6 +51,8 @@ fun LoginScreen(
     var resetEmail by remember { mutableStateOf("") }
     var resetFeedback by remember { mutableStateOf<String?>(null) }
     var sendingReset by remember { mutableStateOf(false) }
+    val scrollState = rememberScrollState()
+
 
     val googleSignIn = GoogleAuthController.googleSignInAction(
         scope = coroutineScope,
@@ -66,9 +69,6 @@ fun LoginScreen(
         onError = { error -> println("Login ERROR: ${error.message}") }
     )
 
-
-
-
     LaunchedEffect(googleLoginSuccess) {
         if (googleLoginSuccess) {
             LoginController.clear()
@@ -76,11 +76,6 @@ fun LoginScreen(
             LoginController.resetGoogleFlag()
         }
     }
-
-
-
-
-
 
     Scaffold(scaffoldState = scaffoldState) {
         Box {
@@ -95,32 +90,33 @@ fun LoginScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 24.dp),
-                verticalArrangement = Arrangement.SpaceBetween
+                    .verticalScroll(scrollState)
+                    .padding(horizontal = 24.dp)
+                    .padding(top = 8.dp),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-
-                    Spacer(modifier = Modifier.height(10.dp))
 
                     // App logo
                     Image(painter = painterResource(Res.drawable.logo),
                         contentDescription = "App Logo",
                         modifier = Modifier.size(210.dp, 210.dp))
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     // Avatar icon
                     Image(painter = painterResource(Res.drawable.user),
                         contentDescription = "Avatar",
                         modifier = Modifier.size(87.dp, 88.dp))
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
                     Text("LOGIN",
                         color = Color.Black,
                         fontSize = 16.sp)
 
-                    Spacer(modifier = Modifier.height(40.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
 
                     // Email field
                     OutlinedTextField(
