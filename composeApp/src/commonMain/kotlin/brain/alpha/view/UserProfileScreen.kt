@@ -5,8 +5,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -65,6 +67,8 @@ fun UserProfileScreen(onBack: () -> Unit) {
     //var showDeleteDialog by remember { mutableStateOf(false) }
     var passwordValue by remember { mutableStateOf(TextFieldValue()) }
     val totalProgress = remember { mutableStateOf<List<UserProgressEntry>>(emptyList()) }
+    val scrollState = rememberScrollState()
+
 
     LaunchedEffect(userId) {
         userId?.let {
@@ -109,6 +113,7 @@ fun UserProfileScreen(onBack: () -> Unit) {
             Column(
                 modifier = Modifier
                     .padding(paddingValues)
+                    .verticalScroll(scrollState)
                     .fillMaxSize()
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -156,33 +161,64 @@ fun UserProfileScreen(onBack: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 12.dp)
-                ) {
-                    Text(
-                        text = Strings.t("your_progress"),
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
+                Text(
+                    text = Strings.t("your_progress"),
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
 
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Box(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        modifier = Modifier.align(Alignment.CenterEnd),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(end = 8.dp),
+                        horizontalArrangement = Arrangement.End, // 🔥 Esto alinea a la derecha
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-
                         DifficultyLegendItem(Res.drawable.easy, Strings.t("easy"), size = 40.dp)
                         DifficultyLegendItem(Res.drawable.medium, Strings.t("medium"), size = 50.dp)
                         DifficultyLegendItem(Res.drawable.hard, Strings.t("hard"), size = 60.dp)
-
                     }
                 }
 
+
+
+
                 Spacer(Modifier.height(10.dp))
 
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = Strings.t("game"),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        text = Strings.t("neurons2"),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        text = Strings.t("difficulty"),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.End,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
 
                 totalProgress.value.forEach { entry ->
                     Card(
@@ -195,33 +231,72 @@ fun UserProfileScreen(onBack: () -> Unit) {
                     ) {
                         Row(
                             modifier = Modifier
-                                .padding(12.dp),
+                                .padding(12.dp)
+                                .fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(
-                                painter = painterResource(Res.drawable.iconoInt),
-                                contentDescription = null,
-                                tint = Color(0xFF64B5F6),
-                                modifier = Modifier.size(24.dp)
-                            )
-
-                            Spacer(modifier = Modifier.width(12.dp))
-
-                            Column {
+                            // Nombre del juego (izquierda)
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(
+                                    painter = painterResource(Res.drawable.iconoInt),
+                                    contentDescription = null,
+                                    tint = Color(0xFF64B5F6),
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = Strings.t(entry.gameName),
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.SemiBold,
                                     color = Color.Black
                                 )
+                            }
+
+                            // Score en medio
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center,
+                                modifier = Modifier.weight(1f)
+                            ) {
                                 Text(
-                                    text = "${entry.score} puntos",
-                                    fontSize = 14.sp,
+                                    text = "${entry.score} ",
+                                    fontSize = 18.sp,
                                     color = Color.DarkGray
                                 )
                             }
+
+                            // Dificultad (derecha)
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.End,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                val difficultyLabel = when (entry.difficulty) {
+                                    "easy" -> Strings.t("easy")
+                                    "medium" -> Strings.t("medium")
+                                    "hard" -> Strings.t("hard")
+                                    else -> "?"
+                                }
+                                val difficultyIcon = when (entry.difficulty) {
+                                    "easy" -> Res.drawable.easy
+                                    "medium" -> Res.drawable.medium
+                                    "hard" -> Res.drawable.hard
+                                    else -> Res.drawable.iconoInt
+                                }
+
+                                Image(
+                                    painter = painterResource(difficultyIcon),
+                                    contentDescription = "Dificultad: $difficultyLabel",
+                                    modifier = Modifier.size(32.dp)
+                                )
+                            }
                         }
+
                     }
+
                 }
 
 

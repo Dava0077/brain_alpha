@@ -25,9 +25,12 @@ object Strings {
             "hard" to "Difícil",
             "your_score" to "Puntuación: ",
             "neurons" to "\uD83E\uDDE0 Neuronas",
+            "neurons2" to "\uD83E\uDDE0 NEURONAS",
             "profile_title" to "Usuario",
             "no_progress" to "No hay progreso",
             "your_progress" to "Tu progeso por juego",
+            "game" to "\uD83D\uDD79JUEGO",
+            "difficulty" to "🏆DIFICULTAD",
             //HOME SCREEN
             "hi" to "Hola, ",
             "categories" to "CATEGORIAS",
@@ -174,10 +177,14 @@ object Strings {
             "medium" to "Medium",
             "hard" to "Hard",
             "your_score" to "Score: ",
-            "neurons" to "\uD83E\uDDE0 Neuronas",
+            "neurons" to "\uD83E\uDDE0 Neurons",
+            "neurons2" to "\uD83E\uDDE0 NEURONS",
             "profile_title" to "Profile",
             "no_progress" to "There is no progress",
             "your_progress" to "Your progress per game",
+            "game" to "\uD83D\uDD79GAME",
+            "difficulty" to "🏆DIFFICULTY",
+
             //HOME SCREEN
             "hi" to "Hi, ",
             "categories" to "CATEGORIES",
