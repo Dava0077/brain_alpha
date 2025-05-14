@@ -58,6 +58,7 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
     var sessionSaved by remember { mutableStateOf(false) }
     val userId = runCatching { UserSession.getUserId() }.getOrNull()
     val totalScore = remember { mutableStateOf(0) }
+    val scrollState = rememberScrollState()
 
     LaunchedEffect(userId) {
         if (userId != null) {
@@ -117,7 +118,7 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
         )
 
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {

@@ -195,7 +195,7 @@ object GameSessionController {
                     val totalScore = partidas.sumOf { it["score"]?.jsonPrimitive?.longOrNull ?: 0L }
                     val difficulty = when {
                         totalScore >= 150 -> "hard"
-                        totalScore >= 75 -> "medium"
+                        totalScore >= 50 -> "medium"
                         else -> "easy"
                     }
 

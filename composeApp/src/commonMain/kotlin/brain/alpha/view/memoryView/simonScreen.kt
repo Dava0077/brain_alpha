@@ -55,6 +55,7 @@ fun simonScreen(
     val userId = runCatching { UserSession.getUserId() }.getOrNull()
     val totalScore = remember { mutableStateOf(0) }
     var selectedDifficulty by remember { mutableStateOf(Difficulty.EASY) }
+    val scrollState = rememberScrollState()
 
 
     LaunchedEffect(userId) {
@@ -101,7 +102,6 @@ fun simonScreen(
             contentScale = ContentScale.Crop
         )
 
-        val scrollState = rememberScrollState()
 
         Column(
             modifier = Modifier

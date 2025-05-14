@@ -1,10 +1,7 @@
 package brain.alpha.view.memoryView
 
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,7 +18,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
-import androidx.compose.foundation.clickable
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.scale
@@ -65,6 +61,7 @@ fun couplesScreen(
     val userId = runCatching { UserSession.getUserId() }.getOrNull()
     val totalScore = remember { mutableStateOf(0) }
     val shuffledCards = List(controller.getShuffledCardCount()) { index -> controller.getCardValue(index) }
+    val scrollState = rememberScrollState()
 
     LaunchedEffect(userId) {
         if (userId != null) {
@@ -135,7 +132,7 @@ fun couplesScreen(
         )
 
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {

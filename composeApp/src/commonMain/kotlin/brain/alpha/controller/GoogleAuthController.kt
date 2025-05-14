@@ -70,7 +70,9 @@ object GoogleAuthController {
                                 aud = user.aud ?: "authenticated"
                             )
                         )
+
                         navigateTo("home")
+
                     }
                 }
 
