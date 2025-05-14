@@ -44,7 +44,7 @@ fun LoginScreen(
     onNavigateToSignUp: () -> Unit
 ) {
     val scaffoldState = rememberScaffoldState()
-    val googleLoginSuccess by LoginController.googleLoginSuccess.collectAsState()
+    val googleLoginSuccess by LoginController.googleLoginSuccess
 
     val coroutineScope = rememberCoroutineScope()
     var showResetDialog by remember { mutableStateOf(false) }
@@ -56,26 +56,34 @@ fun LoginScreen(
 
     val googleSignIn = GoogleAuthController.googleSignInAction(
         scope = coroutineScope,
-        onSuccess = {  userInfo ->
+        onSuccess = { userInfo ->
             println("✅ Google login success: ${userInfo.email}")
 
             coroutineScope.launch {
                 scaffoldState.snackbarHostState.showSnackbar("Bienvenido, ${userInfo.email}")
             }
 
-            LoginController.googleLoginSuccess.value = true
-
-        },
-        onError = { error -> println("Login ERROR: ${error.message}") }
+            LoginController.setUser(userInfo)
+            LoginController.clear()
+        }
+        ,
+        onError = { error ->
+            println("Login ERROR: ${error.message}")
+        }
     )
 
-    LaunchedEffect(googleLoginSuccess) {
+
+
+
+    /*LaunchedEffect(googleLoginSuccess) {
+        println("💡 googleLoginSuccess: $googleLoginSuccess")
         if (googleLoginSuccess) {
+            println("✅ Navegando a home...")
             LoginController.clear()
             LoginController.navigateTo("home")
             LoginController.resetGoogleFlag()
         }
-    }
+    }*/
 
     Scaffold(scaffoldState = scaffoldState) {
         Box {

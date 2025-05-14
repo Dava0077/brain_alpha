@@ -2,10 +2,7 @@ package brain.alpha
 
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
-import brain.alpha.controller.LeaderboardController
-import brain.alpha.controller.LoginController
-import brain.alpha.controller.SettingsController
-import brain.alpha.controller.UserProfileController
+import brain.alpha.controller.*
 import brain.alpha.controller.concentrationController.concentrationHomeController
 import brain.alpha.controller.concentrationController.oddEmojiController
 import brain.alpha.controller.concentrationController.stroopController
@@ -87,6 +84,7 @@ fun App() {
         SettingsController.navigateTo = { route -> currentScreenState.value = route }
         UserProfileController.navigateTo = {route -> currentScreenState.value = route}
         LeaderboardController.navigateTo = {route -> currentScreenState.value = route}
+        GoogleAuthController.navigateTo ={route -> currentScreenState.value = route}
 
         //MEMORY GAMES
         memoryHomeController.navigateTo = { route -> currentScreenState.value = route }

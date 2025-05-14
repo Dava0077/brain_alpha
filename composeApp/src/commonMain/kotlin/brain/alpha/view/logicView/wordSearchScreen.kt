@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import brain.alpha.controller.AuthController
 import brain.alpha.controller.GameSessionController
 import brain.alpha.controller.logicController.wordSearchController
 import brain.alpha.model.UserSession
@@ -339,6 +340,11 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                         scope.launch {
                             val userId = runCatching { UserSession.getUserId() }.getOrNull()
                             if (userId != null) {
+                                AuthController.ensureUserExists(
+                                    userId = userId,
+                                    email = UserSession.email.value,
+                                    username = UserSession.username.value
+                                )
                                 GameSessionController.registerGameSession(
                                     gameId = "d15d1344-df81-41d5-87f0-c468668be2d8",
                                     score = score,

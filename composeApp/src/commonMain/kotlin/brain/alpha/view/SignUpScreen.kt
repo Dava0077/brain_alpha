@@ -84,7 +84,12 @@ fun SignUpScreen(
                         onValueChange = { email = it },
                         label = { Text("Email") },
                         singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            backgroundColor = Color.White,
+                            focusedBorderColor = Color.Gray,
+                            unfocusedBorderColor = Color.LightGray
+                        )
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -94,7 +99,12 @@ fun SignUpScreen(
                         onValueChange = { username = it },
                         label = { Text("Usuario") },
                         singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            backgroundColor = Color.White,
+                            focusedBorderColor = Color.Gray,
+                            unfocusedBorderColor = Color.LightGray
+                        )
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -106,7 +116,12 @@ fun SignUpScreen(
                         visualTransformation = PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            backgroundColor = Color.White,
+                            focusedBorderColor = Color.Gray,
+                            unfocusedBorderColor = Color.LightGray
+                        )
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -118,7 +133,12 @@ fun SignUpScreen(
                         visualTransformation = PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            backgroundColor = Color.White,
+                            focusedBorderColor = Color.Gray,
+                            unfocusedBorderColor = Color.LightGray
+                        )
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -156,7 +176,7 @@ fun SignUpScreen(
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0647D7)),
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text(if (loading) "Creando..." else "SIGN UP", color = Color.Black)
+                        Text(if (loading) "Creando..." else "SIGN UP", color = Color.White)
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))

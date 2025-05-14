@@ -29,6 +29,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
+import brain.alpha.controller.AuthController
 import brain.alpha.controller.GameSessionController
 import brain.alpha.controller.memoryController.pairsController
 import brain.alpha.model.UserSession
@@ -368,6 +369,11 @@ fun couplesScreen(
                     scope.launch {
                         val userId = runCatching { UserSession.getUserId() }.getOrNull()
                         if (userId != null) {
+                            AuthController.ensureUserExists(
+                                userId = userId,
+                                email = UserSession.email.value,
+                                username = UserSession.username.value
+                            )
                             GameSessionController.registerGameSession(
                                 gameId = "24bc262b-ab64-4c71-9c45-8d4fa04a549e",
                                 score = score,

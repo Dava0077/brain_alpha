@@ -191,6 +191,15 @@ object AuthController {
                 .decodeSingle<UserModel>()
         }.getOrNull()
     }
+    suspend fun ensureUserExists(userId: String, email: String?, username: String?) {
+        SupabaseClientProvider.client.postgrest["users"].upsert(
+            buildJsonObject {
+                put("id", userId)
+                put("email", email ?: "")
+                put("name", username ?: "GoogleUser")
+            }
+        )
+    }
 
 
 }

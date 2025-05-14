@@ -6,4 +6,7 @@ object SettingsController {
     fun goHome(){
         navigateTo("home")
     }
+    fun goUserScreen(){
+        navigateTo("profile")
+    }
 }

@@ -86,15 +86,15 @@ fun SettingsScreen(controller: SettingsController) {
                 )
 
                 settingsItem(Strings.t("change_name")) {
-                    // TODO
+                    controller.goUserScreen()
                 }
 
                 settingsItem(Strings.t("change_email")) {
-                    // TODO
+                    controller.goUserScreen()
                 }
 
                 settingsItem(Strings.t("change_password")) {
-                    // TODO
+                    controller.goUserScreen()
                 }
             }
         }

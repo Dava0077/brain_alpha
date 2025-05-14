@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
+import brain.alpha.controller.AuthController
 import brain.alpha.controller.GameSessionController
 import brain.alpha.controller.concentrationController.stroopController
 import brain.alpha.model.UserSession
@@ -358,6 +359,11 @@ fun sudokuScreen(controller: sudokuController, onNavigateToHome: () -> Unit) {
                             scope.launch {
                                 val userId = runCatching { UserSession.getUserId() }.getOrNull()
                                 if (userId != null) {
+                                    AuthController.ensureUserExists(
+                                        userId = userId,
+                                        email = UserSession.email.value,
+                                        username = UserSession.username.value
+                                    )
                                     GameSessionController.registerGameSession(
                                         gameId = "b012b362-d7d3-49f7-b14b-bce8ea297453",
                                         score = score,

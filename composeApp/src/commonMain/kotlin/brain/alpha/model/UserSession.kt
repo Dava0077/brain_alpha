@@ -1,6 +1,8 @@
 package brain.alpha.model
 
 import androidx.compose.runtime.mutableStateOf
+import brain.alpha.services.SupabaseClientProvider
+import io.github.jan.supabase.auth.auth
 import kotlinx.serialization.Serializable
 
 
@@ -102,6 +104,7 @@ object UserSession {
     }
 
     fun getUserId(): String? {
-        return if (isAuthenticated()) currentUserId else null
+        return currentUserId
+            ?: SupabaseClientProvider.client.auth.currentUserOrNull()?.id
     }
 }

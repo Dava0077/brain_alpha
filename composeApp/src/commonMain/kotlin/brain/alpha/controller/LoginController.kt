@@ -7,6 +7,7 @@ import brain.alpha.model.UserSession
 import brain.alpha.model.UserSession.clear
 import brain.alpha.services.SupabaseClientProvider
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -40,7 +41,7 @@ object LoginController {
     // Navigation lambda set in App.kt
     lateinit var navigateTo: (String) -> Unit
 
-    val googleLoginSuccess = MutableStateFlow(false)
+    val googleLoginSuccess = mutableStateOf(false)
 
 
     /**
@@ -159,4 +160,14 @@ object LoginController {
     fun resetGoogleFlag() {
         googleLoginSuccess.value = false
     }
+    fun setUser(userInfo: UserInfo) {
+        UserSession.setSession(
+            id = userInfo.id,
+            emailValue = userInfo.email ?: "desconocido@correo.com",
+            usernameValue = userInfo.email?.substringBefore("@")?.replaceFirstChar { it.uppercase() } ?: "Usuario"
+        )
+    }
+
+
+
 }
