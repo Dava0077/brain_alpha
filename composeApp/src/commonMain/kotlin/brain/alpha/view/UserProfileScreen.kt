@@ -135,6 +135,35 @@ fun UserProfileScreen(onBack: () -> Unit) {
                 Text(username, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 Text(email, fontSize = 14.sp, color = Color.Gray)
 
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Button(
+                        onClick = onBack,
+                        modifier = Modifier
+                            .height(46.dp),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF303030)),
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = ButtonDefaults.elevation(4.dp)
+                    ) {
+                        Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Button(
+                        onClick = { showLogoutConfirm = true },
+                        modifier = Modifier
+                            .height(46.dp),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red),
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = ButtonDefaults.elevation(4.dp)
+                    ) {
+                        Text(Strings.t("log_out"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
+                    }
+                }
+
                 if (!isEmailVerified) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Button(

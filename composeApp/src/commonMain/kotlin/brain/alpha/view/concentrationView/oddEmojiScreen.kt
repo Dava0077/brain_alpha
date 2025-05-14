@@ -24,6 +24,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brain.alpha.controller.GameSessionController
+import brain.alpha.controller.LoginController
 import brain.alpha.controller.concentrationController.oddEmojiController
 import brain.alpha.model.UserSession
 import brain.alpha.model.shared.Difficulty
@@ -40,13 +41,50 @@ fun OddEmojiScreen(controller: oddEmojiController = oddEmojiController) {
     val errors by controller.errors
     val isGameOver by controller.isGameOver
     val showInstructions by controller.showInstructions
-    val difficulty = remember { mutableStateOf(Difficulty.MEDIUM) }
     val score by controller.score
     val timeLeft by controller.timeLeft
     val timeProgress = controller.getTimeProgress()
     val showEndDialog = remember { mutableStateOf(false) }
     val isGameStarted = remember { mutableStateOf(false) }
     val sessionSaved = remember { mutableStateOf(false) }
+    val selectedDifficulty = remember { mutableStateOf(Difficulty.EASY) }
+    val totalScore = remember { mutableStateOf(0) }
+    val gameId = "498d59a6-7136-4676-9075-93d115d0395f"
+
+    suspend fun refreshTotalScore() {
+        val userId = UserSession.userId.value
+        if (!UserSession.isGuest.value && userId != null) {
+            val total = GameSessionController.getTotalScore(
+                userId = userId,
+                gameId = gameId,
+                supabase = brain.alpha.services.SupabaseClientProvider.client
+            )
+            totalScore.value = total
+            selectedDifficulty.value = when (total) {
+                in 0..499 -> Difficulty.EASY
+                in 500..1499 -> Difficulty.MEDIUM
+                else -> Difficulty.HARD
+            }
+        }
+    }
+
+    LaunchedEffect(UserSession.userId.value) {
+        val userId = UserSession.userId.value
+        if (!UserSession.isGuest.value && userId != null) {
+            val total = GameSessionController.getTotalScore(
+                userId = userId,
+                gameId = gameId,
+                supabase = brain.alpha.services.SupabaseClientProvider.client
+            )
+            totalScore.value = total
+            selectedDifficulty.value = when (total) {
+                in 0..499 -> Difficulty.EASY
+                in 500..1499 -> Difficulty.MEDIUM
+                else -> Difficulty.HARD
+            }
+        }
+    }
+
 
     LaunchedEffect(isGameOver) {
         if (isGameOver) showEndDialog.value = true
@@ -81,7 +119,7 @@ fun OddEmojiScreen(controller: oddEmojiController = oddEmojiController) {
                     .border(BorderStroke(2.dp, Color(0xFFB0BEC5)))
             ) {
                 IconButton(
-                    onClick = {},
+                    onClick = { LoginController.navigateTo("profile") },
                     modifier = Modifier
                         .align(Alignment.CenterStart)
                         .padding(start = 8.dp)
@@ -100,7 +138,7 @@ fun OddEmojiScreen(controller: oddEmojiController = oddEmojiController) {
                 )
 
                 IconButton(
-                    onClick = {},
+                    onClick = { LoginController.navigateTo("settings") },
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .padding(end = 8.dp)
@@ -113,6 +151,22 @@ fun OddEmojiScreen(controller: oddEmojiController = oddEmojiController) {
             Spacer(modifier = Modifier.height(5.dp))
 
             Spacer(modifier = Modifier.height(30.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .height(46.dp)
+                    .background(Color.White, shape = RoundedCornerShape(12.dp))
+                    .border(BorderStroke(1.dp, Color.Black), shape = RoundedCornerShape(12.dp))
+                    .padding(horizontal = 16.dp)
+            ) {
+                Text(
+                    text = "${totalScore.value} " + Strings.t("neurons"),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color.Black
+                )
+            }
 
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -153,24 +207,73 @@ fun OddEmojiScreen(controller: oddEmojiController = oddEmojiController) {
 
                     Spacer(modifier = Modifier.height(8.dp))
 
+                    val diffColors = mapOf(
+                        Difficulty.EASY to Color(0xFF81C784),
+                        Difficulty.MEDIUM to Color(0xFF64B5F6),
+                        Difficulty.HARD to Color(0xFFE57373)
+                    )
+
+                    val unlockedDifficulty = when {
+                        totalScore.value >= 3000 -> Difficulty.HARD
+                        totalScore.value >= 1500 -> Difficulty.MEDIUM
+                        else -> Difficulty.EASY
+                    }
+
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Difficulty.values().forEach { diff ->
+                            val isUnlocked = diff.ordinal <= unlockedDifficulty.ordinal
+                            val isSelected = selectedDifficulty.value == diff
+                            val bgColor = diffColors[diff] ?: Color.LightGray
+                            val textColor = if (isUnlocked) Color.White else Color.Gray
+                            val icon = if (isUnlocked) "⚡" else "🔒"
+
                             Button(
-                                onClick = { difficulty.value = diff },
+                                onClick = { if (isUnlocked) selectedDifficulty.value = diff },
+                                enabled = isUnlocked,
                                 colors = ButtonDefaults.buttonColors(
-                                    backgroundColor = if (difficulty.value == diff) Color.Gray else Color.LightGray
+                                    backgroundColor = if (isSelected) bgColor else bgColor.copy(alpha = 0.6f),
+                                    contentColor = textColor
                                 ),
-                                shape = RoundedCornerShape(10.dp)
+                                shape = RoundedCornerShape(10.dp),
+                                elevation = ButtonDefaults.elevation(2.dp)
                             ) {
-                                Text(diff.name)
+                                Text("$icon ${diff.name}")
                             }
                         }
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    val (icon, color, msg) = when {
+                        totalScore.value < 1500 -> Triple("🔒", Color.Red, "${1500 - totalScore.value} neuronas para desbloquear MEDIUM")
+                        totalScore.value < 3000 -> Triple("🔒", Color.Red, "${3000 - totalScore.value} neuronas para desbloquear HARD")
+                        else -> Triple("🔓", Color.Green, "Todas las dificultades desbloqueadas")
+                    }
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .padding(vertical = 4.dp)
+                            .background(Color(0xFFF5F5F5), RoundedCornerShape(8.dp))
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                    ) {
+                        Text(
+                            text = icon,
+                            fontSize = 16.sp,
+                            modifier = Modifier.padding(end = 6.dp)
+                        )
+                        Text(
+                            text = msg,
+                            fontSize = 14.sp,
+                            color = color,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
                     Button(onClick = {
-                        controller.startGame(difficulty.value)
+                        controller.startGame(selectedDifficulty.value)
                         isGameStarted.value = true
                     },
                         modifier = Modifier
@@ -335,7 +438,7 @@ fun OddEmojiScreen(controller: oddEmojiController = oddEmojiController) {
                     if (userId != null) {
                         val score = controller.getFinalScore()
                         val avgTime = controller.getAverageTime().toDouble()
-                        val difficulty = difficulty.value.name
+                        val difficulty = selectedDifficulty.value.name
 
                         GameSessionController.registerGameSession(
                             gameId = "498d59a6-7136-4676-9075-93d115d0395f",
@@ -344,6 +447,7 @@ fun OddEmojiScreen(controller: oddEmojiController = oddEmojiController) {
                             timeAvg = avgTime
                         ).onSuccess {
                             println("✅ Sesión guardada: score=$score, avgTime=$avgTime, difficulty=$difficulty")
+                            refreshTotalScore()
                         }.onFailure {
                             println("❌ Error al guardar sesión: ${it.message}")
                         }
@@ -385,7 +489,7 @@ fun OddInstructionsScreen(onBack: () -> Unit) {
                     .border(BorderStroke(2.dp, Color(0xFFB0BEC5)))
             ) {
                 IconButton(
-                    onClick = { /* Dummy user action */ },
+                    onClick = { LoginController.navigateTo("profile") },
                     modifier = Modifier
                         .align(Alignment.CenterStart)
                         .padding(start = 8.dp)
@@ -407,7 +511,7 @@ fun OddInstructionsScreen(onBack: () -> Unit) {
                 )
 
                 IconButton(
-                    onClick = { /* Dummy settings action */ },
+                    onClick = { LoginController.navigateTo("settings") },
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .padding(end = 8.dp)
