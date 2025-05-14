@@ -62,6 +62,7 @@ fun StroopScreen(controller: stroopController = stroopController) {
     val showEndDialog = remember { mutableStateOf(false) }
     var sessionSaved by remember { mutableStateOf(false) }
 
+
     LaunchedEffect(isGameOver) {
         if (isGameOver) {
             showEndDialog.value = true
@@ -88,7 +89,28 @@ fun StroopScreen(controller: stroopController = stroopController) {
         }
     }
 
+    val gameId = "f68da1b6-6e34-422c-be12-579991dbbc54"
     val selectedDifficulty = remember { mutableStateOf(Difficulty.EASY) }
+    val totalScore = remember { mutableStateOf(0) }
+
+    LaunchedEffect(UserSession.userId.value) {
+        val userId = UserSession.userId.value
+        if (!UserSession.isGuest.value && userId != null) {
+            val total = GameSessionController.getTotalScore(
+                userId = userId,
+                gameId = gameId,
+                supabase = brain.alpha.services.SupabaseClientProvider.client
+            )
+            totalScore.value = total
+
+            selectedDifficulty.value = when (total) {
+                in 0..49 -> Difficulty.EASY
+                in 50..149 -> Difficulty.MEDIUM
+                else -> Difficulty.HARD
+            }
+            controller.setDifficulty(selectedDifficulty.value)
+        }
+    }
 
     val showContinuePrompt = remember { mutableStateOf(false) }
 
@@ -172,6 +194,22 @@ fun StroopScreen(controller: stroopController = stroopController) {
             Spacer(modifier = Modifier.height(5.dp)) // Espacio tras el logo
 
             Spacer(modifier = Modifier.height(30.dp))
+
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .height(46.dp)
+                    .background(Color.White, shape = RoundedCornerShape(12.dp))
+                    .border(BorderStroke(1.dp, Color.Black), shape = RoundedCornerShape(12.dp))
+                    .padding(horizontal = 16.dp)
+            ) {
+                Text(
+                    text = "${totalScore.value} " + Strings.t("neurons"),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color.Black
+                )
+            }
 
 
             // End-game dialog
@@ -262,19 +300,79 @@ fun StroopScreen(controller: stroopController = stroopController) {
                     Text(Strings.t("insST6"), fontSize = 18.sp, fontWeight = FontWeight.Medium)
                     Spacer(modifier = Modifier.height(8.dp))
 
+                    val diffColors = mapOf(
+                        Difficulty.EASY to Color(0xFF81C784),   // Verde
+                        Difficulty.MEDIUM to Color(0xFF64B5F6), // Azul
+                        Difficulty.HARD to Color(0xFFE57373)    // Rojo
+                    )
+
+                    val unlockedDifficulty = when {
+                        totalScore.value >= 150 -> Difficulty.HARD
+                        totalScore.value >= 50 -> Difficulty.MEDIUM
+                        else -> Difficulty.EASY
+                    }
+
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Difficulty.values().forEach { diff ->
+                            val isUnlocked = diff.ordinal <= unlockedDifficulty.ordinal
+                            val isSelected = selectedDifficulty.value == diff
+                            val bgColor = diffColors[diff] ?: Color.LightGray
+                            val textColor = if (isUnlocked) Color.White else Color.Gray
+                            val icon = if (isUnlocked) "⚡" else "🔒"
+
                             Button(
-                                onClick = { selectedDifficulty.value = diff },
+                                onClick = { if (isUnlocked) selectedDifficulty.value = diff },
+                                enabled = isUnlocked,
                                 colors = ButtonDefaults.buttonColors(
-                                    backgroundColor = if (selectedDifficulty.value == diff) Color.Gray else Color.LightGray
+                                    backgroundColor = if (isSelected) bgColor else bgColor.copy(alpha = 0.6f),
+                                    contentColor = textColor
                                 ),
-                                shape = RoundedCornerShape(10.dp)
+                                shape = RoundedCornerShape(10.dp),
+                                elevation = ButtonDefaults.elevation(2.dp)
                             ) {
-                                Text(diff.name)
+                                Text("$icon ${diff.name}")
                             }
                         }
                     }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+//                    val nextUnlockMsg = when {
+//                        totalScore.value < 50 -> "${50 - totalScore.value} neuronas para desbloquear MEDIUM"
+//                        totalScore.value < 150 -> "${150 - totalScore.value} neuronas para desbloquear HARD"
+//                        else -> "Todas las dificultades desbloqueadas"
+//                    }
+//
+//                    Text(nextUnlockMsg, fontSize = 14.sp, color = Color.DarkGray)
+
+                    val (icon, color, msg) = when {
+                        totalScore.value < 50 -> Triple("🔒", Color.Red, "${50 - totalScore.value} neuronas para desbloquear MEDIUM")
+                        totalScore.value < 150 -> Triple("🔒", Color.Red, "${150 - totalScore.value} neuronas para desbloquear HARD")
+                        else -> Triple("🔓", Color.Green, "Todas las dificultades desbloqueadas")
+                    }
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .padding(vertical = 4.dp)
+                            .background(Color(0xFFF5F5F5), RoundedCornerShape(8.dp))
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                    ) {
+                        Text(
+                            text = icon,
+                            fontSize = 16.sp,
+                            modifier = Modifier.padding(end = 6.dp)
+                        )
+                        Text(
+                            text = msg,
+                            fontSize = 14.sp,
+                            color = color,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+
+
+
 
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -406,10 +504,13 @@ fun StroopScreen(controller: stroopController = stroopController) {
                     options.forEach { colorOption ->
                         val colorName = controller.getColorName(colorOption)
 
-                        val textColor = when (colorOption) {
-                            Color.Yellow, Color.Cyan -> Color.Black
-                            else -> Color.White
-                        }
+//                        val textColor = when (colorOption) {
+//                            Color.Yellow, Color.Cyan -> Color.Black
+//                            else -> Color.White
+//                        }
+
+                        // Genera un color aleatorio para el texto (incluyendo negro)
+                        val randomTextColor = listOf(Color.Black, Color.Red, Color.Blue, Color.Green, Color.DarkGray).random()
 
                         Button(
                             onClick = { controller.checkAnswer(colorOption) },
@@ -418,19 +519,20 @@ fun StroopScreen(controller: stroopController = stroopController) {
                                 .width(200.dp)
                                 .height(56.dp),
                             colors = ButtonDefaults.buttonColors(
-                                backgroundColor = colorOption,
-                                contentColor = textColor
+                                backgroundColor = Color.White,
+                                contentColor = randomTextColor
                             ),
-                            shape = RoundedCornerShape(8.dp)
+                            shape = RoundedCornerShape(8.dp),
+                            border = BorderStroke(1.dp, Color.Gray)
                         ) {
                             Text(
                                 text = colorName.uppercase(),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.sp,
                                 textAlign = TextAlign.Center,
-                                color = textColor,
+                                color = randomTextColor,
                                 style = LocalTextStyle.current.copy(
-                                    shadow = Shadow(Color.Black, offset = Offset(1f, 1f), blurRadius = 2f)
+                                    shadow = Shadow(Color.LightGray, offset = Offset(1f, 1f), blurRadius = 2f)
                                 )
                             )
                         }

@@ -14,6 +14,7 @@ import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brain.alpha.controller.AuthController
+import brain.alpha.model.UserSession
 import brainalpha.composeapp.generated.resources.*
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
@@ -213,6 +214,25 @@ fun SignUpScreen(
                     }
                 )
             }
+
+//            //Dialog email validated "TO DO"
+//            if (UserSession.) {
+//                AlertDialog(
+//                    onDismissRequest = {},
+//                    title = { Text("Email validado") },
+//                    text = {
+//                        Text("Hemos enviado un enlace de confirmación a tu email. Debes verificarlo antes de iniciar sesión.")
+//                    },
+//                    confirmButton = {
+//                        TextButton(onClick = {
+//                            showSuccessDialog = false
+//                            onGoToLogin()
+//                        }) {
+//                            Text("OK")
+//                        }
+//                    }
+//                )
+//            }
         }
     }
 }
