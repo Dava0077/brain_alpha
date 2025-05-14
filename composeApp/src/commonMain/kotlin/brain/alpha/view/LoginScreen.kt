@@ -26,6 +26,9 @@ import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import brain.alpha.model.UserSession
+import io.github.jan.supabase.auth.user.UserInfo
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.coroutines.delay
 
 
 /**
@@ -46,32 +49,94 @@ fun LoginScreen(
     val scaffoldState = rememberScaffoldState()
     val googleLoginSuccess by LoginController.googleLoginSuccess
 
-    val coroutineScope = rememberCoroutineScope()
     var showResetDialog by remember { mutableStateOf(false) }
     var resetEmail by remember { mutableStateOf("") }
     var resetFeedback by remember { mutableStateOf<String?>(null) }
     var sendingReset by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
-
+    val coroutineScope = rememberCoroutineScope()
 
     val googleSignIn = GoogleAuthController.googleSignInAction(
         scope = coroutineScope,
-        onSuccess = { userInfo ->
-            println("✅ Google login success: ${userInfo.email}")
+        onSuccess = {}, // no usamos el callback directamente, sino via LaunchedEffect
+        onError = { error -> println("❌ Google login failed: ${error.message}") }
+    )
 
-            coroutineScope.launch {
-                scaffoldState.snackbarHostState.showSnackbar("Bienvenido, ${userInfo.email}")
+    val alreadyHandled = remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(500) // Poll every 0.5s
+            val user = SupabaseClientProvider.client.auth.currentUserOrNull()
+            if (user != null && !alreadyHandled.value) {
+                alreadyHandled.value = true
+
+                println("✅ Usuario detectado tras Google Login: ${user.email}")
+
+                SupabaseClientProvider.client.auth.sessionManager.loadSession()
+
+                UserSession.setSession(
+                    id = user.id,
+                    emailValue = user.email ?: "desconocido@correo.com",
+                    usernameValue = user.userMetadata?.get("username")?.toString()
+                        ?: user.email?.substringBefore('@')?.replaceFirstChar { it.uppercase() }
+                        ?: "Usuario"
+                )
+
+                scaffoldState.snackbarHostState.showSnackbar("Bienvenido, ${user.email}")
+
+                LoginController.setUser(
+                    UserInfo(id = user.id, email = user.email ?: "unknown", aud = user.aud ?: "")
+                )
+                LoginController.clear()
+                LoginController.navigateTo("home")
             }
-
-            LoginController.setUser(userInfo)
-            LoginController.clear()
         }
-        ,
+    }
+
+
+    /*val googleSignIn = GoogleAuthController.googleSignInAction(
+        scope = coroutineScope,
+        onSuccess = { userInfo ->
+            coroutineScope.launch {
+                val user = withTimeoutOrNull(5000) {
+                    while (SupabaseClientProvider.client.auth.currentUserOrNull() == null) {
+                        delay(100)
+                    }
+                    SupabaseClientProvider.client.auth.currentUserOrNull()
+                }
+
+                if (user == null) {
+                    println("❌ Sesión no disponible tras Google Login")
+                    scaffoldState.snackbarHostState.showSnackbar("Error: Sesión no disponible.")
+                    return@launch
+                }
+
+                // ✅ Restaurar sesión explícitamente
+                SupabaseClientProvider.client.auth.sessionManager.loadSession()
+
+                UserSession.setSession(
+                    id = user.id,
+                    emailValue = user.email ?: "desconocido@correo.com",
+                    usernameValue = user.userMetadata?.get("username")?.toString()
+                        ?: user.email?.substringBefore('@')?.replaceFirstChar { it.uppercase() }
+                        ?: "Usuario"
+                )
+
+                println("✅ Google login success: ${user.email}")
+                scaffoldState.snackbarHostState.showSnackbar("Bienvenido, ${user.email}")
+
+                LoginController.setUser(
+                    UserInfo(id = user.id, email = user.email ?: "unknown", aud = user.aud ?: "")
+                )
+                LoginController.clear()
+                LoginController.navigateTo("home")
+            }
+        },
         onError = { error ->
             println("Login ERROR: ${error.message}")
         }
-    )
-
+    )*/
 
 
 

@@ -64,6 +64,7 @@ fun HomeScreen(
 
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
+    val scrollState = rememberScrollState()
 
     Scaffold(
         scaffoldState = scaffoldState,
@@ -80,7 +81,9 @@ fun HomeScreen(
             )
 
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) {
@@ -150,7 +153,7 @@ fun HomeScreen(
                             .padding(start = 72.dp)
                     )
                 }
-                Spacer(modifier = Modifier.height(5.dp))
+                Spacer(modifier = Modifier.height(70.dp))
 
                 Button(
                     onClick = {controller.goLeaderboard()},
@@ -165,8 +168,7 @@ fun HomeScreen(
                     Text(Strings.t("leaderboard"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
                 }
 
-                Spacer(modifier = Modifier.height(70.dp))
-                Spacer(modifier = Modifier.height(70.dp))
+                Spacer(modifier = Modifier.height(60.dp))
 
                 Text(
                     text = Strings.t("categories"),

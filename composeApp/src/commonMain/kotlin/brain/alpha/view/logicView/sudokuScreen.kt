@@ -56,6 +56,7 @@ fun sudokuScreen(controller: sudokuController, onNavigateToHome: () -> Unit) {
     var sessionSaved by remember { mutableStateOf(false) }
     val userId = runCatching { UserSession.getUserId() }.getOrNull()
     val totalScore = remember { mutableStateOf(0) }
+    val scrollState = rememberScrollState()
 
     LaunchedEffect(userId) {
         if (userId != null) {
@@ -118,7 +119,7 @@ fun sudokuScreen(controller: sudokuController, onNavigateToHome: () -> Unit) {
         )
 
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
