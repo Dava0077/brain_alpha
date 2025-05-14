@@ -1,9 +1,12 @@
 package brain.alpha.view
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+
+
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -12,6 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brain.alpha.controller.GameSessionController
@@ -21,6 +26,7 @@ import brain.alpha.controller.LeaderboardEntry
 import brain.alpha.controller.LeaderboardByDifficulty
 import brainalpha.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
+import brain.alpha.utils.isCompactScreen
 import kotlinx.coroutines.launch
 import kotlin.math.round
 
@@ -29,9 +35,40 @@ enum class SortOption(val label: String) {
     TIME_AVG("Tiempo medio")
 }
 
+val displayNamesMap = mapOf(
+    "pairs_game" to "Juego de parejas",
+    "simon_game" to "Simón Dice",
+    "sudoku_game" to "Sudoku",
+    "wordSearch_game" to "Sopa de Letras",
+    "stroopTest_game" to "Stroop Game",
+    "oddEmoji_game" to "Odd Emoji",
+    "mental_math" to "Quick Maths",
+    "click_number" to "Click Number"
+)
+
+
+
+
+
+fun sort(entries: List<LeaderboardEntry>, sortBy: SortOption): List<LeaderboardEntry> {
+    return when (sortBy) {
+        SortOption.SCORE -> entries.sortedByDescending { it.score }
+        SortOption.TIME_AVG -> entries.sortedBy { it.timeAvg ?: Double.MAX_VALUE }
+    }
+}
+
+
+
+
+
+
+
 
 @Composable
 fun LeaderboardScreen(controller: LeaderboardController) {
+    val isCompact = isCompactScreen()
+
+
     val displayName = UserSession.getDisplayName()
     val categories = mapOf(
         "Memoria" to listOf("pairs_game", "simon_game"),
@@ -40,27 +77,23 @@ fun LeaderboardScreen(controller: LeaderboardController) {
         "Agilidad Mental" to listOf("mental_math", "click_number")
     )
 
+    val sortOption = remember { mutableStateOf(SortOption.SCORE) }
+
+    val sortBy = sortOption.value
+
     val ascending = remember { mutableStateOf(false) }
     val expandedCategory = remember { mutableStateOf<String?>(null) }
     val expandedGame = remember { mutableStateOf<String?>(null) }
     val leaderboardMap = remember { mutableStateMapOf<String, LeaderboardByDifficulty>() }
-    val sortOption = remember { mutableStateOf(SortOption.SCORE) }
-    val sortBy = sortOption.value
+
+
     val reloadTrigger = remember { mutableStateOf(0) }
 
     val coroutineScope = rememberCoroutineScope()
 
-    fun sort(entries: List<LeaderboardEntry>): List<LeaderboardEntry> {
-        return when (sortBy) {
-            SortOption.SCORE -> entries.sortedByDescending { it.score }
-            SortOption.TIME_AVG -> entries.sortedBy { it.timeAvg ?: Double.MAX_VALUE }
-        }
-    }
 
 
 
-
-    // IDs de ejemplo para juegos
     val gameIdMap = mapOf(
         "pairs_game" to "24bc262b-ab64-4c71-9c45-8d4fa04a549e",
         "simon_game" to "2927d18f-b1ab-4376-990e-1275e5ba181e",
@@ -73,7 +106,12 @@ fun LeaderboardScreen(controller: LeaderboardController) {
 
     )
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(if (isCompact) 8.dp else 16.dp)
+    ) {
         // Top bar
         Box(
             modifier = Modifier.fillMaxWidth().height(70.dp)
@@ -100,16 +138,12 @@ fun LeaderboardScreen(controller: LeaderboardController) {
             Text("Volver", color = Color.White)
         }
 
-
-
-
-
-
-
         Spacer(modifier = Modifier.height(24.dp))
 
-        Text("Clasificación por juego", fontSize = 28.sp, fontWeight = FontWeight.Bold)
-
+        Text(
+            "Clasificación por juego",
+            fontSize = if (isCompact) 22.sp else 28.sp,
+            fontWeight = FontWeight.Bold)
 
 //        // 👇 DEBUG VISUAL: todas las entradas cargadas
 //        leaderboardMap.forEach { (gameId, leaderboard) ->
@@ -136,22 +170,28 @@ fun LeaderboardScreen(controller: LeaderboardController) {
             Text("Ordenar por:")
             SortOption.values().forEach { option ->
                 Button(
-                    onClick = { sortOption.value = option
-                        reloadTrigger.value++ // 🟢 recarga al cambiar //
-                        },
+                    onClick = {
+                        sortOption.value = option
+                        reloadTrigger.value++  // Forzar recarga
+                    },
                     colors = ButtonDefaults.buttonColors(
-                        backgroundColor = if (sortOption.value == option) Color.Gray else Color.LightGray
+                        backgroundColor = if (sortOption.value == option) Color(0xFF4FC3F7) else Color.LightGray
                     )
                 ) {
-                    Text(option.label)
+                    Text(option.label, color = Color.White)
                 }
-
             }
 
-            Button(onClick = { ascending.value = !ascending.value
-                reloadTrigger.value++ // 🟢 recarga al cambiar
-                 }) {
-                Text(if (ascending.value) "Asc" else "Desc")
+            Button(
+                onClick = {
+                    ascending.value = !ascending.value
+                    reloadTrigger.value++  // Forzar recarga
+                },
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color(0xFF4FC3F7)
+                )
+            ) {
+                Text(if (ascending.value) "Asc" else "Desc", color = Color.White)
             }
         }
 
@@ -166,34 +206,57 @@ fun LeaderboardScreen(controller: LeaderboardController) {
                     expandedGame.value = null
                 }
             ) {
+//                games.forEach { game ->
+//                    val gameId = gameIdMap[game]
+//                    if (gameId.isNullOrBlank()) {
+//                        println("⚠️ No se encontró gameId válido para '$game'.")
+//                        return@forEach
+//                    }
+
+//                    ExpandableGame(
+//                        gameName = game,
+//                        gameId = gameId,
+//                        isExpanded = expandedGame.value == game,
+//                        onExpandToggle = {
+//                            expandedGame.value = if (expandedGame.value == game) null else game
+//                            if (expandedGame.value != null && !leaderboardMap.containsKey(gameId)) {
+//                                coroutineScope.launch {
+//                                    println("🔍 Intentando cargar leaderboard para juegoId=$gameId...")
+//                                    val orderField = sortOption.value.name.lowercase()
+//                                    println("📤 Solicitando leaderboard: gameId=$gameId, orderBy=$orderField, asc=${ascending.value}")
+//                                    val data = GameSessionController.getGlobalLeaderboardByGameId(
+//                                        gameId = gameId,
+//                                        orderBy = orderField,
+//                                        ascending = ascending.value
+//                                    )
+//                                    data.onFailure { error -> println("❌ Error al cargar leaderboard: ${error.message}") }
+//                                    data.getOrNull()?.let {
+//                                        println("✅ Leaderboard cargado con ${it.easy.size + it.medium.size + it.hard.size} entradas")
+//                                        leaderboardMap[gameId] = it
+//                                    }
+//                                }
+//                            }
+//                        },
+//                        leaderboard = leaderboardMap[gameId]
+//                    )
                 games.forEach { game ->
-                    val gameId = gameIdMap[game]
-                    if (gameId.isNullOrBlank()) {
-                        println("⚠️ No se encontró gameId válido para '$game'.")
-                        return@forEach
-                    }
+                    val gameId = gameIdMap[game] ?: return@forEach
+                    val gameLabel = displayNamesMap[game] ?: game
 
                     ExpandableGame(
-                        gameName = game,
+                        gameName = gameLabel,
                         gameId = gameId,
                         isExpanded = expandedGame.value == game,
                         onExpandToggle = {
                             expandedGame.value = if (expandedGame.value == game) null else game
                             if (expandedGame.value != null && !leaderboardMap.containsKey(gameId)) {
                                 coroutineScope.launch {
-                                    println("🔍 Intentando cargar leaderboard para juegoId=$gameId...")
-                                    val orderField = sortOption.value.name.lowercase()
-                                    println("📤 Solicitando leaderboard: gameId=$gameId, orderBy=$orderField, asc=${ascending.value}")
                                     val data = GameSessionController.getGlobalLeaderboardByGameId(
                                         gameId = gameId,
-                                        orderBy = orderField,
+                                        orderBy = sortOption.value.name.lowercase(),
                                         ascending = ascending.value
                                     )
-                                    data.onFailure { error -> println("❌ Error al cargar leaderboard: ${error.message}") }
-                                    data.getOrNull()?.let {
-                                        println("✅ Leaderboard cargado con ${it.easy.size + it.medium.size + it.hard.size} entradas")
-                                        leaderboardMap[gameId] = it
-                                    }
+                                    data.getOrNull()?.let { leaderboardMap[gameId] = it }
                                 }
                             }
                         },
@@ -213,15 +276,22 @@ fun ExpandableCategory(
     content: @Composable ColumnScope.() -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp))
             .padding(8.dp)
             .clickable { onExpandToggle() }
     ) {
         Text(text = title, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-        if (isExpanded) {
-            Spacer(modifier = Modifier.height(8.dp))
-            content()
+//        if (isExpanded) {
+//            Spacer(modifier = Modifier.height(8.dp))
+//            content()
+//        }
+        AnimatedVisibility(visible = isExpanded, enter = fadeIn(), exit = fadeOut()) {
+            Column {
+                Spacer(modifier = Modifier.height(8.dp))
+                content()
+            }
         }
     }
 }
@@ -237,17 +307,34 @@ fun ExpandableGame(
     Column(modifier = Modifier.fillMaxWidth().padding(start = 12.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(gameName, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
-            Button(onClick = onExpandToggle) {
-                Text(if (isExpanded) "Cerrar" else "Ver")
+            Button(
+                onClick = onExpandToggle,
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF4FC3F7))
+            ) {
+                Text(if (isExpanded) "Cerrar" else "Ver", color = Color.White)
             }
         }
-        if (isExpanded) {
-            if (leaderboard != null) {
-                LeaderboardSection("Fácil", leaderboard.easy)
-                LeaderboardSection("Medio", leaderboard.medium)
-                LeaderboardSection("Difícil", leaderboard.hard)
-            } else {
-                if (leaderboard == null) {
+//        if (isExpanded) {
+//            if (leaderboard != null) {
+//                LeaderboardSection("Fácil", leaderboard.easy)
+//                LeaderboardSection("Medio", leaderboard.medium)
+//                LeaderboardSection("Difícil", leaderboard.hard)
+//            } else {
+//                if (leaderboard == null) {
+//                    CircularProgressIndicator(
+//                        modifier = Modifier.size(24.dp).padding(8.dp),
+//                        color = Color.Gray
+//                    )
+//                }
+//            }
+//        }
+        AnimatedVisibility(visible = isExpanded, enter = fadeIn(), exit = fadeOut()) {
+            Column {
+                if (leaderboard != null) {
+                    LeaderboardSection("Fácil", sort(leaderboard.easy, SortOption.SCORE))
+                    LeaderboardSection("Medio", sort(leaderboard.medium, SortOption.SCORE))
+                    LeaderboardSection("Difícil", sort(leaderboard.hard, SortOption.SCORE))
+                } else {
                     CircularProgressIndicator(
                         modifier = Modifier.size(24.dp).padding(8.dp),
                         color = Color.Gray
@@ -255,30 +342,82 @@ fun ExpandableGame(
                 }
             }
         }
+
     }
 }
 
 @Composable
 fun LeaderboardSection(title: String, entries: List<LeaderboardEntry>) {
-    Text("• $title", fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.padding(top = 12.dp))
-    entries.forEachIndexed { i, entry ->
-        Card(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-            elevation = 4.dp
-        ) {
-            Column(Modifier.padding(12.dp)) {
-                Text("#${i + 1} ${entry.username}", fontWeight = FontWeight.Bold)
-                Text("Puntos: ${entry.score}")
-                entry.timeAvg?.let {
-                    Text("Tiempo medio: ${round(it * 10) / 10} s")
-                }
-                entry.timeLeft?.let {
-                    Text("Tiempo restante: ${round(it * 10) / 10} s")
-                }
-                Text("Fecha: ${entry.playedAt.take(10)}")
+    val headerColor = when (title.lowercase()) {
+        "fácil" -> Color(0xFFD6F5E3)
+        "medio" -> Color(0xFFD6E9F5)
+        "difícil" -> Color(0xFFF5D6E0)
+        else -> Color(0xFFCCE5FF)
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 12.dp)
+            .background(Color(0xFFEAF4FF))
+    ) {
+        Text(
+            text = "• $title",
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp,
+            modifier = Modifier.padding(8.dp)
+        )
+
+        HeaderRow(headerColor)
+
+        if (entries.isEmpty()) {
+            Text(
+                "Aún no hay partidas registradas",
+                color = Color.Gray,
+                modifier = Modifier.padding(12.dp)
+            )
+        } else {
+            entries.forEachIndexed { i, entry ->
+                EntryRow(index = i, entry = entry)
             }
         }
     }
 }
+
+@Composable
+fun HeaderRow(bgColor: Color) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(bgColor)
+            .padding(vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text("🏆", fontSize = 14.sp, modifier = Modifier.width(30.dp), textAlign = TextAlign.Center)
+        Text("👤", fontSize = 14.sp, modifier = Modifier.width(100.dp), textAlign = TextAlign.Center)
+        Text("🧠", fontSize = 14.sp, modifier = Modifier.width(60.dp), textAlign = TextAlign.Center)
+        Text("⏱", fontSize = 14.sp, modifier = Modifier.width(60.dp), textAlign = TextAlign.Center)
+        Text("📅", fontSize = 14.sp, modifier = Modifier.width(80.dp), textAlign = TextAlign.Center)
+    }
+}
+
+@Composable
+fun EntryRow(index: Int, entry: LeaderboardEntry) {
+    val bgColor = if (index % 2 == 0) Color.White else Color(0xFFF5FAFF)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(bgColor)
+            .padding(vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text("#${index + 1}", fontSize = 13.sp, modifier = Modifier.width(30.dp), textAlign = TextAlign.Center)
+        Text(entry.username, fontSize = 13.sp, modifier = Modifier.width(100.dp), textAlign = TextAlign.Center)
+        Text(entry.score.toString(), fontSize = 13.sp, modifier = Modifier.width(60.dp), textAlign = TextAlign.Center)
+        Text(entry.timeAvg?.let { "${round(it * 10) / 10} s" } ?: "-", fontSize = 13.sp, modifier = Modifier.width(60.dp), textAlign = TextAlign.Center)
+        Text(entry.playedAt.take(10), fontSize = 13.sp, modifier = Modifier.width(80.dp), textAlign = TextAlign.Center)
+    }
+}
+
 
 
