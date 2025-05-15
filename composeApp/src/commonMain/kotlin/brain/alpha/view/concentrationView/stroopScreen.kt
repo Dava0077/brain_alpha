@@ -26,6 +26,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brain.alpha.controller.GameSessionController
+import brain.alpha.controller.LoginController
 import brain.alpha.controller.concentrationController.stroopController
 import brain.alpha.model.UserSession
 import brain.alpha.model.shared.Difficulty
@@ -158,7 +159,7 @@ fun StroopScreen(controller: stroopController = stroopController) {
             ) {
 
                 IconButton(
-                    onClick = { /* future user action */ },
+                    onClick = { LoginController.navigateTo("profile") },
                     modifier = Modifier
                         .align(Alignment.CenterStart)
                         .padding(start = 8.dp)
@@ -178,7 +179,7 @@ fun StroopScreen(controller: stroopController = stroopController) {
                         .scale(1.2f)
                 )
                 IconButton(
-                    onClick = { /* future settings action */ },
+                    onClick = { LoginController.navigateTo("settings") },
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .padding(end = 8.dp)
@@ -610,7 +611,7 @@ fun StroopInstructionsScreen(onBack: () -> Unit) {
                     .border(BorderStroke(2.dp, Color(0xFFB0BEC5)))
             ) {
                 IconButton(
-                    onClick = { /* Dummy user action */ },
+                    onClick = { LoginController.navigateTo("profile") },
                     modifier = Modifier
                         .align(Alignment.CenterStart)
                         .padding(start = 8.dp)
@@ -632,7 +633,7 @@ fun StroopInstructionsScreen(onBack: () -> Unit) {
                 )
 
                 IconButton(
-                    onClick = { /* Dummy settings action */ },
+                    onClick = { LoginController.navigateTo("settings") },
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .padding(end = 8.dp)
