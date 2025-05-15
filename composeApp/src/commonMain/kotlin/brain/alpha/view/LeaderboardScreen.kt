@@ -47,11 +47,12 @@ val displayNamesMap = mapOf(
 
 
 
-fun sort(entries: List<LeaderboardEntry>, sortBy: SortOption): List<LeaderboardEntry> {
-    return when (sortBy) {
-        SortOption.SCORE -> entries.sortedByDescending { it.score }
+fun sort(entries: List<LeaderboardEntry>, sortBy: SortOption, ascending: Boolean): List<LeaderboardEntry> {
+    val sorted = when (sortBy) {
+        SortOption.SCORE -> entries.sortedBy { it.score }
         SortOption.TIME_AVG -> entries.sortedBy { it.timeAvg ?: Double.MAX_VALUE }
     }
+    return if (ascending) sorted else sorted.reversed()
 }
 
 
@@ -118,10 +119,12 @@ fun LeaderboardScreen(controller: LeaderboardController) {
             IconButton(onClick = {LoginController.navigateTo("profile")}, modifier = Modifier.align(Alignment.CenterStart).padding(start = 8.dp).size(55.dp)) {
                 Image(painter = painterResource(Res.drawable.user), contentDescription = "User")
             }
-            Image(painter = painterResource(Res.drawable.logo), contentDescription = null,
-                modifier = Modifier.align(Alignment.Center).size(120.dp).scale(1.5f))
+
             Text(displayName, color = Color.White, fontSize = 16.sp,
                 modifier = Modifier.align(Alignment.CenterStart).padding(start = 72.dp))
+
+            Text("Clasificación", color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Bold,
+                modifier = Modifier.align(Alignment.Center).padding(start = 72.dp))
 
             IconButton(onClick = { LoginController.navigateTo("settings")}, modifier = Modifier.align(Alignment.CenterEnd).padding(start = 8.dp).size(55.dp)) {
                 Image(painter = painterResource(Res.drawable.ajustes), contentDescription = "Settings")
@@ -261,7 +264,9 @@ fun LeaderboardScreen(controller: LeaderboardController) {
                                 }
                             }
                         },
-                        leaderboard = leaderboardMap[gameId]
+                        leaderboard = leaderboardMap[gameId],
+                        sortOption = sortOption.value,
+                        ascending = ascending.value
                     )
                 }
             }
@@ -303,7 +308,9 @@ fun ExpandableGame(
     gameId: String,
     isExpanded: Boolean,
     onExpandToggle: () -> Unit,
-    leaderboard: LeaderboardByDifficulty?
+    leaderboard: LeaderboardByDifficulty?,
+    sortOption: SortOption,
+    ascending: Boolean
 ) {
     Column(modifier = Modifier.fillMaxWidth().padding(start = 12.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -331,21 +338,20 @@ fun ExpandableGame(
 //        }
         AnimatedVisibility(visible = isExpanded, enter = fadeIn(), exit = fadeOut()) {
             Column {
-                if (leaderboard != null) {
-                    LeaderboardSection("Fácil", sort(leaderboard.easy, SortOption.SCORE))
-                    LeaderboardSection("Medio", sort(leaderboard.medium, SortOption.SCORE))
-                    LeaderboardSection("Difícil", sort(leaderboard.hard, SortOption.SCORE))
-                } else {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp).padding(8.dp),
-                        color = Color.Gray
-                    )
-                }
+                leaderboard?.let {
+                    LeaderboardSection("Fácil", sort(it.easy, sortOption, ascending))
+                    LeaderboardSection("Medio", sort(it.medium, sortOption, ascending))
+                    LeaderboardSection("Difícil", sort(it.hard, sortOption, ascending))
+                } ?: CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp).padding(8.dp),
+                    color = Color.Gray
+                )
+            }
             }
         }
 
     }
-}
+
 
 @Composable
 fun LeaderboardSection(title: String, entries: List<LeaderboardEntry>) {

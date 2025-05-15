@@ -1,5 +1,6 @@
 package brain.alpha.view.concentrationViews
 
+// Required Compose and UI imports
 import androidx.compose.animation.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -40,16 +41,15 @@ import org.jetbrains.compose.resources.painterResource
 
 /**
  * StroopScreen.kt
- *
- * Main composable for the Stroop Test game.
- * Manages instruction screen, game UI, color buttons, timer, score, and feedback.
+ * Main game screen for the Stroop Test
+ * Handles UI, game flow, difficulty logic, score saving, and instructions
  */
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun StroopScreen(controller: stroopController = stroopController) {
 
-    // State bindings from controller
+    // UI state bindings from the controller
     val timeLeft by controller.timeLeft
     val colorWord by controller.currentColorWord
     val displayColor by controller.colorToShow
@@ -64,6 +64,7 @@ fun StroopScreen(controller: stroopController = stroopController) {
     var sessionSaved by remember { mutableStateOf(false) }
 
 
+    // Trigger score saving when game ends
     LaunchedEffect(isGameOver) {
         if (isGameOver) {
             showEndDialog.value = true
@@ -90,10 +91,12 @@ fun StroopScreen(controller: stroopController = stroopController) {
         }
     }
 
+    // Difficulty unlocking and progress tracking
     val gameId = "f68da1b6-6e34-422c-be12-579991dbbc54"
     val selectedDifficulty = remember { mutableStateOf(Difficulty.EASY) }
     val totalScore = remember { mutableStateOf(0) }
 
+    // Load user's total neurons for unlocking difficulties
     LaunchedEffect(UserSession.userId.value) {
         val userId = UserSession.userId.value
         if (!UserSession.isGuest.value && userId != null) {
@@ -113,9 +116,8 @@ fun StroopScreen(controller: stroopController = stroopController) {
         }
     }
 
+    // Resume prompt if a game is already running
     val showContinuePrompt = remember { mutableStateOf(false) }
-
-
     LaunchedEffect(Unit) {
         if (controller.isOngoingGame && !isGameOver) {
             selectedDifficulty.value = controller.getCurrentDifficulty()
@@ -124,16 +126,13 @@ fun StroopScreen(controller: stroopController = stroopController) {
     }
 
 
-    // Show instructions
+    // Show instruction screen if requested
     if (showInstructions) {
         StroopInstructionsScreen(onBack = { controller.showInstructions.value = false })
         return
     }
 
-
-
-
-
+    // Main screen container
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -149,7 +148,7 @@ fun StroopScreen(controller: stroopController = stroopController) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            // Top header bar
+            // Top bar with profile and settings
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -192,8 +191,9 @@ fun StroopScreen(controller: stroopController = stroopController) {
                 }
 
             }
-            Spacer(modifier = Modifier.height(5.dp)) // Espacio tras el logo
 
+            Spacer(modifier = Modifier.height(5.dp))
+            // Display user's total neuron score
             Spacer(modifier = Modifier.height(30.dp))
 
             Box(
@@ -213,7 +213,7 @@ fun StroopScreen(controller: stroopController = stroopController) {
             }
 
 
-            // End-game dialog
+            // Show game-over dialog
             if (showEndDialog.value) {
                 AlertDialog(
                     onDismissRequest = {},
@@ -263,23 +263,25 @@ fun StroopScreen(controller: stroopController = stroopController) {
                 )
             }
 
+            // Main gameplay column layout
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
+                // Adds space at the top
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Back button
+                // Back button logic depending on current game state
                 Button(
                     onClick = {
                         if (isGameStarted.value) {
-                            // Si el juego está corriendo, simplemente vuelve a la selección de dificultad
+                            // If game is running, stop and return to difficulty selection
                             isGameStarted.value = false
                             controller.stopGame()
                             controller.goBackToDifficultySelection()
                         } else {
-                            // Si no hay juego en curso, vuelve a la pantalla principal de concentración
+                            // If not playing, go back to concentration home screen
                             controller.goBackToConcentrationHome()
                         }
                     },
@@ -294,25 +296,31 @@ fun StroopScreen(controller: stroopController = stroopController) {
                     elevation = ButtonDefaults.elevation(4.dp),
                     border = BorderStroke(1.dp, Color.Black)
                 ) {
+                    // Label for back button
                     Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium)
                 }
 
+                // Displayed if game is not currently running
                 if (!isGameStarted.value) {
+                    // Instruction prompt
                     Text(Strings.t("insST6"), fontSize = 18.sp, fontWeight = FontWeight.Medium)
                     Spacer(modifier = Modifier.height(8.dp))
 
+                    // Define colors for each difficulty level
                     val diffColors = mapOf(
-                        Difficulty.EASY to Color(0xFF81C784),   // Verde
-                        Difficulty.MEDIUM to Color(0xFF64B5F6), // Azul
-                        Difficulty.HARD to Color(0xFFE57373)    // Rojo
+                        Difficulty.EASY to Color(0xFF81C784),   // Green
+                        Difficulty.MEDIUM to Color(0xFF64B5F6), // Blue
+                        Difficulty.HARD to Color(0xFFE57373)    // Red
                     )
 
+                    // Determine currently unlocked difficulty level
                     val unlockedDifficulty = when {
                         totalScore.value >= 150 -> Difficulty.HARD
                         totalScore.value >= 50 -> Difficulty.MEDIUM
                         else -> Difficulty.EASY
                     }
 
+                    // Row of difficulty buttons with visual status
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Difficulty.values().forEach { diff ->
                             val isUnlocked = diff.ordinal <= unlockedDifficulty.ordinal
@@ -331,6 +339,7 @@ fun StroopScreen(controller: stroopController = stroopController) {
                                 shape = RoundedCornerShape(10.dp),
                                 elevation = ButtonDefaults.elevation(2.dp)
                             ) {
+                                // Difficulty level label with status icon
                                 Text("$icon ${diff.name}")
                             }
                         }
@@ -346,12 +355,12 @@ fun StroopScreen(controller: stroopController = stroopController) {
 //
 //                    Text(nextUnlockMsg, fontSize = 14.sp, color = Color.DarkGray)
 
+                    // Unlock message info block (with emoji and color-coded status)
                     val (icon, color, msg) = when {
                         totalScore.value < 50 -> Triple("🔒", Color.Red, "${50 - totalScore.value} neuronas para desbloquear MEDIUM")
                         totalScore.value < 150 -> Triple("🔒", Color.Red, "${150 - totalScore.value} neuronas para desbloquear HARD")
                         else -> Triple("🔓", Color.Green, "Todas las dificultades desbloqueadas")
                     }
-
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
@@ -372,11 +381,9 @@ fun StroopScreen(controller: stroopController = stroopController) {
                         )
                     }
 
-
-
-
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    // Start button
                     Button(onClick = {
                         controller.setDifficulty(selectedDifficulty.value)
                         controller.beginGame()
@@ -398,6 +405,7 @@ fun StroopScreen(controller: stroopController = stroopController) {
 
                     Spacer(modifier = Modifier.height(8.dp))
 
+                    // Show instruction screen
                     Button(onClick = {
                         controller.showInstructions.value = true
                     },
@@ -420,16 +428,18 @@ fun StroopScreen(controller: stroopController = stroopController) {
                     return@Column
                 }
 
-
-
-                // Game title and timer
+                // Display the game title text
                 Text(Strings.t("insST7"), fontSize = 24.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Cursive)
+                // Show remaining time in seconds
                 Text(Strings.t("insST8") + "$timeLeft" + Strings.t("insST9"), fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
-                // Progress bar
+                // Progress bar setup
+                // Get the total time from the controller
                 val totalTime by controller.totalTime
+                // Calculate progress as a float value from 0 to 1
                 val progress = timeLeft / totalTime.toFloat()
 
+                // Render a linear progress bar to show remaining time visually
                 LinearProgressIndicator(
                     progress = progress,
                     modifier = Modifier
@@ -437,12 +447,13 @@ fun StroopScreen(controller: stroopController = stroopController) {
                         .height(10.dp)
                         .padding(horizontal = 32.dp),
                     backgroundColor = Color.LightGray,
-                    color = Color(0xFF4CAF50) // verde
+                    color = Color(0xFF4CAF50) // Green progress color
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // Central word shown in color
+                // Word displayed in the color (Stroop challenge)
+                // Use AnimatedContent for a transition effect when color or word changes
                 AnimatedContent(
                     targetState = Pair(colorWord, displayColor),
                     transitionSpec = {
@@ -477,10 +488,10 @@ fun StroopScreen(controller: stroopController = stroopController) {
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Feedback for last answer
+                    // Show feedback (Correct / Incorrect) if a previous answer was given
                     if (answerFeedback != null) {
                         LaunchedEffect(answerFeedback) {
-                            delay(600)
+                            delay(600) // Short delay before clearing feedback
                             controller.clearFeedback()
                         }
 
@@ -501,7 +512,7 @@ fun StroopScreen(controller: stroopController = stroopController) {
                             )
                         }
                     }
-                    // Color answer options
+                    // Render answer buttons for each color option
                     options.forEach { colorOption ->
                         val colorName = controller.getColorName(colorOption)
 
@@ -510,7 +521,7 @@ fun StroopScreen(controller: stroopController = stroopController) {
 //                            else -> Color.White
 //                        }
 
-                        // Genera un color aleatorio para el texto (incluyendo negro)
+                        // Generate a random color for the text label of the button
                         val randomTextColor = listOf(Color.Black, Color.Red, Color.Blue, Color.Green, Color.DarkGray).random()
 
                         Button(
@@ -542,7 +553,7 @@ fun StroopScreen(controller: stroopController = stroopController) {
 
                 Spacer(modifier = Modifier.height(25.dp))
 
-                // Score counter
+                // Display final score
                 Text(Strings.t("insST12") + "$score", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
             }
 
@@ -576,17 +587,21 @@ fun StroopScreen(controller: stroopController = stroopController) {
 //        )
 //    }
 
+    // On leaving screen, stop any active game session
     DisposableEffect(Unit) {
         onDispose {
-            controller.stopGame() // ⛔ Detiene el timer en background
-            isGameStarted.value = false // 🔄 Resetea el estado del juego local
+            controller.stopGame()
+            isGameStarted.value = false
         }
     }
 }
 
+// Instructions screen for the Stroop test game
 @Composable
 fun StroopInstructionsScreen(onBack: () -> Unit) {
+    // Root container filling the screen
     Box(modifier = Modifier.fillMaxSize()) {
+        // Background image for the screen
         Image(
             painter = painterResource(Res.drawable.fondoConcentracion),
             contentDescription = null,
@@ -594,6 +609,7 @@ fun StroopInstructionsScreen(onBack: () -> Unit) {
             contentScale = ContentScale.Crop
         )
 
+        // Main layout column centered on screen
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -601,6 +617,7 @@ fun StroopInstructionsScreen(onBack: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
+            // Card that contains the instructions
             Card(
                 elevation = 6.dp,
                 shape = RoundedCornerShape(16.dp),
@@ -608,12 +625,14 @@ fun StroopInstructionsScreen(onBack: () -> Unit) {
                 border = BorderStroke(1.dp, Color(0xFFB0BEC5)),
                 modifier = Modifier.padding(12.dp)
             ) {
+                // Inner column for card content
                 Column(
                     modifier = Modifier
                         .padding(24.dp)
                         .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    // Title text "Instructions"
                     Text(
                         Strings.t("instructions"),
                         fontSize = 28.sp,
@@ -623,6 +642,7 @@ fun StroopInstructionsScreen(onBack: () -> Unit) {
 
                     Spacer(modifier = Modifier.height(24.dp))
 
+                    // Rich text instructions block
                     Text(
                         buildAnnotatedString {
                             append(Strings.t("insST20"))
@@ -642,6 +662,7 @@ fun StroopInstructionsScreen(onBack: () -> Unit) {
 
                     Spacer(modifier = Modifier.height(32.dp))
 
+                    // Button to start the game, triggering onBack callback
                     Button(
                         onClick = onBack,
                         modifier = Modifier
