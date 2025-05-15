@@ -19,11 +19,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import brain.alpha.controller.GameSessionController
-import brain.alpha.controller.LeaderboardController
+import brain.alpha.controller.*
 import brain.alpha.model.UserSession
-import brain.alpha.controller.LeaderboardEntry
-import brain.alpha.controller.LeaderboardByDifficulty
 import brainalpha.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 import brain.alpha.utils.isCompactScreen
@@ -118,13 +115,17 @@ fun LeaderboardScreen(controller: LeaderboardController) {
                 .background(Color(0xFF222937), shape = RoundedCornerShape(4.dp))
                 .border(BorderStroke(2.dp, Color(0xFF4CE3E8)))
         ) {
-            IconButton(onClick = {}, modifier = Modifier.align(Alignment.CenterStart).padding(start = 8.dp).size(55.dp)) {
+            IconButton(onClick = {LoginController.navigateTo("profile")}, modifier = Modifier.align(Alignment.CenterStart).padding(start = 8.dp).size(55.dp)) {
                 Image(painter = painterResource(Res.drawable.user), contentDescription = "User")
             }
             Image(painter = painterResource(Res.drawable.logo), contentDescription = null,
                 modifier = Modifier.align(Alignment.Center).size(120.dp).scale(1.5f))
             Text(displayName, color = Color.White, fontSize = 16.sp,
                 modifier = Modifier.align(Alignment.CenterStart).padding(start = 72.dp))
+
+            IconButton(onClick = { LoginController.navigateTo("settings")}, modifier = Modifier.align(Alignment.CenterEnd).padding(start = 8.dp).size(55.dp)) {
+                Image(painter = painterResource(Res.drawable.ajustes), contentDescription = "Settings")
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))

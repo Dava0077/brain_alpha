@@ -587,8 +587,6 @@ fun StroopScreen(controller: stroopController = stroopController) {
 @Composable
 fun StroopInstructionsScreen(onBack: () -> Unit) {
     Box(modifier = Modifier.fillMaxSize()) {
-
-        // Background image
         Image(
             painter = painterResource(Res.drawable.fondoConcentracion),
             contentDescription = null,
@@ -598,110 +596,68 @@ fun StroopInstructionsScreen(onBack: () -> Unit) {
 
         Column(
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxSize()
+                .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
+            verticalArrangement = Arrangement.Center
         ) {
-            // Same HEADER as game screen (user icon, logo, settings)
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(70.dp)
-                    .background(Color(0xFFEFEFEF), shape = RoundedCornerShape(4.dp))
-                    .border(BorderStroke(2.dp, Color(0xFFB0BEC5)))
+            Card(
+                elevation = 6.dp,
+                shape = RoundedCornerShape(16.dp),
+                backgroundColor = Color.White.copy(alpha = 0.9f),
+                border = BorderStroke(1.dp, Color(0xFFB0BEC5)),
+                modifier = Modifier.padding(12.dp)
             ) {
-                IconButton(
-                    onClick = { LoginController.navigateTo("profile") },
+                Column(
                     modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .padding(start = 8.dp)
-                        .size(48.dp)
+                        .padding(24.dp)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Image(
-                        painter = painterResource(Res.drawable.user),
-                        contentDescription = "Usuario"
+                    Text(
+                        Strings.t("instructions"),
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF212121)
                     )
-                }
 
-                Image(
-                    painter = painterResource(Res.drawable.logo),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(100.dp)
-                        .align(Alignment.Center)
-                        .scale(1.2f)
-                )
+                    Spacer(modifier = Modifier.height(24.dp))
 
-                IconButton(
-                    onClick = { LoginController.navigateTo("settings") },
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .padding(end = 8.dp)
-                        .size(48.dp)
-                ) {
-                    Image(
-                        painter = painterResource(Res.drawable.ajustes),
-                        contentDescription = "Ajustes"
+                    Text(
+                        buildAnnotatedString {
+                            append(Strings.t("insST20"))
+                            withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(Strings.t("insST21")) }
+                            append(Strings.t("insST22"))
+                            withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = Color(0xFF388E3C))) { append(Strings.t("insST23")) }
+                            append(Strings.t("insST24"))
+                            withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = Color(0xFFD32F2F))) { append(Strings.t("insST25")) }
+                            append(Strings.t("insST26"))
+                            withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = Color(0xFF1565C0))) { append(Strings.t("insST27")) }
+                        },
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center,
+                        color = Color(0xFF424242),
+                        lineHeight = 24.sp
                     )
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    Button(
+                        onClick = onBack,
+                        modifier = Modifier
+                            .height(46.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color.White,
+                            contentColor = Color.Black
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = ButtonDefaults.elevation(4.dp),
+                        border = BorderStroke(1.dp, Color.Black)
+                    ) {
+                        Text(Strings.t("start_game"), fontWeight = FontWeight.SemiBold)
+                    }
                 }
-            }
-
-            Spacer(modifier = Modifier.height(50.dp))
-
-            Spacer(modifier = Modifier.height(100.dp))
-
-            // Title of instruction section
-            Text(
-                Strings.t("instructions"),
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF212121)
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            // Game explanation using styled text
-            Text(
-                buildAnnotatedString {
-                    append(Strings.t("insST13"))
-                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(Strings.t("insST14")) }
-                    append(Strings.t("insST15"))
-
-                    append(Strings.t("insST16"))
-                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(Strings.t("insST17")) }
-                    append(Strings.t("insST18"))
-
-                    append(Strings.t("insST19"))
-                },
-                fontSize = 16.sp,
-                textAlign = TextAlign.Center,
-                color = Color(0xFF424242),
-                lineHeight = 24.sp,
-                modifier = Modifier.padding(horizontal = 32.dp)
-            )
-
-            Spacer(modifier = Modifier.height(40.dp))
-
-            // Start game button
-            Button(
-                onClick = onBack,
-                modifier = Modifier
-                    .padding(8.dp)
-                    .height(46.dp),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color.White,
-                    contentColor = Color.Black
-                ),
-                shape = RoundedCornerShape(12.dp),
-                elevation = ButtonDefaults.elevation(4.dp),
-                border = BorderStroke(1.dp, Color.Black)
-            ) {
-                Text(Strings.t("start_game"), fontWeight = FontWeight.SemiBold)
             }
         }
     }
 }
-
-
-
-

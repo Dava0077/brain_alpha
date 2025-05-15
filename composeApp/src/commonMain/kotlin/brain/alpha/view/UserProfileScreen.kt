@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
@@ -140,6 +141,19 @@ fun UserProfileScreen(onBack: () -> Unit) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Button(
+                        onClick = { showLogoutConfirm = true },
+                        modifier = Modifier
+                            .height(46.dp),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red),
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = ButtonDefaults.elevation(4.dp)
+                    ) {
+                        Text(Strings.t("log_out"), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Button(
                         onClick = onBack,
                         modifier = Modifier
                             .height(46.dp),
@@ -150,18 +164,9 @@ fun UserProfileScreen(onBack: () -> Unit) {
                         Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
                     }
 
-                    Spacer(modifier = Modifier.height(12.dp))
 
-                    Button(
-                        onClick = { showLogoutConfirm = true },
-                        modifier = Modifier
-                            .height(46.dp),
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red),
-                        shape = RoundedCornerShape(12.dp),
-                        elevation = ButtonDefaults.elevation(4.dp)
-                    ) {
-                        Text(Strings.t("log_out"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
-                    }
+
+
                 }
 
                 if (!isEmailVerified) {
@@ -209,7 +214,7 @@ fun UserProfileScreen(onBack: () -> Unit) {
                         horizontalArrangement = Arrangement.End, // 🔥 Esto alinea a la derecha
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        DifficultyLegendItem(Res.drawable.easy, Strings.t("easy"), size = 40.dp)
+                        DifficultyLegendItem(Res.drawable.easy, Strings.t("easy"),  size = 40.dp)
                         DifficultyLegendItem(Res.drawable.medium, Strings.t("medium"), size = 50.dp)
                         DifficultyLegendItem(Res.drawable.hard, Strings.t("hard"), size = 60.dp)
                     }
@@ -331,31 +336,9 @@ fun UserProfileScreen(onBack: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Button(
-                    onClick = onBack,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .height(46.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF303030)),
-                    shape = RoundedCornerShape(12.dp),
-                    elevation = ButtonDefaults.elevation(4.dp)
-                ) {
-                    Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
-                }
-
                 Spacer(modifier = Modifier.height(12.dp))
 
-                Button(
-                    onClick = { showLogoutConfirm = true },
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .height(46.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red),
-                    shape = RoundedCornerShape(12.dp),
-                    elevation = ButtonDefaults.elevation(4.dp)
-                ) {
-                    Text(Strings.t("log_out"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
-                }
+
 
 //                //Delete button
 //                Button(
@@ -590,7 +573,8 @@ fun DifficultyLegendItem(image: DrawableResource, label: String, size: Dp) {
         Text(
             text = label,
             fontSize = 12.sp,
-            color = Color.Gray
+            style = TextStyle(Color.Black), fontWeight = FontWeight.Bold
+
         )
     }
 }
