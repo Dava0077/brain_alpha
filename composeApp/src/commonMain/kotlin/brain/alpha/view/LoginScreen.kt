@@ -71,8 +71,6 @@ fun LoginScreen(
             if (user != null && !alreadyHandled.value) {
                 alreadyHandled.value = true
 
-                println("✅ Usuario detectado tras Google Login: ${user.email}")
-
                 SupabaseClientProvider.client.auth.sessionManager.loadSession()
 
                 UserSession.setSession(

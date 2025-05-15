@@ -24,8 +24,6 @@ import brain.alpha.controller.LeaderboardController
 import brain.alpha.model.UserSession
 import brain.alpha.controller.LeaderboardEntry
 import brain.alpha.controller.LeaderboardByDifficulty
-import brain.alpha.model.shared.Difficulty
-import brain.alpha.strings.Strings
 import brainalpha.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 import brain.alpha.utils.isCompactScreen
@@ -47,9 +45,9 @@ val displayNamesMap = mapOf(
     "mental_math" to "Quick Maths",
     "click_number" to "Click Number"
 )
-val gamesWithDifficulty = setOf(
-    "pairs_game", "simon_game", "sudoku_game", "wordSearch_game"
-)
+
+
+
 
 
 fun sort(entries: List<LeaderboardEntry>, sortBy: SortOption): List<LeaderboardEntry> {
@@ -58,6 +56,12 @@ fun sort(entries: List<LeaderboardEntry>, sortBy: SortOption): List<LeaderboardE
         SortOption.TIME_AVG -> entries.sortedBy { it.timeAvg ?: Double.MAX_VALUE }
     }
 }
+
+
+
+
+
+
 
 
 @Composable
@@ -256,8 +260,7 @@ fun LeaderboardScreen(controller: LeaderboardController) {
                                 }
                             }
                         },
-                        leaderboard = leaderboardMap[gameId],
-                        showDifficulty = game in gamesWithDifficulty
+                        leaderboard = leaderboardMap[gameId]
                     )
                 }
             }
@@ -299,8 +302,7 @@ fun ExpandableGame(
     gameId: String,
     isExpanded: Boolean,
     onExpandToggle: () -> Unit,
-    leaderboard: LeaderboardByDifficulty?,
-    showDifficulty: Boolean
+    leaderboard: LeaderboardByDifficulty?
 ) {
     Column(modifier = Modifier.fillMaxWidth().padding(start = 12.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -329,17 +331,9 @@ fun ExpandableGame(
         AnimatedVisibility(visible = isExpanded, enter = fadeIn(), exit = fadeOut()) {
             Column {
                 if (leaderboard != null) {
-                    if (showDifficulty) {
-                        val combined = leaderboard.easy + leaderboard.medium + leaderboard.hard
-                        val merged = mergeEntriesByUsername(combined)
-                        LeaderboardSection("Clasificación", sort(merged, SortOption.SCORE), showDifficulty)
-
-
-                    } else {
-                        LeaderboardSection("Fácil", sort(leaderboard.easy, SortOption.SCORE), showDifficulty)
-                        LeaderboardSection("Medio", sort(leaderboard.medium, SortOption.SCORE), showDifficulty)
-                        LeaderboardSection("Difícil", sort(leaderboard.hard, SortOption.SCORE), showDifficulty)
-                    }
+                    LeaderboardSection("Fácil", sort(leaderboard.easy, SortOption.SCORE))
+                    LeaderboardSection("Medio", sort(leaderboard.medium, SortOption.SCORE))
+                    LeaderboardSection("Difícil", sort(leaderboard.hard, SortOption.SCORE))
                 } else {
                     CircularProgressIndicator(
                         modifier = Modifier.size(24.dp).padding(8.dp),
@@ -353,7 +347,7 @@ fun ExpandableGame(
 }
 
 @Composable
-fun LeaderboardSection(title: String, entries: List<LeaderboardEntry>, showDifficulty: Boolean) {
+fun LeaderboardSection(title: String, entries: List<LeaderboardEntry>) {
     val headerColor = when (title.lowercase()) {
         "fácil" -> Color(0xFFD6F5E3)
         "medio" -> Color(0xFFD6E9F5)
@@ -374,7 +368,7 @@ fun LeaderboardSection(title: String, entries: List<LeaderboardEntry>, showDiffi
             modifier = Modifier.padding(8.dp)
         )
 
-        HeaderRow(headerColor, showDifficulty)
+        HeaderRow(headerColor)
 
         if (entries.isEmpty()) {
             Text(
@@ -384,14 +378,14 @@ fun LeaderboardSection(title: String, entries: List<LeaderboardEntry>, showDiffi
             )
         } else {
             entries.forEachIndexed { i, entry ->
-                EntryRow(index = i, entry = entry, showDifficulty = showDifficulty)
+                EntryRow(index = i, entry = entry)
             }
         }
     }
 }
 
 @Composable
-fun HeaderRow(bgColor: Color, showDifficulty: Boolean) {
+fun HeaderRow(bgColor: Color) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -402,18 +396,13 @@ fun HeaderRow(bgColor: Color, showDifficulty: Boolean) {
         Text("🏆", fontSize = 14.sp, modifier = Modifier.width(30.dp), textAlign = TextAlign.Center)
         Text("👤", fontSize = 14.sp, modifier = Modifier.width(100.dp), textAlign = TextAlign.Center)
         Text("🧠", fontSize = 14.sp, modifier = Modifier.width(60.dp), textAlign = TextAlign.Center)
-        if (showDifficulty) {
-            Text("🎯", fontSize = 14.sp, modifier = Modifier.width(60.dp), textAlign = TextAlign.Center)
-        }else{
-            Text("⌚", fontSize = 14.sp, modifier = Modifier.width(60.dp), textAlign = TextAlign.Center)
-
-        }
-        Text("🗓", fontSize = 14.sp, modifier = Modifier.width(80.dp), textAlign = TextAlign.Center)
+        Text("⏱", fontSize = 14.sp, modifier = Modifier.width(60.dp), textAlign = TextAlign.Center)
+        Text("📅", fontSize = 14.sp, modifier = Modifier.width(80.dp), textAlign = TextAlign.Center)
     }
 }
 
 @Composable
-fun EntryRow(index: Int, entry: LeaderboardEntry, showDifficulty: Boolean) {
+fun EntryRow(index: Int, entry: LeaderboardEntry) {
     val bgColor = if (index % 2 == 0) Color.White else Color(0xFFF5FAFF)
     Row(
         modifier = Modifier
@@ -425,48 +414,10 @@ fun EntryRow(index: Int, entry: LeaderboardEntry, showDifficulty: Boolean) {
         Text("#${index + 1}", fontSize = 13.sp, modifier = Modifier.width(30.dp), textAlign = TextAlign.Center)
         Text(entry.username, fontSize = 13.sp, modifier = Modifier.width(100.dp), textAlign = TextAlign.Center)
         Text(entry.score.toString(), fontSize = 13.sp, modifier = Modifier.width(60.dp), textAlign = TextAlign.Center)
-        if (showDifficulty) {
-            Text(
-                entry.difficulty?.let {
-                    runCatching { Strings.translateDifficulty(Difficulty.valueOf(it)) }.getOrDefault("-")
-                } ?: "-",
-                fontSize = 13.sp,
-                modifier = Modifier.width(60.dp),
-                textAlign = TextAlign.Center
-            )
-        }else{
-            Text(entry.timeAvg?.let { "${round(it * 10) / 10} s" } ?: "-", fontSize = 13.sp, modifier = Modifier.width(60.dp), textAlign = TextAlign.Center)
-
-        }
+        Text(entry.timeAvg?.let { "${round(it * 10) / 10} s" } ?: "-", fontSize = 13.sp, modifier = Modifier.width(60.dp), textAlign = TextAlign.Center)
         Text(entry.playedAt.take(10), fontSize = 13.sp, modifier = Modifier.width(80.dp), textAlign = TextAlign.Center)
-
     }
 }
-fun mergeEntriesByUsername(entries: List<LeaderboardEntry>): List<LeaderboardEntry> {
-    return entries
-        .groupBy { it.username }
-        .map { (username, group) ->
-            val totalScore = group.sumOf { it.score }
-
-            val difficulty = when {
-                totalScore < 75 -> "EASY"
-                totalScore < 150 -> "MEDIUM"
-                else -> "HARD"
-            }
-
-            LeaderboardEntry(
-                username = username,
-                score = totalScore,
-                difficulty = difficulty,
-                timeAvg = group.mapNotNull { it.timeAvg }.average().takeIf { !it.isNaN() },
-                timeLeft = group.mapNotNull { it.timeLeft }.average().takeIf { !it.isNaN() },
-                playedAt = group.maxOfOrNull { it.playedAt } ?: ""
-            )
-        }
-}
-
-
-
 
 
 
