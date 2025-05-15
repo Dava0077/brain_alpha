@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brain.alpha.controller.AuthController
 import brain.alpha.controller.GameSessionController
+import brain.alpha.controller.LoginController
 import brain.alpha.controller.logicController.wordSearchController
 import brain.alpha.model.UserSession
 import brain.alpha.model.shared.Difficulty
@@ -131,7 +132,7 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                     .border(BorderStroke(2.dp, Color(0xFF4CE3E8)))
             ) {
                 IconButton(
-                    onClick = { },
+                    onClick = { LoginController.buttonUsername()},
                     modifier = Modifier.align(Alignment.CenterStart).padding(start = 8.dp).size(55.dp)
                 ) {
                     Image(painter = painterResource(Res.drawable.user), contentDescription = "User")
@@ -142,7 +143,7 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                     modifier = Modifier.size(120.dp).align(Alignment.Center).scale(1.5f)
                 )
                 IconButton(
-                    onClick = { brain.alpha.controller.LoginController.buttonSettings() },
+                    onClick = { LoginController.buttonSettings() },
                     modifier = Modifier.align(Alignment.CenterEnd).padding(end = 8.dp).size(55.dp)
                 ) {
                     Image(painter = painterResource(Res.drawable.ajustes), contentDescription = "Settings")
@@ -195,29 +196,76 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                 }
             }
 
-            if (UserSession.isGuest.value) {
+            if (!gameStarted) {
+                val diffColors = mapOf(
+                    Difficulty.EASY to Color(0xFF81C784),
+                    Difficulty.MEDIUM to Color(0xFF64B5F6),
+                    Difficulty.HARD to Color(0xFFE57373)
+                )
+
+                val unlockedDifficulty = when {
+                    totalScore.value >= 150 -> Difficulty.HARD
+                    totalScore.value >= 75 -> Difficulty.MEDIUM
+                    else -> Difficulty.EASY
+                }
+
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Difficulty.values().forEach { difficulty ->
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            RadioButton(
-                                selected = selectedDifficulty == difficulty,
-                                onClick = {
-                                    selectedDifficulty = difficulty
-                                    controller.configureGame(difficulty)
-                                },
-                                enabled = !gameStarted
-                            )
-                            Text(text = Strings.translateDifficulty(difficulty))
+                    Difficulty.values().forEach { diff ->
+                        val isUnlocked = diff.ordinal <= unlockedDifficulty.ordinal
+                        val isSelected = selectedDifficulty == diff
+                        val bgColor = diffColors[diff] ?: Color.LightGray
+                        val textColor = if (isUnlocked) Color.White else Color.Gray
+                        val icon = if (isUnlocked) "⚡" else "🔒"
+
+                        Button(
+                            onClick = {
+                                if (isUnlocked) {
+                                    selectedDifficulty = diff
+                                    controller.configureGame(diff)
+                                }
+                            },
+                            enabled = isUnlocked,
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = if (isSelected) bgColor else bgColor.copy(alpha = 0.6f),
+                                contentColor = textColor
+                            ),
+                            shape = RoundedCornerShape(10.dp),
+                            elevation = ButtonDefaults.elevation(2.dp)
+                        ) {
+                            Text("$icon ${diff.name}")
                         }
                     }
                 }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                val (icon, color, msg) = when {
+                    totalScore.value < 75 -> Triple("🔒", Color.Red, "${75 - totalScore.value} neuronas para desbloquear MEDIUM")
+                    totalScore.value < 150 -> Triple("🔒", Color.Red, "${150 - totalScore.value} neuronas para desbloquear HARD")
+                    else -> Triple("🔓", Color.Green, "Todas las dificultades desbloqueadas")
+                }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .padding(vertical = 4.dp)
+                        .background(Color(0xFFF5F5F5), RoundedCornerShape(8.dp))
+                        .padding(horizontal = 12.dp, vertical = 6.dp)
+                ) {
+                    Text(
+                        text = icon,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(end = 6.dp)
+                    )
+                    Text(
+                        text = msg,
+                        fontSize = 14.sp,
+                        color = color,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
-            Text(
-                text = Strings.t("difficulty") + ": " + Strings.translateDifficulty(selectedDifficulty),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color.Black
-            )
+
 
             Spacer(modifier = Modifier.height(30.dp))
             Text(Strings.t("title_wordSearch"), fontSize = 40.sp, color = Color.Black, fontFamily = FontFamily.SansSerif, textAlign = TextAlign.Center)

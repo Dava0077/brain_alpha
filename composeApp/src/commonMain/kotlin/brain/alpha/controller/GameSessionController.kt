@@ -14,6 +14,7 @@ import kotlinx.datetime.Clock
 data class LeaderboardEntry(
     val username: String,
     val score: Long,
+    val difficulty: String?,
     val timeAvg: Double?,
     val timeLeft: Double?,
     val playedAt: String
@@ -100,6 +101,7 @@ object GameSessionController {
                 LeaderboardEntry(
                     username = user ?: "Usuario",
                     score = obj["score"]?.jsonPrimitive?.long ?: 0,
+                    difficulty = obj["difficulty"]?.jsonPrimitive?.contentOrNull,
                     timeAvg = obj["time_avg"]?.jsonPrimitive?.doubleOrNull,
                     timeLeft = obj["time_left"]?.jsonPrimitive?.doubleOrNull,
                     playedAt = obj["played_at"]?.jsonPrimitive?.content ?: ""
@@ -294,6 +296,7 @@ object GameSessionController {
                 LeaderboardEntry(
                     username = user ?: "Usuario",
                     score = obj["score"]?.jsonPrimitive?.long ?: 0,
+                    difficulty = obj["difficulty"]?.jsonPrimitive?.contentOrNull,
                     timeAvg = obj["time_avg"]?.jsonPrimitive?.doubleOrNull,
                     timeLeft = obj["time_left"]?.jsonPrimitive?.doubleOrNull,
                     playedAt = obj["played_at"]?.jsonPrimitive?.content ?: ""
@@ -330,6 +333,7 @@ object GameSessionController {
                     LeaderboardEntry(
                         username = obj["name"]?.jsonPrimitive?.content ?: "Usuario",
                         score = obj["score"]?.jsonPrimitive?.longOrNull ?: 0L,
+                        difficulty = obj["difficulty"]?.jsonPrimitive?.contentOrNull,
                         timeAvg = obj["time_avg"]?.jsonPrimitive?.doubleOrNull,
                         timeLeft = obj["time_left"]?.jsonPrimitive?.doubleOrNull,
                         playedAt = obj["played_at"]?.jsonPrimitive?.content ?: ""
@@ -383,6 +387,7 @@ object GameSessionController {
                 LeaderboardEntry(
                     username = obj["users"]?.jsonObject?.get("name")?.jsonPrimitive?.content ?: "Usuario",
                     score = obj["score"]?.jsonPrimitive?.longOrNull ?: 0L,
+                    difficulty = obj["difficulty"]?.jsonPrimitive?.contentOrNull,
                     timeAvg = obj["time_avg"]?.jsonPrimitive?.doubleOrNull,
                     timeLeft = obj["time_left"]?.jsonPrimitive?.doubleOrNull,
                     playedAt = obj["played_at"]?.jsonPrimitive?.content ?: ""

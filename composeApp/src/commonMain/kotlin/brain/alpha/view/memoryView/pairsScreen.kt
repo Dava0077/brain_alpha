@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import brain.alpha.controller.AuthController
 import brain.alpha.controller.GameSessionController
+import brain.alpha.controller.LoginController
 import brain.alpha.controller.memoryController.pairsController
 import brain.alpha.model.UserSession
 import brain.alpha.model.shared.Difficulty
@@ -77,7 +78,7 @@ fun couplesScreen(
     LaunchedEffect(totalScore.value) {
         if (!UserSession.isGuest.value) {
             selectedDifficulty = when (totalScore.value) {
-                in 0..49 -> Difficulty.EASY
+                in 0..74 -> Difficulty.EASY
                 in 50..149 -> Difficulty.MEDIUM
                 else -> Difficulty.HARD
             }
@@ -145,7 +146,7 @@ fun couplesScreen(
             {
 
                 IconButton(
-                    onClick = { /* Dummy action */ },
+                    onClick = { LoginController.buttonUsername() },
                     modifier = Modifier
                         .align(Alignment.CenterStart)
                         .padding(start = 8.dp)
@@ -233,36 +234,75 @@ fun couplesScreen(
                     Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
                 }
             }
-            if (UserSession.isGuest.value) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.padding(vertical = 16.dp)
-                ) {
-                    Difficulty.values().forEach { difficulty ->
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            RadioButton(
-                                selected = selectedDifficulty == difficulty,
-                                onClick = {
-                                    selectedDifficulty = difficulty
-                                    controller.setDifficulty(difficulty)
-                                },
-                                enabled = !gameStarted
-                            )
-                            Text(text = Strings.translateDifficulty(difficulty))
+            if (!gameStarted) {
+                val diffColors = mapOf(
+                    Difficulty.EASY to Color(0xFF81C784),
+                    Difficulty.MEDIUM to Color(0xFF64B5F6),
+                    Difficulty.HARD to Color(0xFFE57373)
+                )
+
+                val unlockedDifficulty = when {
+                    totalScore.value >= 150 -> Difficulty.HARD
+                    totalScore.value >= 50 -> Difficulty.MEDIUM
+                    else -> Difficulty.EASY
+                }
+
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Difficulty.values().forEach { diff ->
+                        val isUnlocked = diff.ordinal <= unlockedDifficulty.ordinal
+                        val isSelected = selectedDifficulty == diff
+                        val bgColor = diffColors[diff] ?: Color.LightGray
+                        val textColor = if (isUnlocked) Color.White else Color.Gray
+                        val icon = if (isUnlocked) "⚡" else "🔒"
+
+                        Button(
+                            onClick = {
+                                if (isUnlocked) {
+                                    selectedDifficulty = diff
+                                    controller.setDifficulty(diff)
+                                }
+                            },
+                            enabled = isUnlocked,
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = if (isSelected) bgColor else bgColor.copy(alpha = 0.6f),
+                                contentColor = textColor
+                            ),
+                            shape = RoundedCornerShape(10.dp),
+                            elevation = ButtonDefaults.elevation(2.dp)
+                        ) {
+                            Text("$icon ${diff.name}")
                         }
                     }
                 }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                val (icon, color, msg) = when {
+                    totalScore.value < 50 -> Triple("🔒", Color.Red, "${50 - totalScore.value} neuronas para desbloquear MEDIUM")
+                    totalScore.value < 150 -> Triple("🔒", Color.Red, "${150 - totalScore.value} neuronas para desbloquear HARD")
+                    else -> Triple("🔓", Color.Green, "Todas las dificultades desbloqueadas")
+                }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .padding(vertical = 4.dp)
+                        .background(Color(0xFFF5F5F5), RoundedCornerShape(8.dp))
+                        .padding(horizontal = 12.dp, vertical = 6.dp)
+                ) {
+                    Text(
+                        text = icon,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(end = 6.dp)
+                    )
+                    Text(
+                        text = msg,
+                        fontSize = 14.sp,
+                        color = color,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
-
-            Text(
-                text = Strings.t("difficulty") + ": " + Strings.translateDifficulty(selectedDifficulty),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color.Black
-            )
-
-
 
             Spacer(modifier = Modifier.height(15.dp)) // Espacio tras el logo
 

@@ -66,18 +66,25 @@ object LoginController {
                 if (user != null) {
                     UserSession.setUserId(user.id)
 
-                    val profile = SupabaseClientProvider.client
+                    val profileList = SupabaseClientProvider.client
                         .postgrest["users"]
                         .select {
                             filter { eq("id", user.id) }
                         }
-                        .decodeSingle<UserModel>() // ← decodifica directamente
+                        .decodeList<UserModel>()
 
+                    if (profileList.isEmpty()) {
+                        errorMessage = "Tu perfil aún no está disponible. Intenta de nuevo en unos segundos."
+                        return@launch
+                    }
+
+                    val profile = profileList.first()
                     UserSession.setSession(
                         id = user.id,
                         emailValue = profile.email,
                         usernameValue = profile.name
                     )
+
                 }
 
                 navigateTo("home")
