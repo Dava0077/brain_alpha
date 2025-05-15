@@ -66,7 +66,7 @@ fun LoginScreen(
 
     LaunchedEffect(Unit) {
         while (true) {
-            delay(500) // Poll every 0.5s
+            delay(250) // Poll every 0.5s
             val user = SupabaseClientProvider.client.auth.currentUserOrNull()
             if (user != null && !alreadyHandled.value) {
                 alreadyHandled.value = true
