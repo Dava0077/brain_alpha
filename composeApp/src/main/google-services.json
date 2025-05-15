@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "788528220622",
+    "project_id": "brainalpha-app",
+    "storage_bucket": "brainalpha-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:788528220622:android:30a6f6c94afbbff751039f",
+        "android_client_info": {
+          "package_name": "brain.alpha"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "788528220622-ha95djlrp9msfd3vh4752gki122rac03.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "brain.alpha",
+            "certificate_hash": "ab257867f8c5dcdccc34a7b24766ceaaee05eff2"
+          }
+        },
+        {
+          "client_id": "788528220622-f80rt9dfvbalp386fflrbs1i5dda56qj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkHNqD7baVvzUvVkP5iDQMjVBq9FgvUjo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "788528220622-f80rt9dfvbalp386fflrbs1i5dda56qj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

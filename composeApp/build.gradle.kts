@@ -55,6 +55,7 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation("io.ktor:ktor-client-cio:3.0.3")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -78,13 +79,15 @@ kotlin {
             implementation("io.ktor:ktor-client-cio:3.0.3")
 
 
-
-
-
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
+            implementation("io.ktor:ktor-client-cio:3.0.3")
+        }
+        val wasmJsMain by getting
+        wasmJsMain.dependencies {
+            implementation("io.ktor:ktor-client-js:3.0.3") // compatible con wasm
         }
     }
 }
