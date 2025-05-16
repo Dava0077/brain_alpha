@@ -48,3 +48,4 @@ object mentalMathController {
     fun getTotalQuestions(): Int = model.totalQuestions
     fun getCurrentQuestionNumber(): Int = model.currentQuestion + 1
 }
+
