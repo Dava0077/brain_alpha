@@ -14,7 +14,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import brain.alpha.controller.GameSessionController
 import brain.alpha.controller.mentalAgilityController.mentalMathController
+import brain.alpha.model.UserSession
 import brain.alpha.model.shared.Difficulty
 import brain.alpha.utils.currentTimeMillis
 
@@ -39,8 +41,48 @@ fun mentalMathView(
     var timeLeft by remember { mutableStateOf(0) }
     var showOverlay by remember { mutableStateOf(false) }
     var overlayColor by remember { mutableStateOf(Color.Transparent) }
-    var selectedDifficulty by remember { mutableStateOf(Difficulty.MEDIUM) }
     var flashRed by remember { mutableStateOf(false) }
+
+ //------------------------------------------------------------------------------
+
+    // Define gameId (puedes cambiar el UUID si lo deseas)
+    val gameId = "f017777c-f246-4770-bb73-a652a23e761d"
+
+    // Total de puntos acumulados del usuario
+    val totalScore = remember { mutableStateOf(0) }
+
+    // 🔹 Dificultad seleccionada
+    val selectedDifficulty = remember { mutableStateOf(Difficulty.EASY) }
+
+    // 🔹 Carga la puntuación total del usuario y calcula desbloqueo
+    LaunchedEffect(UserSession.userId.value) {
+        val userId = UserSession.userId.value
+        if (!UserSession.isGuest.value && userId != null) {
+            val total = GameSessionController.getTotalScore(
+                userId = userId,
+                gameId = gameId,
+                supabase = brain.alpha.services.SupabaseClientProvider.client
+            )
+            totalScore.value = total
+
+            selectedDifficulty.value = when (total) {
+                in 0..1499 -> Difficulty.EASY
+                in 1500..2999 -> Difficulty.MEDIUM
+                else -> Difficulty.HARD
+            }
+            controller.setDifficulty(selectedDifficulty.value)
+        }
+    }
+
+  //----------------------------------------------------------------------------
+
+
+
+    val showEndDialog = remember { mutableStateOf(false) }
+    LaunchedEffect(controller.isGameOver()) {
+        if (controller.isGameOver()) showEndDialog.value = true
+    }
+
 
 
     // Timer effect
@@ -52,6 +94,50 @@ fun mentalMathView(
             gameStarted = false
             feedback = "¡Tiempo agotado!"
         }
+    }
+    if (showEndDialog.value) {
+        AlertDialog(
+            onDismissRequest = {},
+            title = {
+                Text(
+                    "¡Juego Terminado!",
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            },
+            text = {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Puntuación final: ${controller.getScore()}")
+                    Text("Dificultad: ${selectedDifficulty.value.name}")
+                    Text("Tiempo promedio: ${(controller.getTimeLimit().toDouble() / controller.getTotalQuestions()).toInt()}s por pregunta")
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    controller.resetGame()
+                    gameStarted = false
+                    showEndDialog.value = false
+                    feedback = null
+                    isCorrect = null
+                    userAnswer = ""
+                }) {
+                    Text("Jugar de nuevo")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    controller.resetGame()
+                    gameStarted = false
+                    showEndDialog.value = false
+                    onNavigateToHome()
+                }) {
+                    Text("Salir")
+                }
+            },
+            shape = RoundedCornerShape(12.dp)
+        )
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -106,15 +192,47 @@ fun mentalMathView(
 
             // Selector dificultad antes de iniciar juego
             if (!gameStarted) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Dificultad:", fontWeight = FontWeight.Bold)
-                    Spacer(Modifier.width(8.dp))
-                    DropdownMenuBox(selected = selectedDifficulty) {
-                        selectedDifficulty = it
-                        controller.setDifficulty(it)
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("Dificultad:", fontWeight = FontWeight.Bold)
+                        Spacer(Modifier.width(8.dp))
+                        DropdownMenuBox(
+                            selected = selectedDifficulty.value,
+                            onSelect = {
+                                selectedDifficulty.value = it
+                                controller.setDifficulty(it)
+                            },
+                            totalScore = totalScore.value
+                        )
+                    }
+
+                    // 🔓 Unlock info shown BELOW the selector
+                    val (icon, color, msg) = when {
+                        totalScore.value < 1500 -> Triple("🔒", Color.Red, "${1500 - totalScore.value} neuronas para desbloquear MEDIUM")
+                        totalScore.value < 3000 -> Triple("🔒", Color.Red, "${3000 - totalScore.value} neuronas para desbloquear HARD")
+                        else -> Triple("🔓", Color.Green, "Todas las dificultades desbloqueadas")
+                    }
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .padding(top = 8.dp)
+                            .background(Color(0xFFF5F5F5), RoundedCornerShape(8.dp))
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                    ) {
+                        Text(
+                            text = icon,
+                            fontSize = 16.sp,
+                            modifier = Modifier.padding(end = 6.dp)
+                        )
+                        Text(
+                            text = msg,
+                            fontSize = 14.sp,
+                            color = color,
+                            fontWeight = FontWeight.Medium
+                        )
                     }
                 }
-
             }
 
             Spacer(Modifier.height(16.dp))
@@ -131,7 +249,7 @@ fun mentalMathView(
                     if (!gameStarted) {
                         Button(
                             onClick = {
-                                controller.setDifficulty(selectedDifficulty)
+                                controller.setDifficulty(selectedDifficulty.value)
                                 gameStarted = true
                                 timeLeft = controller.getTimeLimit()
                                 controller.resetGame()
@@ -222,22 +340,89 @@ fun mentalMathView(
             }
         }
     }
+
+    val sessionSaved = remember { mutableStateOf(false) }
+
+    suspend fun refreshTotalScore() {
+        val userId = UserSession.userId.value
+        if (!UserSession.isGuest.value && userId != null) {
+            val total = GameSessionController.getTotalScore(
+                userId = userId,
+                gameId = gameId,
+                supabase = brain.alpha.services.SupabaseClientProvider.client
+            )
+            totalScore.value = total
+        }
+    }
+
+
+
+
+
+
+
+    LaunchedEffect(controller.isGameOver()) {
+        if (controller.isGameOver() && !sessionSaved.value) {
+            sessionSaved.value = true
+
+            val userId = runCatching { UserSession.getUserId() }.getOrNull()
+            if (userId != null) {
+                val score = controller.getScore()
+                val difficulty = selectedDifficulty.value.name
+                val avgTime = (controller.getTimeLimit().toDouble() / controller.getTotalQuestions())
+
+                GameSessionController.registerGameSession(
+                    gameId = "f017777c-f246-4770-bb73-a652a23e761d", // same as used earlier
+                    difficulty = difficulty,
+                    score = score,
+                    timeAvg = avgTime
+                ).onSuccess {
+                    println("✅ Session saved: score=$score, avgTime=$avgTime, difficulty=$difficulty")
+                    refreshTotalScore()
+                }.onFailure {
+                    println("❌ Error saving session: ${it.message}")
+                }
+            } else {
+                println("⚠ No session saved, user not logged in.")
+            }
+        }
+    }
 }
 
 @Composable
-fun DropdownMenuBox(selected: Difficulty, onSelect: (Difficulty) -> Unit) {
+fun DropdownMenuBox(
+    selected: Difficulty,
+    onSelect: (Difficulty) -> Unit,
+    totalScore: Int
+) {
     var expanded by remember { mutableStateOf(false) }
+
+    val unlockedDifficulty = when {
+        totalScore >= 3000 -> Difficulty.HARD
+        totalScore >= 1500 -> Difficulty.MEDIUM
+        else -> Difficulty.EASY
+    }
+
     Box {
         Button(onClick = { expanded = true }) {
             Text(text = selected.name.lowercase().replaceFirstChar { it.uppercase() })
         }
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             Difficulty.values().forEach { diff ->
-                DropdownMenuItem(onClick = {
-                    onSelect(diff)
-                    expanded = false
-                }) {
-                    Text(diff.name.lowercase().replaceFirstChar { it.uppercase() })
+                val isUnlocked = diff.ordinal <= unlockedDifficulty.ordinal
+                val textColor = if (isUnlocked) Color.Black else Color.Gray
+                val icon = if (isUnlocked) "⚡" else "🔒"
+
+                DropdownMenuItem(
+                    onClick = {
+                        if (isUnlocked) {
+                            onSelect(diff)
+                            expanded = false
+                        }
+                    },
+                    enabled = isUnlocked
+                ) {
+                    Text("$icon ${diff.name.lowercase().replaceFirstChar { it.uppercase() }}", color = textColor)
                 }
             }
         }

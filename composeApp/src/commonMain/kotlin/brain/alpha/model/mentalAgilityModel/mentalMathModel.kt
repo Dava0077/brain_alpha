@@ -18,9 +18,9 @@ object mentalMathModel {
     fun getDifficulty(): Difficulty = difficulty
 
     fun getTimeLimit(): Int = when (difficulty) {
-        Difficulty.EASY -> 90
-        Difficulty.MEDIUM -> 60
-        Difficulty.HARD -> 30
+        Difficulty.EASY -> 60
+        Difficulty.MEDIUM -> 30
+        Difficulty.HARD -> 15
     }
 
     fun generateQuestion(): Question {
