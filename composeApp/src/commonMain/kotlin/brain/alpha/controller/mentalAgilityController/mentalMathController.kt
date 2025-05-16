@@ -27,6 +27,7 @@ object mentalMathController {
         onAnswerChecked(isCorrect, model.score, correctAnswer)
     }
 
+    //Reset game
     fun resetGame() {
         model.resetGame()
     }

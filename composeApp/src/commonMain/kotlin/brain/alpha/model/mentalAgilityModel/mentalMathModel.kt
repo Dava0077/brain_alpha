@@ -23,6 +23,7 @@ object mentalMathModel {
         Difficulty.HARD -> 15
     }
 
+    //Generate questions
     fun generateQuestion(): Question {
         val num1 = kotlin.random.Random.nextInt(1, 20)
         val num2 = kotlin.random.Random.nextInt(1, 20)
