@@ -8,7 +8,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.*
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -19,13 +18,11 @@ import brain.alpha.controller.mentalAgilityController.mentalMathController
 import brain.alpha.model.UserSession
 import brain.alpha.model.shared.Difficulty
 import brain.alpha.utils.currentTimeMillis
-
 import model.mentalMathModel
 import org.jetbrains.compose.resources.painterResource
 import brainalpha.composeapp.generated.resources.*
-
 import kotlinx.coroutines.delay
-import kotlinx.datetime.Clock
+import kotlinx.coroutines.launch
 
 @Composable
 fun mentalMathView(
@@ -39,22 +36,15 @@ fun mentalMathView(
     var gameStarted by remember { mutableStateOf(false) }
     var startTime by remember { mutableStateOf(0L) }
     var timeLeft by remember { mutableStateOf(0) }
-    var showOverlay by remember { mutableStateOf(false) }
-    var overlayColor by remember { mutableStateOf(Color.Transparent) }
-    var flashRed by remember { mutableStateOf(false) }
+    val showEndDialog = remember { mutableStateOf(false) }
+    val sessionSaved = remember { mutableStateOf(false) }
 
- //------------------------------------------------------------------------------
-
-    // Define gameId (puedes cambiar el UUID si lo deseas)
     val gameId = "f017777c-f246-4770-bb73-a652a23e761d"
-
-    // Total de puntos acumulados del usuario
     val totalScore = remember { mutableStateOf(0) }
-
-    // 🔹 Dificultad seleccionada
     val selectedDifficulty = remember { mutableStateOf(Difficulty.EASY) }
+    val coroutineScope = rememberCoroutineScope()
 
-    // 🔹 Carga la puntuación total del usuario y calcula desbloqueo
+    // Cargar puntuación y dificultad desbloqueada
     LaunchedEffect(UserSession.userId.value) {
         val userId = UserSession.userId.value
         if (!UserSession.isGuest.value && userId != null) {
@@ -64,7 +54,6 @@ fun mentalMathView(
                 supabase = brain.alpha.services.SupabaseClientProvider.client
             )
             totalScore.value = total
-
             selectedDifficulty.value = when (total) {
                 in 0..1499 -> Difficulty.EASY
                 in 1500..2999 -> Difficulty.MEDIUM
@@ -74,18 +63,7 @@ fun mentalMathView(
         }
     }
 
-  //----------------------------------------------------------------------------
-
-
-
-    val showEndDialog = remember { mutableStateOf(false) }
-    LaunchedEffect(controller.isGameOver()) {
-        if (controller.isGameOver()) showEndDialog.value = true
-    }
-
-
-
-    // Timer effect
+    // Temporizador de cuenta regresiva
     LaunchedEffect(gameStarted, timeLeft) {
         if (gameStarted && timeLeft > 0) {
             delay(1000)
@@ -95,6 +73,38 @@ fun mentalMathView(
             feedback = "¡Tiempo agotado!"
         }
     }
+
+    // Mostrar diálogo al finalizar
+    LaunchedEffect(controller.isGameOver()) {
+        if (controller.isGameOver()) showEndDialog.value = true
+        if (controller.isGameOver() && !sessionSaved.value) {
+            sessionSaved.value = true
+            val userId = runCatching { UserSession.getUserId() }.getOrNull()
+            if (userId != null) {
+                val score = controller.getScore()
+                val difficulty = selectedDifficulty.value.name
+                val avgTime = (controller.getTimeLimit().toDouble() / controller.getTotalQuestions())
+                GameSessionController.registerGameSession(
+                    gameId = gameId,
+                    difficulty = difficulty,
+                    score = score,
+                    timeAvg = avgTime
+                ).onSuccess {
+                    coroutineScope.launch {
+                        val updated = GameSessionController.getTotalScore(
+                            userId = userId,
+                            gameId = gameId,
+                            supabase = brain.alpha.services.SupabaseClientProvider.client
+                        )
+                        totalScore.value = updated
+                    }
+                }.onFailure {
+                    println("❌ Error saving session: ${it.message}")
+                }
+            }
+        }
+    }
+
     if (showEndDialog.value) {
         AlertDialog(
             onDismissRequest = {},
@@ -153,7 +163,6 @@ fun mentalMathView(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            // Encabezado superior
             TopAppBar(
                 backgroundColor = Color(0xFF222937),
                 contentColor = Color.White,
@@ -176,12 +185,19 @@ fun mentalMathView(
 
             Spacer(Modifier.height(10.dp))
 
-            // Botón volver
             Button(
                 onClick = {
-                    gameStarted = false
-                    controller.resetGame()
-                    onNavigateToHome()
+                    if (gameStarted) {
+                        gameStarted = false
+                        controller.resetGame()
+                        feedback = null
+                        isCorrect = null
+                        userAnswer = ""
+
+                    } else {
+                        controller.resetGame()
+                        onNavigateToHome()
+                    }
                 },
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow),
                 shape = RoundedCornerShape(12.dp),
@@ -190,7 +206,7 @@ fun mentalMathView(
                 Text("⬅ Volver", color = Color.Black)
             }
 
-            // Selector dificultad antes de iniciar juego
+
             if (!gameStarted) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -206,7 +222,6 @@ fun mentalMathView(
                         )
                     }
 
-                    // 🔓 Unlock info shown BELOW the selector
                     val (icon, color, msg) = when {
                         totalScore.value < 1500 -> Triple("🔒", Color.Red, "${1500 - totalScore.value} neuronas para desbloquear MEDIUM")
                         totalScore.value < 3000 -> Triple("🔒", Color.Red, "${3000 - totalScore.value} neuronas para desbloquear HARD")
@@ -220,24 +235,14 @@ fun mentalMathView(
                             .background(Color(0xFFF5F5F5), RoundedCornerShape(8.dp))
                             .padding(horizontal = 12.dp, vertical = 6.dp)
                     ) {
-                        Text(
-                            text = icon,
-                            fontSize = 16.sp,
-                            modifier = Modifier.padding(end = 6.dp)
-                        )
-                        Text(
-                            text = msg,
-                            fontSize = 14.sp,
-                            color = color,
-                            fontWeight = FontWeight.Medium
-                        )
+                        Text(text = icon, fontSize = 16.sp, modifier = Modifier.padding(end = 6.dp))
+                        Text(text = msg, fontSize = 14.sp, color = color, fontWeight = FontWeight.Medium)
                     }
                 }
             }
 
             Spacer(Modifier.height(16.dp))
 
-            // Cuerpo principal
             Box(modifier = Modifier.fillMaxSize()) {
                 Column(
                     modifier = Modifier
@@ -262,21 +267,6 @@ fun mentalMathView(
                         ) {
                             Text("Iniciar Juego", color = Color.Black)
                         }
-                    } else if (controller.isGameOver()) {
-                        Text(
-                            text = "¡Juego Terminado!\nPuntuación: ${controller.getScore()} de ${controller.getTotalQuestions() * 10}",
-                            fontSize = 24.sp,
-                            textAlign = TextAlign.Center
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Button(onClick = {
-                            gameStarted = false
-                            feedback = null
-                            isCorrect = null
-                            userAnswer = ""
-                        }) {
-                            Text("Jugar de Nuevo")
-                        }
                     } else {
                         currentQuestion?.let { question ->
                             Text(
@@ -285,9 +275,7 @@ fun mentalMathView(
                                 textAlign = TextAlign.Center
                             )
                             Spacer(modifier = Modifier.height(8.dp))
-
                             Text("Tiempo restante: $timeLeft s", fontWeight = FontWeight.Bold, color = Color.Red)
-
                             Spacer(modifier = Modifier.height(16.dp))
 
                             TextField(
@@ -340,53 +328,6 @@ fun mentalMathView(
             }
         }
     }
-
-    val sessionSaved = remember { mutableStateOf(false) }
-
-    suspend fun refreshTotalScore() {
-        val userId = UserSession.userId.value
-        if (!UserSession.isGuest.value && userId != null) {
-            val total = GameSessionController.getTotalScore(
-                userId = userId,
-                gameId = gameId,
-                supabase = brain.alpha.services.SupabaseClientProvider.client
-            )
-            totalScore.value = total
-        }
-    }
-
-
-
-
-
-
-
-    LaunchedEffect(controller.isGameOver()) {
-        if (controller.isGameOver() && !sessionSaved.value) {
-            sessionSaved.value = true
-
-            val userId = runCatching { UserSession.getUserId() }.getOrNull()
-            if (userId != null) {
-                val score = controller.getScore()
-                val difficulty = selectedDifficulty.value.name
-                val avgTime = (controller.getTimeLimit().toDouble() / controller.getTotalQuestions())
-
-                GameSessionController.registerGameSession(
-                    gameId = "f017777c-f246-4770-bb73-a652a23e761d", // same as used earlier
-                    difficulty = difficulty,
-                    score = score,
-                    timeAvg = avgTime
-                ).onSuccess {
-                    println("✅ Session saved: score=$score, avgTime=$avgTime, difficulty=$difficulty")
-                    refreshTotalScore()
-                }.onFailure {
-                    println("❌ Error saving session: ${it.message}")
-                }
-            } else {
-                println("⚠ No session saved, user not logged in.")
-            }
-        }
-    }
 }
 
 @Composable
@@ -396,7 +337,6 @@ fun DropdownMenuBox(
     totalScore: Int
 ) {
     var expanded by remember { mutableStateOf(false) }
-
     val unlockedDifficulty = when {
         totalScore >= 3000 -> Difficulty.HARD
         totalScore >= 1500 -> Difficulty.MEDIUM
