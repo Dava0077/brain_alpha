@@ -240,9 +240,9 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                 Spacer(modifier = Modifier.height(8.dp))
 
                 val (icon, color, msg) = when {
-                    totalScore.value < 75 -> Triple("🔒", Color.Red, "${75 - totalScore.value} neuronas para desbloquear MEDIUM")
-                    totalScore.value < 150 -> Triple("🔒", Color.Red, "${150 - totalScore.value} neuronas para desbloquear HARD")
-                    else -> Triple("🔓", Color.Green, "Todas las dificultades desbloqueadas")
+                    totalScore.value < 50 -> Triple("🔒", Color.Red, "${50 - totalScore.value}" + Strings.t("mm8"))
+                    totalScore.value < 150 -> Triple("🔒", Color.Red, "${150 - totalScore.value}"+ Strings.t("mm9"))
+                    else -> Triple("🔓", Color.Green, Strings.t("mm10"))
                 }
 
                 Row(

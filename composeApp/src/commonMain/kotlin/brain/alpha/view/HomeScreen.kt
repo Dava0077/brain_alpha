@@ -146,7 +146,7 @@ fun HomeScreen(
 
                     // Display greeting with username
                     Text(
-                        text = Strings.t("hi") +"$displayName!",
+                        text = "$displayName!",
                         color = Color.White,
                         fontSize = 16.sp,
                         modifier = Modifier

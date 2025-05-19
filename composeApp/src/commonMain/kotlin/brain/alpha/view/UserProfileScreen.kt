@@ -35,6 +35,8 @@ import brain.alpha.controller.UserProgressEntry
 import brain.alpha.model.UserSession
 import brain.alpha.services.SupabaseClientProvider
 import brain.alpha.strings.Strings
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.ui.text.style.TextOverflow
 import brainalpha.composeapp.generated.resources.Res
 import brainalpha.composeapp.generated.resources.*
 import brainalpha.composeapp.generated.resources.iconoInt
@@ -46,6 +48,7 @@ import kotlinx.serialization.json.put
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun UserProfileScreen(onBack: () -> Unit) {
     val coroutineScope = rememberCoroutineScope()
@@ -136,22 +139,32 @@ fun UserProfileScreen(onBack: () -> Unit) {
                 Text(username, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 Text(email, fontSize = 14.sp, color = Color.Gray)
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                FlowRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Button(
                         onClick = { showLogoutConfirm = true },
                         modifier = Modifier
-                            .height(32.dp),
+                            .height(40.dp)
+                            .defaultMinSize(minWidth = 100.dp)
+                            .wrapContentWidth(),
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red),
                         shape = RoundedCornerShape(12.dp),
                         elevation = ButtonDefaults.elevation(4.dp)
                     ) {
-                        Text(Strings.t("log_out"), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        Text(
+                            text = Strings.t("log_out"),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     }
-
-                    Spacer(modifier = Modifier.height(12.dp))
                     Button(
                         onClick = {
                             coroutineScope.launch {
@@ -160,37 +173,48 @@ fun UserProfileScreen(onBack: () -> Unit) {
 
                                 if (success) {
                                     scaffoldState.snackbarHostState.showSnackbar("Cuenta eliminada correctamente")
-                                    AuthController.signOut() // Limpia sesión
+                                    AuthController.signOut()
                                 } else {
                                     scaffoldState.snackbarHostState.showSnackbar("Error al eliminar cuenta")
                                 }
                             }
                         },
                         modifier = Modifier
-                            .height(32.dp),
+                            .height(40.dp)
+                            .defaultMinSize(minWidth = 100.dp)
+                            .wrapContentWidth(),
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF303030)),
-                        shape = RoundedCornerShape(12.dp),
-
-                        ) {
-                        Text("Eliminar cuenta", color = Color.White)
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = Strings.t("delete_account"),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     }
-                    Spacer(modifier = Modifier.height(12.dp))
-
 
                     Button(
                         onClick = onBack,
                         modifier = Modifier
-                            .height(32.dp),
+                            .height(40.dp)
+                            .defaultMinSize(minWidth = 100.dp)
+                            .wrapContentWidth(),
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF303030)),
                         shape = RoundedCornerShape(12.dp),
                         elevation = ButtonDefaults.elevation(4.dp)
                     ) {
-                        Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
+                        Text(
+                            text = Strings.t("back"),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     }
-
-
-
-
                 }
 
                 if (!isEmailVerified) {
@@ -211,7 +235,11 @@ fun UserProfileScreen(onBack: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     ActionButton(Strings.t("change_name")) { showDialog = "name" }
                     ActionButton(Strings.t("change_email")) { showDialog = "email" }
                     ActionButton(Strings.t("change_password")) { showDialog = "password" }
