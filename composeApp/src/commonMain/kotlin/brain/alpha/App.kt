@@ -65,17 +65,24 @@ fun App() {
             val user = SupabaseClientProvider.client.auth.currentUserOrNull()
 
             if (session != null && user != null) {
+                val userProfile = AuthController.loadUserProfile()
+
+                val fallbackName = user.email?.substringBefore('@')?.replaceFirstChar { it.uppercase() } ?: "Usuario"
+                val username = userProfile?.name?.takeIf { it.isNotBlank() } ?: fallbackName
+
                 UserSession.setSession(
                     id = user.id,
                     emailValue = user.email ?: "desconocido@correo.com",
-                    usernameValue = user.userMetadata?.get("username")?.toString()
-                        ?: user.email?.substringBefore('@')?.replaceFirstChar { it.uppercase() }
-                        ?: "Usuario"
+                    usernameValue = username
                 )
+
                 LoginController.clear()
                 LoginController.navigateTo("home")
             }
         }
+
+
+
 
 
         // Assigns a navigation callback for use in controllers

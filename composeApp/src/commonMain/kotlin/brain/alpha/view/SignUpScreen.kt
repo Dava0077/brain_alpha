@@ -49,6 +49,7 @@ fun SignUpScreen(
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
 
+
     Scaffold(scaffoldState = scaffoldState) {
         Box {
             // Background image
@@ -155,19 +156,43 @@ fun SignUpScreen(
                                     password = password,
                                     repeatPassword = repeatPassword
                                 )
-                                loading = false
-                                result.onSuccess {
-                                    // Clear form on success
+                                result.onSuccess { user ->
+                                    // Asegura que el usuario se inserta en la tabla "users"
+                                    AuthController.ensureUserExists(
+                                        userId = user.id,
+                                        email = user.email,
+                                        username = username
+                                    )
+
+                                    UserSession.setSession(
+                                        id = user.id,
+                                        emailValue = user.email ?: "desconocido@correo.com",
+                                        usernameValue = username
+                                    )
+
+                                    showSuccessDialog = true
                                     email = ""
                                     username = ""
                                     password = ""
                                     repeatPassword = ""
-                                    showSuccessDialog = true
                                 }.onFailure { exception ->
                                     val message = exception.message ?: "Error inesperado"
-                                    onFailure(message)
                                     scaffoldState.snackbarHostState.showSnackbar(message)
+                                    onFailure(message)
                                 }
+                                loading = false
+//                                result.onSuccess {
+//                                    // Clear form on success
+//                                    email = ""
+//                                    username = ""
+//                                    password = ""
+//                                    repeatPassword = ""
+//                                    showSuccessDialog = true
+//                                }.onFailure { exception ->
+//                                    val message = exception.message ?: "Error inesperado"
+//                                    onFailure(message)
+//                                    scaffoldState.snackbarHostState.showSnackbar(message)
+//                                }
                             }
                         },
                         enabled = !loading,
@@ -194,10 +219,12 @@ fun SignUpScreen(
                         Text("¿Ya tienes cuenta? Inicia sesión!", color = Color.Blue)
                     }
                 }
+
             }
 
+
             // Success alert dialog "TO DO"
-            if (showSuccessDialog) {
+            /*if (showSuccessDialog) {
                 AlertDialog(
                     onDismissRequest = {},
                     title = { Text("Verifica tu correo electrónico") },
@@ -213,7 +240,9 @@ fun SignUpScreen(
                         }
                     }
                 )
-            }
+            }*/
+
+
 
 //            //Dialog email validated "TO DO"
 //            if (UserSession.) {

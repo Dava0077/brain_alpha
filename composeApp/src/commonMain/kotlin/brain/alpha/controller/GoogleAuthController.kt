@@ -30,28 +30,29 @@ object GoogleAuthController {
             when (result) {
                 is NativeSignInResult.Success -> {
                     scope.launch {
-                        SupabaseClientProvider.client.auth.sessionManager.loadSession()
+//                        SupabaseClientProvider.client.auth.sessionManager.loadSession()
+//
+//                        // ✅ Esperar hasta que haya usuario
+//                        val user = withTimeoutOrNull(5000) {
+//                            while (SupabaseClientProvider.client.auth.currentUserOrNull() == null) {
+//                                delay(100)
+//                            }
+//                            SupabaseClientProvider.client.auth.currentUserOrNull()
+//                        }
+                        val session = SupabaseClientProvider.client.auth.currentSessionOrNull()
 
-                        // ✅ Esperar hasta que haya usuario
-                        val user = withTimeoutOrNull(5000) {
-                            while (SupabaseClientProvider.client.auth.currentUserOrNull() == null) {
-                                delay(100)
-                            }
-                            SupabaseClientProvider.client.auth.currentUserOrNull()
+                        if (session?.user == null) {
+                            onError(Exception("No hay sesión tras login Google."))
+                            return@launch
                         }
+
+                        val user = session.user
+
 
                         if (user == null) {
                             onError(Exception("Sesión no disponible tras login."))
                             return@launch
                         }
-
-                        UserSession.setSession(
-                            id = user.id,
-                            emailValue = user.email ?: "desconocido@correo.com",
-                            usernameValue = user.userMetadata?.get("username")?.toString()
-                                ?: user.email?.substringBefore('@')?.replaceFirstChar { it.uppercase() }
-                                ?: "Usuario"
-                        )
 
                         try {
                             SupabaseClientProvider.client.postgrest["users"].upsert(
