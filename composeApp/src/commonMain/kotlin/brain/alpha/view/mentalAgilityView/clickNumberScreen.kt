@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
@@ -45,12 +46,25 @@ fun clickNumberScreen(
 
     val showInstructions by controller.showInstructions
     var sessionSaved by remember { mutableStateOf(false) }
+    val totalScore = remember { mutableStateOf(0) }
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(UserSession.userId.value) {
+        val userId = UserSession.userId.value
+        if (!UserSession.isGuest.value && userId != null) {
+            val total = GameSessionController.getTotalScore(
+                userId = userId,
+                gameId = "ed29af2f-6346-4a55-bd4d-1b07c013d726",
+                supabase = brain.alpha.services.SupabaseClientProvider.client
+            )
+            totalScore.value = total
+        }
+    }
 
     // Show instructions first
     if (showInstructions) {
         InstructionsClickNumber(
-            onStart = { controller.beginClickGame() },
+            onStart = { controller.showInstructions.value = false },
             controller = clickNumberController
         )
         return
@@ -78,7 +92,7 @@ fun clickNumberScreen(
                     .border(BorderStroke(2.dp, Color(0xFF4CE3E8)))
             ) {
                 IconButton(
-                    onClick = { /* Dummy action */ },
+                    onClick = { LoginController.navigateTo("profile")},
                     modifier = Modifier
                         .align(Alignment.CenterStart)
                         .padding(start = 8.dp)
@@ -95,7 +109,7 @@ fun clickNumberScreen(
                         .scale(1.5f)
                 )
                 IconButton(
-                    onClick = { /* Dummy action */ },
+                    onClick = { LoginController.navigateTo("settings") },
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .padding(end = 8.dp)
@@ -105,28 +119,29 @@ fun clickNumberScreen(
                 }
             }
 
+
             Spacer(modifier = Modifier.height(5.dp))
+            Spacer(modifier = Modifier.height(30.dp))
 
             Button(
                 onClick = { controller.goHome() },
                 modifier = Modifier
                     .align(Alignment.End)
                     .height(46.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF4adef8)),
                 shape = RoundedCornerShape(12.dp),
                 elevation = ButtonDefaults.elevation(4.dp),
-                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+                border = BorderStroke(1.dp, Color.Black)
             ) {
-                Text("⬅ Volver", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
+                Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
             }
 
             Spacer(modifier = Modifier.height(30.dp))
 
             Text(
-                text = "CLICK NUMBER",
+                text = Strings.t("click_number"),
                 fontSize = 40.sp,
                 color = Color.Black,
-                fontFamily = FontFamily.SansSerif,
                 textAlign = TextAlign.Center
             )
 
@@ -134,95 +149,129 @@ fun clickNumberScreen(
 
             // Contenido del juego o pantalla inicial
             if (!clickNumberController.isGameStarted) {
-                // Pantalla inicial
-                Text(
-                    text = "",
-                    fontSize = 24.sp,
-                    modifier = Modifier.padding(bottom = 20.dp)
-                )
+                Text(Strings.t("mm7"), fontWeight = FontWeight.Bold)
+                Spacer(Modifier.height(8.dp))
 
-                // Selector de dificultad
-                Text(
-                    text = "Selecciona la dificultad:",
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(bottom = 10.dp)
-                )
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    modifier = Modifier.padding(bottom = 20.dp)
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .height(46.dp)
+                        .background(Color.White, shape = RoundedCornerShape(12.dp))
+                        .border(BorderStroke(1.dp, Color.Black), shape = RoundedCornerShape(12.dp))
+                        .padding(horizontal = 16.dp)
                 ) {
-                    Button(
-                        onClick = { controller.setDifficulty(Difficulty.EASY) },
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = if (clickNumberController.currentDifficulty == Difficulty.EASY) Color.Green else Color.Gray
-                        ),
-                        shape = RoundedCornerShape(12.dp),
-                        elevation = ButtonDefaults.elevation(4.dp),
-                        border = BorderStroke(1.dp, Color(0xFFB0BEC5))
-                    ) {
-                        Text("Fácil", color = Color.White)
-                    }
-                    Button(
-                        onClick = { controller.setDifficulty(Difficulty.MEDIUM) },
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = if (clickNumberController.currentDifficulty == Difficulty.MEDIUM) Color.Yellow else Color.Gray
-                        ),
-                        shape = RoundedCornerShape(12.dp),
-                        elevation = ButtonDefaults.elevation(4.dp),
-                        border = BorderStroke(1.dp, Color(0xFFB0BEC5))
-                    ) {
-                        Text("Medio", color = Color.Black)
-                    }
-                    Button(
-                        onClick = { controller.setDifficulty(Difficulty.HARD) },
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = if (clickNumberController.currentDifficulty == Difficulty.HARD) Color.Red else Color.Gray
-                        ),
-                        shape = RoundedCornerShape(12.dp),
-                        elevation = ButtonDefaults.elevation(4.dp),
-                        border = BorderStroke(1.dp, Color(0xFFB0BEC5))
-                    ) {
-                        Text("Difícil", color = Color.White)
+                    Text(
+                        text = "${totalScore.value} " + Strings.t("neurons"),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.Black
+                    )
+                }
+
+                Spacer(Modifier.height(16.dp))
+
+                val unlocked = when {
+                    totalScore.value >= 150 -> Difficulty.HARD
+                    totalScore.value >= 50 -> Difficulty.MEDIUM
+                    else -> Difficulty.EASY
+                }
+
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Difficulty.values().forEach { diff ->
+                        val isUnlocked = diff.ordinal <= unlocked.ordinal
+                        val selected = clickNumberController.currentDifficulty == diff
+                        val bg = when (diff) {
+                            Difficulty.EASY -> Color(0xFF0ffc86)
+                            Difficulty.MEDIUM -> Color(0xFF64B5F6)
+                            Difficulty.HARD -> Color(0xFFE57373)
+                        }
+
+                        Button(
+                            onClick = { if (isUnlocked) clickNumberController.setDifficulty(diff) },
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = if (selected) bg else bg.copy(alpha = 0.5f)
+                            ),
+                            enabled = isUnlocked,
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Text("${if (isUnlocked) "⚡" else "🔒"} ${Strings.translateDifficulty(diff)}")
+                        }
                     }
                 }
+
+                Spacer(Modifier.height(8.dp))
+
+                val (icon, color, msg) = when {
+                    totalScore.value < 50 -> Triple("🔒", Color.Red, "${50 - totalScore.value} ${Strings.t("mm8")}")
+                    totalScore.value < 150 -> Triple("🔒", Color.Red, "${150 - totalScore.value} ${Strings.t("mm9")}")
+                    else -> Triple("🔓", Color.Green, Strings.t("mm10"))
+                }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .background(Color(0xFFF5F5F5), RoundedCornerShape(8.dp))
+                        .padding(10.dp)
+                ) {
+                    Text(icon, modifier = Modifier.padding(end = 6.dp))
+                    Text(msg, color = color, fontWeight = FontWeight.Medium)
+                }
+
+                Spacer(Modifier.height(16.dp))
 
                 Button(
                     onClick = { clickNumberController.startGame() },
-                    modifier = Modifier.padding(bottom = 20.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.height(46.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color(0xFF4adef8),
+                        contentColor = Color.Black
+                    ),
+                    elevation = ButtonDefaults.elevation(4.dp),
+                    border = BorderStroke(1.dp, Color(0xFF388E3C))
                 ) {
-                    Text("Iniciar Juego")
+                    Text(Strings.t("mm11"))
+                }
+
+                Spacer(Modifier.height(8.dp))
+
+                Button(
+                    onClick = { clickNumberController.showInstructions.value = true },
+                    modifier = Modifier.height(46.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color(0xFF4adef8),
+                        contentColor = Color.Black
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.elevation(4.dp),
+                    border = BorderStroke(1.dp, Color(0xFF388E3C))
+                ) {
+                    Text(Strings.t("instructions"))
                 }
             } else {
-                // UI del juego
-                // Temporizador (formato MM:SS)
                 val minutes = clickNumberController.timeLeft / 60
                 val seconds = clickNumberController.timeLeft % 60
                 Text(
-                    text = "Tiempo restante: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}",
+                    text = Strings.t("mm15") + " ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}",
                     fontSize = 18.sp,
                     modifier = Modifier.padding(bottom = 10.dp)
                 )
 
-                // Instrucción del juego
                 Text(
                     text = clickNumberController.instructionMessage,
                     fontSize = 20.sp,
                     modifier = Modifier.padding(bottom = 10.dp)
                 )
 
-                // Mensaje de resultado
                 Text(
                     text = clickNumberController.resultMessage,
                     fontSize = 18.sp,
                     modifier = Modifier.padding(bottom = 10.dp)
                 )
 
-                // Cuadrícula de botones
                 if (!clickNumberController.gameOver && clickNumberController.numbers.isNotEmpty()) {
                     for (row in 0 until 4) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                             for (col in 0 until 4) {
                                 val index = row * 4 + col
                                 val number = clickNumberController.numbers.getOrElse(index) { 0 }
@@ -243,81 +292,70 @@ fun clickNumberScreen(
         // Ventana emergente cuando el juego termina
         if (clickNumberController.showGameOverDialog) {
             AlertDialog(
-                onDismissRequest = { /* No permitir cerrar haciendo clic fuera */ },
+                onDismissRequest = {},
                 title = {
                     Text(
-                        text = "¡Juego Terminado!",
-                        fontSize = 24.sp,
+                        text = Strings.t("mm1"),
+                        fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
                     )
                 },
                 text = {
-                    Text(
-                        text = "Puntuación obtenida: ${clickNumberController.score}",
-                        fontSize = 18.sp,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                },
-                buttons = {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Button(
-                            onClick = { clickNumberController.goHome() },
-                            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow),
-                            shape = RoundedCornerShape(12.dp),
-                            elevation = ButtonDefaults.elevation(4.dp),
-                            border = BorderStroke(1.dp, Color(0xFFB0BEC5))
-                        ) {
-                            Text("Volver al Menú", color = Color.Black)
-                        }
-                        Button(
-                            onClick = { clickNumberController.restartGame() },
-                            colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
-                            shape = RoundedCornerShape(12.dp),
-                            elevation = ButtonDefaults.elevation(4.dp),
-                            border = BorderStroke(1.dp, Color(0xFFB0BEC5))
-                        ) {
-                            Text("Jugar de Nuevo", color = Color.Black)
-                        }
+                        Text(Strings.t("mm2") + " ${clickNumberController.score}", fontSize = 18.sp)
+                        Text(Strings.t("mm4") + " ${clickNumberController.currentDifficulty.name}", fontSize = 18.sp)
+                        Text(Strings.t("mm3") + " ${when (clickNumberController.currentDifficulty) {
+                            Difficulty.EASY -> 90
+                            Difficulty.MEDIUM -> 60
+                            Difficulty.HARD -> 30
+                        }}s", fontSize = 18.sp)
                     }
                 },
-                modifier = Modifier
-                    .background(Color.White, shape = RoundedCornerShape(16.dp))
-                    .padding(16.dp)
+                confirmButton = {
+                    TextButton(onClick = {
+                        clickNumberController.restartGame()
+                    }) {
+                        Text(Strings.t("mm5"), color = Color(0xFF6200EE), fontWeight = FontWeight.SemiBold)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = {
+                        clickNumberController.goHome()
+                    }) {
+                        Text(Strings.t("mm6"), color = Color(0xFF6200EE), fontWeight = FontWeight.SemiBold)
+                    }
+                },
+                shape = RoundedCornerShape(16.dp)
             )
+
             if (!sessionSaved) {
                 sessionSaved = true
                 scope.launch {
                     val userId = runCatching { UserSession.getUserId() }.getOrNull()
                     if (userId != null) {
                         GameSessionController.registerGameSession(
-                            gameId = "ed29af2f-6346-4a55-bd4d-1b07c013d726", // ID único del juego ClickNumber
+                            gameId = "ed29af2f-6346-4a55-bd4d-1b07c013d726",
                             score = clickNumberController.score,
                             difficulty = clickNumberController.currentDifficulty.name
-                        ).onSuccess {
-                            println("✅ Partida guardada: ${clickNumberController.score} puntos.")
-                        }.onFailure {
+                        ).onFailure {
                             println("❌ Error al guardar la partida: ${it.message}")
                         }
-                    } else {
-                        println("⚠ Usuario no logueado, no se puede guardar la partida.")
                     }
                 }
             }
         }
     }
 }
+
 @Composable
 fun InstructionsClickNumber(onStart: () -> Unit, controller: clickNumberController) {
     Box(modifier = Modifier.fillMaxSize()) {
-        // Background image
         Image(
             painter = painterResource(Res.drawable.fondoMental),
             contentDescription = null,
@@ -326,12 +364,10 @@ fun InstructionsClickNumber(onStart: () -> Unit, controller: clickNumberControll
         )
 
         Column(
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            // Same HEADER as game screen (user icon, logo, settings)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -340,16 +376,13 @@ fun InstructionsClickNumber(onStart: () -> Unit, controller: clickNumberControll
                     .border(BorderStroke(2.dp, Color(0xFF4CE3E8)))
             ) {
                 IconButton(
-                    onClick = { /* Dummy user action */ },
+                    onClick = { LoginController.navigateTo("profile")},
                     modifier = Modifier
                         .align(Alignment.CenterStart)
                         .padding(start = 8.dp)
                         .size(48.dp)
                 ) {
-                    Image(
-                        painter = painterResource(Res.drawable.user),
-                        contentDescription = "Usuario"
-                    )
+                    Image(painter = painterResource(Res.drawable.user), contentDescription = "Usuario")
                 }
 
                 Image(
@@ -368,31 +401,27 @@ fun InstructionsClickNumber(onStart: () -> Unit, controller: clickNumberControll
                         .padding(end = 8.dp)
                         .size(48.dp)
                 ) {
-                    Image(
-                        painter = painterResource(Res.drawable.ajustes),
-                        contentDescription = "Ajustes"
-                    )
+                    Image(painter = painterResource(Res.drawable.ajustes), contentDescription = "Ajustes")
                 }
             }
 
             Spacer(modifier = Modifier.height(5.dp))
-            // Back Button (same design as in game)
+
             Button(
-                onClick = { controller.goHomeLogic() },
+                onClick = { clickNumberController.goHome() },
                 modifier = Modifier
                     .align(Alignment.End)
                     .height(46.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF4adef8)),
                 shape = RoundedCornerShape(12.dp),
                 elevation = ButtonDefaults.elevation(4.dp),
-                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+                border = BorderStroke(1.dp, Color.Black)
             ) {
                 Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
             }
 
-            Spacer(modifier = Modifier.height(100.dp))
+            Spacer(modifier = Modifier.height(80.dp))
 
-            // Title of instruction section
             Text(
                 Strings.t("instructions"),
                 fontSize = 28.sp,
@@ -402,48 +431,64 @@ fun InstructionsClickNumber(onStart: () -> Unit, controller: clickNumberControll
 
             Spacer(modifier = Modifier.height(30.dp))
 
-            // Game explanation using styled text
             Box(
                 modifier = Modifier
                     .padding(horizontal = 32.dp)
                     .background(Color.White, shape = RoundedCornerShape(16.dp))
-                    .padding(16.dp) // Padding interno
+                    .padding(20.dp)
             ) {
                 Text(
                     buildAnnotatedString {
-                        append(Strings.t("insW1"))
-                        withStyle(androidx.compose.ui.text.SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append(Strings.t("insW2"))
-                        }
-                        append(Strings.t("insW3") + "\n\n")
+                        append(Strings.t("insCN1") + "\n\n")
 
-                        append(Strings.t("insW4"))
-                        withStyle(androidx.compose.ui.text.SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append(Strings.t("insW5"))
-                        }
-                        append(" .\n")
+                        append(Strings.t("insCN2") + "\n\n")
 
-                        append(Strings.t("insW6"))
+                        append(Strings.t("insCN3") + "\n\n")
+
+                        append(Strings.t("insCN4"))
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = Color(0xFF388E3C))) {
+                            append(Strings.t("insCN5"))
+                        }
+                        append(Strings.t("insCN6") + "\n\n")
+
+                        append(Strings.t("insCN7") + "\n")
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = Color(0xFF81C784))) {
+                            append(Strings.t("easy"))
+                        }
+                        append(": " + Strings.t("insCN8").split(":")[1] + "\n")
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = Color(0xFF64B5F6))) {
+                            append(Strings.t("medium"))
+                        }
+                        append(": " + Strings.t("insCN9").split(":")[1] + "\n")
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = Color(0xFFE57373))) {
+                            append(Strings.t("hard"))
+                        }
+                        append(": " + Strings.t("insCN10").split(":")[1] + "\n\n")
+
+                        append(Strings.t("insCN11") + "\n")
+                        append(Strings.t("insCN12") + "\n")
+                        append(Strings.t("insCN13") + "\n\n")
+
+                        append(Strings.t("insCN14"))
                     },
                     fontSize = 16.sp,
                     textAlign = TextAlign.Center,
-                    color = Color.Black,
+                    color = Color(0xFF424242),
                     lineHeight = 24.sp
                 )
             }
 
             Spacer(modifier = Modifier.height(40.dp))
 
-            // Start game button
             Button(
                 onClick = onStart,
                 modifier = Modifier
                     .height(48.dp)
                     .width(200.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF4adef8)),
                 shape = RoundedCornerShape(12.dp),
                 elevation = ButtonDefaults.elevation(4.dp),
-                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+                border = BorderStroke(1.dp, Color.Black)
             ) {
                 Text(Strings.t("start_game"), fontWeight = FontWeight.Medium, color = Color.Black)
             }
