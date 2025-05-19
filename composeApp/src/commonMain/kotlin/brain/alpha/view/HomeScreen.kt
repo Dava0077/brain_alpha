@@ -16,6 +16,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
+import brain.alpha.controller.AuthController
 import brain.alpha.controller.LoginController
 import brain.alpha.model.UserSession
 import brain.alpha.services.SupabaseClientProvider
@@ -209,6 +210,7 @@ fun HomeScreen(
                             onNavigateToAgility)
                     }
                 }
+
             }
 
             // Floating logo on top center

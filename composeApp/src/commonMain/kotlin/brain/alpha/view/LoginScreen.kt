@@ -17,18 +17,17 @@ import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import brain.alpha.controller.AuthController
 import brain.alpha.controller.GoogleAuthController
 import brain.alpha.controller.LoginController
 import brain.alpha.services.SupabaseClientProvider
 import brainalpha.composeapp.generated.resources.Res
 import brainalpha.composeapp.generated.resources.*
 import io.github.jan.supabase.auth.auth
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import brain.alpha.model.UserSession
 import io.github.jan.supabase.auth.user.UserInfo
-import kotlinx.coroutines.withTimeoutOrNull
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 
 
 /**
@@ -66,19 +65,25 @@ fun LoginScreen(
 
     LaunchedEffect(Unit) {
         while (true) {
-            delay(250) // Poll every 0.5s
+            delay(250)
             val user = SupabaseClientProvider.client.auth.currentUserOrNull()
+
             if (user != null && !alreadyHandled.value) {
                 alreadyHandled.value = true
 
                 SupabaseClientProvider.client.auth.sessionManager.loadSession()
 
+                val userProfile = withContext(Dispatchers.Default) {
+                    AuthController.loadUserProfile()
+                }
+
+                val fallbackName = user.email?.substringBefore('@')?.replaceFirstChar { it.uppercase() } ?: "Usuario"
+                val username = userProfile?.name?.takeIf { it.isNotBlank() } ?: fallbackName
+
                 UserSession.setSession(
                     id = user.id,
                     emailValue = user.email ?: "desconocido@correo.com",
-                    usernameValue = user.userMetadata?.get("username")?.toString()
-                        ?: user.email?.substringBefore('@')?.replaceFirstChar { it.uppercase() }
-                        ?: "Usuario"
+                    usernameValue = username
                 )
 
                 scaffoldState.snackbarHostState.showSnackbar("Bienvenido, ${user.email}")
@@ -86,11 +91,15 @@ fun LoginScreen(
                 LoginController.setUser(
                     UserInfo(id = user.id, email = user.email ?: "unknown", aud = user.aud ?: "")
                 )
+
                 LoginController.clear()
                 LoginController.navigateTo("home")
             }
         }
     }
+
+
+
 
 
     /*val googleSignIn = GoogleAuthController.googleSignInAction(
