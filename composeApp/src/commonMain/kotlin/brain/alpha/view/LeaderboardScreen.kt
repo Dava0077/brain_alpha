@@ -5,8 +5,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-
-
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -60,12 +59,7 @@ fun sort(entries: List<LeaderboardEntry>, sortBy: SortOption, ascending: Boolean
     return if (ascending) sorted else sorted.reversed()
 }
 
-
-
-
-
-
-
+@OptIn(ExperimentalLayoutApi::class)
 
 @Composable
 fun LeaderboardScreen(controller: LeaderboardController) {
@@ -121,20 +115,10 @@ fun LeaderboardScreen(controller: LeaderboardController) {
                 .background(Color(0xFF222937), shape = RoundedCornerShape(4.dp))
                 .border(BorderStroke(2.dp, Color(0xFF4CE3E8)))
         ) {
-            IconButton(onClick = { LoginController.navigateTo("profile")}, modifier = Modifier.align(Alignment.CenterStart).padding(start = 8.dp).size(55.dp)) {
-                Image(painter = painterResource(Res.drawable.user), contentDescription = "User")
-            }
-
-            Text(displayName, color = Color.White, fontSize = 16.sp,
-                modifier = Modifier.align(Alignment.CenterStart).padding(start = 72.dp))
-
             Text("Clasificación", color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Bold,
                 modifier = Modifier.align(Alignment.Center).padding(start = 72.dp))
 
-            IconButton(onClick = { LoginController.navigateTo("settings")}, modifier = Modifier.align(Alignment.CenterEnd).padding(start = 8.dp).size(55.dp)) {
-                Image(painter = painterResource(Res.drawable.ajustes), contentDescription = "Settings")
-            }
-        }
+                    }
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
@@ -169,24 +153,21 @@ fun LeaderboardScreen(controller: LeaderboardController) {
 //        }
 
         Spacer(modifier = Modifier.height(12.dp))
-        Row(
+        FlowRow(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            maxItemsInEachRow = Int.MAX_VALUE
         ) {
             Text("Ordenar por:")
+
             SortOption.values().forEach { option ->
                 Button(
                     onClick = {
                         sortOption.value = option
-                        reloadTrigger.value++  // Forzar recarga
+                        reloadTrigger.value++
                     },
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = if (sortOption.value == option) Color(0xFF4FC3F7) else Color.LightGray
@@ -199,27 +180,30 @@ fun LeaderboardScreen(controller: LeaderboardController) {
             Button(
                 onClick = {
                     ascending.value = !ascending.value
-                    reloadTrigger.value++  // Forzar recarga
+                    reloadTrigger.value++
                 },
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color(0xFF4FC3F7)
                 )
             ) {
-                Text(if (ascending.value) "Asc" else "Desc", color = Color.White)
+                Text(
+                    if (ascending.value) "Asc" else "Desc",
+                    color = Color.White
+                )
             }
         }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.End,
-                modifier = Modifier.weight(1f)
-            ) {
-                DifficultyLegendItem(Res.drawable.easy, Strings.t("easy"), size = 32.dp)
-                DifficultyLegendItem(Res.drawable.medium, Strings.t("medium"), size = 40.dp)
-                DifficultyLegendItem(Res.drawable.hard, Strings.t("hard"), size = 48.dp)
-            }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(end = 8.dp),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            DifficultyLegendItem(Res.drawable.easy, Strings.t("easy"), size = 32.dp)
+            DifficultyLegendItem(Res.drawable.medium, Strings.t("medium"), size = 40.dp)
+            DifficultyLegendItem(Res.drawable.hard, Strings.t("hard"), size = 48.dp)
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
 
         categories.forEach { (category, games) ->
             ExpandableCategory(
