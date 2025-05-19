@@ -121,7 +121,7 @@ fun mentalMathView(
         if (gameStarted && (timeLeft == 0 || controller.isGameOver())) {
             gameStarted = false
             if (timeLeft == 0 && !controller.isGameOver()) {
-                feedback = "¡Tiempo agotado!"
+                feedback = Strings.t("mm1")
             }
             saveSessionIfNeeded()
             showEndDialog.value = true
@@ -257,7 +257,7 @@ fun mentalMathView(
                     onDismissRequest = {},
                     title = {
                         Text(
-                            text = "¡Juego Terminado!",
+                            text = Strings.t("mm1"),
                             fontSize = 22.sp,
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Center,
@@ -270,9 +270,9 @@ fun mentalMathView(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Text("Puntuación: ${controller.getScore()}", fontSize = 18.sp)
-                            Text("Dificultad: ${selectedDifficulty.value.name}", fontSize = 18.sp)
-                            Text("Tiempo promedio: ${(controller.getTimeLimit().toDouble() / controller.getTotalQuestions()).toInt()}s", fontSize = 18.sp)
+                            Text(Strings.t("mm2") + "${controller.getScore()}", fontSize = 18.sp)
+                            Text(Strings.t("mm4") + "${selectedDifficulty.value.name}", fontSize = 18.sp)
+                            Text(Strings.t("mm3") +  "${(controller.getTimeLimit().toDouble() / controller.getTotalQuestions()).toInt()}s", fontSize = 18.sp)
                         }
                     },
                     confirmButton = {
@@ -284,7 +284,7 @@ fun mentalMathView(
                             showEndDialog.value = false
                         })
                         {
-                            Text("Jugar de nuevo", color = Color(0xFF6200EE), fontWeight = FontWeight.SemiBold)
+                            Text(Strings.t("mm5"), color = Color(0xFF6200EE), fontWeight = FontWeight.SemiBold)
                         }
                     },
                     dismissButton = {
@@ -293,14 +293,14 @@ fun mentalMathView(
                             gameStarted = false
                             showEndDialog.value = false
                             onNavigateToHome()
-                        }) { Text("Salir", color = Color(0xFF6200EE), fontWeight = FontWeight.SemiBold) }
+                        }) { Text(Strings.t("mm6"), color = Color(0xFF6200EE), fontWeight = FontWeight.SemiBold) }
                     },
                     shape = RoundedCornerShape(16.dp)
                 )
             }
 
             if (!gameStarted) {
-                Text("Selecciona Dificultad:", fontWeight = FontWeight.Bold)
+                Text(Strings.t("mm7"), fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(8.dp))
 
                 val unlocked = when {
@@ -335,9 +335,9 @@ fun mentalMathView(
                 Spacer(Modifier.height(8.dp))
 
                 val (icon, color, msg) = when {
-                    totalScore.value < 50 -> Triple("🔒", Color.Red, "${50 - totalScore.value} neuronas para desbloquear MEDIUM")
-                    totalScore.value < 150 -> Triple("🔒", Color.Red, "${150 - totalScore.value} neuronas para desbloquear HARD")
-                    else -> Triple("🔓", Color.Green, "Todas las dificultades desbloqueadas")
+                    totalScore.value < 50 -> Triple("🔒", Color.Red, "${50 - totalScore.value}" +  Strings.t("mm8"))
+                    totalScore.value < 150 -> Triple("🔒", Color.Red, "${150 - totalScore.value}" + Strings.t("mm9"))
+                    else -> Triple("🔓", Color.Green, Strings.t("mm10"))
                 }
 
                 Row(
@@ -372,7 +372,7 @@ fun mentalMathView(
                     elevation = ButtonDefaults.elevation(4.dp),
                     border = BorderStroke(1.dp, Color(0xFF388E3C))
                 ) {
-                    Text("Iniciar Juego")
+                    Text(Strings.t("mm11"))
                 }
 
                 Spacer(Modifier.height(8.dp))
@@ -387,7 +387,7 @@ fun mentalMathView(
                     elevation = ButtonDefaults.elevation(4.dp),
                     border = BorderStroke(1.dp, Color(0xFF388E3C))
                 ) {
-                    Text("Instrucciones")
+                    Text(Strings.t("instructions"))
                 }
 
             } else {
@@ -400,18 +400,18 @@ fun mentalMathView(
                             .padding(horizontal = 24.dp)
                     ) {
                         Text(
-                            "Pregunta ${controller.getCurrentQuestionNumber()}: ${question.text}",
+                            Strings.t("mm18") + "${controller.getCurrentQuestionNumber()}: " + "${question.text}",
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(Modifier.height(8.dp))
-                        Text("⏱️ Tiempo restante: $timeLeft s", color = Color.Red, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text(Strings.t("mm15") + "$timeLeft s", color = Color.Red, fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
                         Spacer(Modifier.height(20.dp))
                         TextField(
                             value = userAnswer,
                             onValueChange = { userAnswer = it },
-                            label = { Text("Tu respuesta") },
+                            label = { Text(Strings.t("mm12")) },
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -424,7 +424,7 @@ fun mentalMathView(
                                     val time = (currentTimeMillis() - startTime) / 1000.0
                                     controller.submitAnswer(ans, time) { correct, score, message ->
                                         isCorrect = correct
-                                        feedback = if (correct) "✅ Correcto. Puntuación: $score" else message
+                                        feedback = if (correct) Strings.t("mm17") + "$score" else message
                                         userAnswer = ""
                                         if (!controller.isGameOver()) {
                                             controller.startGame {
@@ -433,7 +433,7 @@ fun mentalMathView(
                                             }
                                         }
                                     }
-                                } else feedback = "Introduce un número válido"
+                                } else feedback = Strings.t("mm16")
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -446,7 +446,7 @@ fun mentalMathView(
                             elevation = ButtonDefaults.elevation(4.dp),
                             border = BorderStroke(1.dp, Color(0xFF000405))
                         ) {
-                            Text("Enviar Respuesta")
+                            Text(Strings.t("mm13"))
                         }
 
                         Spacer(Modifier.height(12.dp))
@@ -466,7 +466,7 @@ fun mentalMathView(
                             elevation = ButtonDefaults.elevation(2.dp),
                             border = BorderStroke(1.dp, Color.Black)
                         ) {
-                            Text("Volver")
+                            Text(Strings.t("mm14"))
                         }
 
                         Spacer(Modifier.height(16.dp))
@@ -510,7 +510,7 @@ fun MentalInstructionsScreen(onBack: () -> Unit) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        "Instrucciones",
+                        Strings.t("instructions"),
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF000405)
@@ -520,29 +520,29 @@ fun MentalInstructionsScreen(onBack: () -> Unit) {
 
                     Text(
                         buildAnnotatedString {
-                            append("Resuelve operaciones matemáticas lo más rápido posible.\n\n")
-                            append("Cada respuesta correcta te da puntos. ")
+                            append(Strings.t("mm19") + "\n\n")
+                            append(Strings.t("mm20") + " ")
                             withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = Color(0xFF388E3C))) {
-                                append("¡Cuanto más rápido respondas, más puntos obtendrás!")
+                                append(Strings.t("mm21"))
                             }
-                            append("\n\nTienes ")
+                            append("\n\n" + Strings.t("mm22"))
                             withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append("10 preguntas")
+                                append(Strings.t("mm23"))
                             }
-                            append(" por partida. Elige una dificultad para comenzar.\n\n")
-                            append("Dificultades disponibles:\n")
+                            append(Strings.t("mm24") + "\n\n")
+                            append(Strings.t("mm25") + "\n")
                             withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = Color(0xFF81C784))) {
                                 append("EASY")
                             }
-                            append(" (10 puntos), ")
+                            append(Strings.t("mm26") + ", ")
                             withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = Color(0xFF64B5F6))) {
                                 append("MEDIUM")
                             }
-                            append(" (15 puntos), ")
+                            append(Strings.t("mm27") + ", ")
                             withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = Color(0xFFE57373))) {
                                 append("HARD")
                             }
-                            append(" (20 puntos)\n")
+                            append(Strings.t("mm28"))
                         },
                         fontSize = 16.sp,
                         textAlign = TextAlign.Center,
@@ -563,7 +563,7 @@ fun MentalInstructionsScreen(onBack: () -> Unit) {
                         elevation = ButtonDefaults.elevation(4.dp),
                         border = BorderStroke(1.dp, Color(0xFF388E3C))
                     ) {
-                        Text("Volver", fontWeight = FontWeight.SemiBold)
+                        Text(Strings.t("back"), fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
