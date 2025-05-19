@@ -187,7 +187,7 @@ fun UserProfileScreen(onBack: () -> Unit) {
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            text = "Eliminar cuenta",
+                            text = Strings.t("delete_account"),
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White,

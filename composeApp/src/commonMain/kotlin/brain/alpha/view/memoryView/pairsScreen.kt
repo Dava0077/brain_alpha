@@ -330,9 +330,9 @@ fun couplesScreen(
 
                 // Determine the icon, color, and message based on score to unlock difficulties
                 val (icon, color, msg) = when {
-                    totalScore.value < 50 -> Triple("🔒", Color.Red, "${50 - totalScore.value} neuronas para desbloquear MEDIUM")
-                    totalScore.value < 150 -> Triple("🔒", Color.Red, "${150 - totalScore.value} neuronas para desbloquear HARD")
-                    else -> Triple("🔓", Color.Green, "Todas las dificultades desbloqueadas")
+                    totalScore.value < 50 -> Triple("🔒", Color.Red, "${50 - totalScore.value}" + Strings.t("mm8"))
+                    totalScore.value < 150 -> Triple("🔒", Color.Red, "${150 - totalScore.value}"+ Strings.t("mm9"))
+                    else -> Triple("🔓", Color.Green, Strings.t("mm10"))
                 }
 
                 // Row to display the unlock message

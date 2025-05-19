@@ -9,6 +9,7 @@ object Strings {
             //GENERAL
             "play" to "JUGAR",
             "leaderboard" to "CLASSIFICACIÓN",
+            "leaderboard_bygame" to "Clasificación por juego",
             "play_again" to "JUGAR DE NUEVO",
             "restart" to "REINICIAR",
             "charging" to "CARGANDO...",
@@ -31,6 +32,10 @@ object Strings {
             "your_progress" to "Tu progeso por juego",
             "game" to "\uD83D\uDD79JUEGO",
             "difficulty" to "🏆DIFICULTAD",
+            "order_by" to "🏆Ordenar por:",
+            "score" to "Puntaje",
+            "avg_time" to "Tiempo medio",
+            "delete_account" to "Eliminar cuenta",
             //HOME SCREEN
             "hi" to "Hola, ",
             "categories" to "CATEGORIAS",
@@ -195,6 +200,7 @@ object Strings {
             //GENERAL
             "play" to "PLAY",
             "leaderboard" to "LEADERBOARD",
+            "leaderboard_bygame" to "Leaderboard by game",
             "play_again" to "PLAY AGAIN",
             "restart" to "RESTART",
             "charging" to "CHARGING...",
@@ -217,6 +223,10 @@ object Strings {
             "your_progress" to "Your progress per game",
             "game" to "\uD83D\uDD79GAME",
             "difficulty" to "🏆DIFFICULTY",
+            "order_by" to "🏆Order by:",
+            "score" to "Score",
+            "avg_time" to "Average time",
+            "delete_account" to "Delete account",
 
             //HOME SCREEN
             "hi" to "Hi, ",
