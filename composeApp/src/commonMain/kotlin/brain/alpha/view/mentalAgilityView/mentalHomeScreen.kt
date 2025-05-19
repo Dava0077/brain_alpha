@@ -86,10 +86,10 @@ fun mentalHomeScreen(
                 modifier = Modifier
                     .align(Alignment.End)
                     .height(46.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0XFF4adef8)),
                 shape = RoundedCornerShape(12.dp),
                 elevation = ButtonDefaults.elevation(4.dp),
-                border = BorderStroke(1.dp, Color(0xFFB0BEC5))
+                border = BorderStroke(1.dp, Color.Black)
             ){
                 Text("⬅ Volver", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
             }
@@ -114,14 +114,14 @@ fun mentalHomeScreen(
             ) {
                 brain.alpha.view.CategoryItem(
                     "MENTAL MATH",
-                    Res.drawable.math,
-                    Color.Yellow,
+                    Res.drawable.mentalMath,
+                    Color.Black,
                     onNavigateToMath
                 )
                 brain.alpha.view.CategoryItem(
                     "CLICK NUMBER",
                     Res.drawable.clickNumber,
-                    Color.Yellow,
+                    Color.Black,
                     onNavigateToClick
                 )
             }

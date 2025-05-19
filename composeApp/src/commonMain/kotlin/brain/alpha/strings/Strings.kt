@@ -149,7 +149,26 @@ object Strings {
             "stroopTest_game" to "Test de Stroop",
             "mental_math" to "Cálculo mental",
             "oddEmoji_game" to "Emoji raro",
-            "click_number" to "Haz clic en el número"
+            "click_number" to "Haz clic en el número",
+
+            //Mental Math
+            "mm1" to "¡Juego Terminado!",
+            "mm2" to "Puntuación:",
+            "mm3" to "Tiempo promedio:",
+            "mm4" to "Dificultad:",
+            "mm5" to "Jugar de nuevo",
+            "mm6" to "Salir",
+            "mm7" to "Selecciona Dificultad:",
+            "mm8" to "neuronas para desbloquear MEDIUM",
+            "mm9" to "neuronas para desbloquear HARD",
+            "mm10" to "Todas las dificultades desbloqueadas",
+            "mm11" to "Iniciar Juego",
+            "mm12" to "Tu respuesta",
+            "mm13" to "Enviar Respuesta",
+            "mm14" to "Volver",
+            "mm15" to "Tiempo restante:",
+            "mm16" to "Introduce un número válido",
+            "mm17" to "✅ Correcto. Puntuación: "
 
 
 
@@ -302,7 +321,28 @@ object Strings {
             "stroopTest_game" to "Stroop Test",
             "mental_math" to "Mental Math",
             "oddEmoji_game" to "Odd Emoji",
-            "click_number" to "Click Number"
+            "click_number" to "Click Number",
+
+
+            //Mental Math
+            "mm1" to "Game Over!",
+            "mm2" to "Score:",
+            "mm3" to "Average Time:",
+            "mm4" to "Difficulty:",
+            "mm5" to "Play Again",
+            "mm6" to "Exit",
+            "mm7" to "Select Difficulty:",
+            "mm8" to "neurons to unlock MEDIUM",
+            "mm9" to "neurons to unlock HARD",
+            "mm10" to "All difficulties unlocked",
+            "mm11" to "Start Game",
+            "mm12" to "Your answer",
+            "mm13" to "Submit Answer",
+            "mm14" to "Return",
+            "mm15" to "Time left:",
+            "mm16" to "Enter a valid number",
+            "mm17" to "✅ Correct. Score: "
+
 
 
         )
