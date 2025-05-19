@@ -9,10 +9,16 @@ import io.github.jan.supabase.auth.providers.OAuthProvider
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.postgrest.postgrest
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.request.*
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
+import kotlinx.datetime.Instant
+import kotlinx.serialization.json.*
 
 /**
  * AuthController.kt
@@ -28,6 +34,45 @@ import kotlinx.serialization.json.put
 
 
 object AuthController {
+
+    suspend fun deleteUserFromAuth(userId: String): Boolean = withContext(Dispatchers.Default) {
+        val serviceRoleKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV6enV6amJhdnpudGRiYnJjemxhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MTg5MjUyOCwiZXhwIjoyMDU3NDY4NTI4fQ._ShBWX1s5yrBMtJztoy4mI02cgJzOZXZTgVHFv0ERMA"
+        val projectUrl = "https://uzzuzjbavzntdbbrczla.supabase.co"
+
+        val client = HttpClient(CIO) {
+            install(ContentNegotiation) {
+                json(Json {
+                    ignoreUnknownKeys = true
+                    prettyPrint = true
+                    isLenient = true
+                })
+            }
+        }
+
+        val authResponse = client.delete("$projectUrl/auth/v1/admin/users/$userId") {
+            headers {
+                append(HttpHeaders.Authorization, "Bearer $serviceRoleKey")
+                append("apikey", serviceRoleKey)
+            }
+        }
+
+        val authDeleted = authResponse.status.value in 200..299
+
+        // Solo intenta borrar de public.users si el auth se eliminó correctamente
+        if (authDeleted) {
+            val clientSupabase = SupabaseClientProvider.client
+            runCatching {
+                clientSupabase.postgrest["users"].delete {
+                    filter { eq("id", userId) }
+                }
+            }.onFailure {
+                println("❌ Error al eliminar de public.users: ${it.message}")
+            }
+        }
+
+        client.close()
+        return@withContext authDeleted
+    }
 
     // Access Supabase Auth module
     private val auth get() = SupabaseClientProvider.client.auth
@@ -64,7 +109,7 @@ object AuthController {
      * Registers a new user with validation, authentication, and insertion into the custom "users" table.
      * @throws IllegalArgumentException if inputs are invalid.
      */
-    suspend fun signUp(
+    /*suspend fun signUp(
         email: String,
         username: String,
         password: String,
@@ -124,7 +169,67 @@ object AuthController {
 
             user
         }
+    }*/
+    suspend fun signUp(
+        email: String,
+        username: String,
+        password: String,
+        repeatPassword: String
+    ): Result<UserInfo> = withContext(Dispatchers.Default) {
+        runCatching {
+            if (email.isBlank() || username.isBlank() || password.isBlank() || repeatPassword.isBlank()) {
+                throw IllegalArgumentException("Todos los campos son obligatorios.")
+            }
+
+            if (!isValidEmail(email)) {
+                throw IllegalArgumentException("El email no es válido.")
+            }
+
+            if (password.length < 6) {
+                throw IllegalArgumentException("La contraseña debe tener al menos 6 caracteres.")
+            }
+
+            if (password != repeatPassword) {
+                throw IllegalArgumentException("Las contraseñas no coinciden.")
+            }
+
+            auth.signUpWith(Email) {
+                this.email = email
+                this.password = password
+                data = buildJsonObject {
+                    put("username", username)
+                }
+            }
+
+            // Autenticamos inmediatamente después para obtener el ID de usuario
+            auth.signInWith(Email) {
+                this.email = email
+                this.password = password
+            }
+
+            val user = auth.currentUserOrNull()
+                ?: throw IllegalStateException("No se pudo obtener el usuario tras el registro.")
+
+            // Insertamos en la tabla 'users' con su ID real
+            SupabaseClientProvider.client.postgrest["users"].insert(
+                buildJsonObject {
+                    put("id", user.id)
+                    put("email", user.email ?: "")
+                    put("name", username)
+                }
+            )
+
+            UserSession.setSession(
+                id = user.id,
+                emailValue = user.email ?: "desconocido@correo.com",
+                usernameValue = username
+            )
+
+            user
+        }
     }
+
+
 
 
     /**
@@ -187,10 +292,14 @@ object AuthController {
             client.postgrest["users"]
                 .select {
                     filter { eq("id", userId) }
+                    single()
                 }
                 .decodeSingle<UserModel>()
         }.getOrNull()
     }
+
+
+
     suspend fun ensureUserExists(userId: String, email: String?, username: String?) {
         SupabaseClientProvider.client.postgrest["users"].upsert(
             buildJsonObject {
@@ -200,6 +309,14 @@ object AuthController {
             }
         )
     }
+    suspend fun loadUserProfileByEmail(email: String): UserModel? = withContext(Dispatchers.Default) {
+        SupabaseClientProvider.client.postgrest["users"]
+            .select {
+                filter { eq("email", email) }
+            }
+            .decodeSingleOrNull<UserModel>()
+    }
+
 
 
 }

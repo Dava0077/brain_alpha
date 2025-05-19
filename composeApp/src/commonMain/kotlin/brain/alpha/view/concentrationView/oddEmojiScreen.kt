@@ -283,9 +283,9 @@ fun OddEmojiScreen(controller: oddEmojiController = oddEmojiController) {
 
                     // Show message about how many neurons are needed to unlock next difficulty
                     val (icon, color, msg) = when {
-                        totalScore.value < 1500 -> Triple("🔒", Color.Red, "${1500 - totalScore.value} neuronas para desbloquear MEDIUM")
-                        totalScore.value < 3000 -> Triple("🔒", Color.Red, "${3000 - totalScore.value} neuronas para desbloquear HARD")
-                        else -> Triple("🔓", Color.Green, "Todas las dificultades desbloqueadas")
+                        totalScore.value < 1500 -> Triple("🔒", Color.Red, "${1500 - totalScore.value}" +  Strings.t("mm8"))
+                        totalScore.value < 3000 -> Triple("🔒", Color.Red, "${3000 - totalScore.value}" + Strings.t("mm9"))
+                        else -> Triple("🔓", Color.Green, Strings.t("mm10"))
                     }
 
                     // Message row showing current unlock status

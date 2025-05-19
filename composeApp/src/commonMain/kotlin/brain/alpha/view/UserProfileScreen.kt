@@ -143,7 +143,7 @@ fun UserProfileScreen(onBack: () -> Unit) {
                     Button(
                         onClick = { showLogoutConfirm = true },
                         modifier = Modifier
-                            .height(46.dp),
+                            .height(32.dp),
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red),
                         shape = RoundedCornerShape(12.dp),
                         elevation = ButtonDefaults.elevation(4.dp)
@@ -152,11 +152,35 @@ fun UserProfileScreen(onBack: () -> Unit) {
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
+                    Button(
+                        onClick = {
+                            coroutineScope.launch {
+                                val userId = UserSession.userId.value ?: return@launch
+                                val success = AuthController.deleteUserFromAuth(userId)
+
+                                if (success) {
+                                    scaffoldState.snackbarHostState.showSnackbar("Cuenta eliminada correctamente")
+                                    AuthController.signOut() // Limpia sesión
+                                } else {
+                                    scaffoldState.snackbarHostState.showSnackbar("Error al eliminar cuenta")
+                                }
+                            }
+                        },
+                        modifier = Modifier
+                            .height(32.dp),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF303030)),
+                        shape = RoundedCornerShape(12.dp),
+
+                        ) {
+                        Text("Eliminar cuenta", color = Color.White)
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+
 
                     Button(
                         onClick = onBack,
                         modifier = Modifier
-                            .height(46.dp),
+                            .height(32.dp),
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF303030)),
                         shape = RoundedCornerShape(12.dp),
                         elevation = ButtonDefaults.elevation(4.dp)
