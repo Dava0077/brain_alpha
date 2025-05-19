@@ -13,6 +13,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import brain.alpha.model.mentalAgilityModel.clickNumberModel
 import brain.alpha.model.shared.Difficulty
+import brain.alpha.strings.Strings
 
 
 object clickNumberController {
@@ -59,15 +60,15 @@ object clickNumberController {
         score = 0
         // Establecer el tiempo según la dificultad
         timeLeft = when (currentDifficulty) {
-            Difficulty.EASY -> 90 // 1:30 minutos
-            Difficulty.MEDIUM -> 60 // 1:00 minuto
-            Difficulty.HARD -> 30 // 30 segundos
+            Difficulty.EASY -> 60 // 1:30 minutos
+            Difficulty.MEDIUM -> 30 // 1:00 minuto
+            Difficulty.HARD -> 15 // 30 segundos
         }
         showGameOverDialog = false
         clickNumberModel.startGame()
         numbers = clickNumberModel.getNumbers()
         targetNumber = clickNumberModel.targetNumber
-        instructionMessage = "Haz clic en el número: $targetNumber"
+        instructionMessage = Strings.t("insCN15") +  "$targetNumber"
         resultMessage = ""
         startTimer()
     }
@@ -78,13 +79,13 @@ object clickNumberController {
             val isCorrect = clickNumberModel.checkNumber(selectedNumber)
             if (isCorrect) {
                 score++
-                resultMessage = "¡Correcto!"
+                resultMessage = Strings.t("insCN16")
                 clickNumberModel.startGame()
                 numbers = clickNumberModel.getNumbers()
                 targetNumber = clickNumberModel.targetNumber
-                instructionMessage = "Haz clic en el número: $targetNumber"
+                instructionMessage = Strings.t("insCN15") + "$targetNumber"
             } else {
-                resultMessage = "Incorrecto, intenta de nuevo."
+                resultMessage = Strings.t("insCN17")
             }
         }
     }
@@ -99,8 +100,8 @@ object clickNumberController {
             }
             if (isGameStarted) {
                 gameOver = true
-                instructionMessage = "¡Tiempo terminado!"
-                resultMessage = "Aciertos: $score"
+                instructionMessage = Strings.t("insCN18")
+                resultMessage = Strings.t("insCN19") + " $score"
                 isGameStarted = false
                 showGameOverDialog = true
             }
@@ -115,9 +116,9 @@ object clickNumberController {
         gameOver = false
         score = 0
         timeLeft = when (currentDifficulty) {
-            Difficulty.EASY -> 90
-            Difficulty.MEDIUM -> 60
-            Difficulty.HARD -> 30
+            Difficulty.EASY -> 60
+            Difficulty.MEDIUM -> 30
+            Difficulty.HARD -> 15
         }
         numbers = emptyList()
         targetNumber = 0

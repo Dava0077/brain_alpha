@@ -30,50 +30,43 @@ object GoogleAuthController {
             when (result) {
                 is NativeSignInResult.Success -> {
                     scope.launch {
-//                        SupabaseClientProvider.client.auth.sessionManager.loadSession()
-//
-//                        // ✅ Esperar hasta que haya usuario
-//                        val user = withTimeoutOrNull(5000) {
-//                            while (SupabaseClientProvider.client.auth.currentUserOrNull() == null) {
-//                                delay(100)
-//                            }
-//                            SupabaseClientProvider.client.auth.currentUserOrNull()
-//                        }
-                        val session = SupabaseClientProvider.client.auth.currentSessionOrNull()
-
-                        if (session?.user == null) {
-                            onError(Exception("No hay sesión tras login Google."))
-                            return@launch
+                        // Esperar sesión válida en memoria
+                        val user = withTimeoutOrNull(5000) {
+                            while (SupabaseClientProvider.client.auth.currentUserOrNull() == null) {
+                                delay(100)
+                            }
+                            SupabaseClientProvider.client.auth.currentUserOrNull()
                         }
-
-                        val user = session.user
-
 
                         if (user == null) {
-                            onError(Exception("Sesión no disponible tras login."))
+                            onError(Exception("Sesión no disponible tras login con Google."))
                             return@launch
                         }
+
+                        val fallbackName = user.email?.substringBefore('@')?.replaceFirstChar { it.uppercase() } ?: "Usuario"
+                        val username = user.userMetadata?.get("username")?.toString() ?: fallbackName
 
                         try {
                             SupabaseClientProvider.client.postgrest["users"].upsert(
                                 buildJsonObject {
                                     put("id", user.id)
                                     put("email", user.email ?: "")
-                                    put("name", user.userMetadata?.get("username")?.toString() ?: "GoogleUser")
+                                    put("name", username)
                                 }
                             )
                         } catch (_: Exception) {}
 
-                        onSuccess(
-                            UserInfo(
-                                id = user.id,
-                                email = user.email ?: "desconocido@correo.com",
-                                aud = user.aud ?: "authenticated"
-                            )
+                        UserSession.setSession(
+                            id = user.id,
+                            emailValue = user.email ?: "desconocido@correo.com",
+                            usernameValue = username
                         )
 
-                        navigateTo("home")
-
+                        LoginController.setUser(
+                            UserInfo(id = user.id, email = user.email ?: "unknown", aud = user.aud ?: "")
+                        )
+                        LoginController.clear()
+                        LoginController.navigateTo("home")
                     }
                 }
 
@@ -83,6 +76,7 @@ object GoogleAuthController {
             }
         }
     )
+
 
 
 }

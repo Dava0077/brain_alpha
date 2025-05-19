@@ -9,6 +9,7 @@ object Strings {
             //GENERAL
             "play" to "JUGAR",
             "leaderboard" to "CLASSIFICACIÓN",
+            "leaderboard_bygame" to "Clasificación por juego",
             "play_again" to "JUGAR DE NUEVO",
             "restart" to "REINICIAR",
             "charging" to "CARGANDO...",
@@ -31,6 +32,10 @@ object Strings {
             "your_progress" to "Tu progeso por juego",
             "game" to "\uD83D\uDD79JUEGO",
             "difficulty" to "🏆DIFICULTAD",
+            "order_by" to "🏆Ordenar por:",
+            "score" to "Puntaje",
+            "avg_time" to "Tiempo medio",
+            "delete_account" to "Eliminar cuenta",
             //HOME SCREEN
             "hi" to "Hola, ",
             "categories" to "CATEGORIAS",
@@ -184,7 +189,34 @@ object Strings {
             "mm25" to "Dificultades disponibles:",
             "mm26" to " (10 puntos)",
             "mm27" to " (15 puntos)",
-            "mm28" to " (20 puntos)"
+            "mm28" to " (20 puntos)",
+            //ClickNumber
+            "click_number_title" to "CLICK NUMBER",
+            "select_difficulty" to "Selecciona Dificultad",
+            "start_game" to "Iniciar Juego",
+            "all_unlocked" to "Todas las dificultades desbloqueadas",
+            "neuron_unlock_medium" to "neuronas para desbloquear MEDIO",
+            "neuron_unlock_hard" to "neuronas para desbloquear DIFICIL",
+            "insCN1" to "👆 Haz clic en el número que se muestra en la instrucción lo más rápido posible.",
+            "insCN2" to "⏱ Tienes un tiempo límite que depende de la dificultad elegida.",
+            "insCN3" to "✅ Cada vez que aciertes, se generará una nueva cuadrícula y un nuevo objetivo.",
+            "insCN4" to "🏅 Ganas ",
+            "insCN5" to "1 punto",
+            "insCN6" to " por cada respuesta correcta.",
+            "insCN7" to "🎯 Las dificultades disponibles son:",
+            "insCN8" to "EASY: 90 segundos",
+            "insCN9" to "MEDIUM: 60 segundos",
+            "insCN10" to "HARD: 30 segundos",
+            "insCN11" to "🔓 Las dificultades se desbloquean acumulando neuronas:",
+            "insCN12" to "- 50 neuronas para MEDIUM",
+            "insCN13" to "- 150 neuronas para HARD",
+            "insCN14" to "¡Buena suerte! 🧠",
+            "insCN15" to "Haz clic en el número: ",
+            "insCN16" to "!Correcto!",
+            "insCN17" to "Incorrecto, intenta de nuevo.",
+            "insCN18" to "!Tiempo terminado!",
+            "insCN19" to "Aciertos: ",
+
 
 
 
@@ -195,6 +227,7 @@ object Strings {
             //GENERAL
             "play" to "PLAY",
             "leaderboard" to "LEADERBOARD",
+            "leaderboard_bygame" to "Leaderboard by game",
             "play_again" to "PLAY AGAIN",
             "restart" to "RESTART",
             "charging" to "CHARGING...",
@@ -217,6 +250,10 @@ object Strings {
             "your_progress" to "Your progress per game",
             "game" to "\uD83D\uDD79GAME",
             "difficulty" to "🏆DIFFICULTY",
+            "order_by" to "🏆Order by:",
+            "score" to "Score",
+            "avg_time" to "Average time",
+            "delete_account" to "Delete account",
 
             //HOME SCREEN
             "hi" to "Hi, ",
@@ -373,7 +410,33 @@ object Strings {
             "mm25" to "Available difficulties: ",
             "mm26" to " (10 points)",
             "mm27" to " (15 points)",
-            "mm28" to " (20 points)"
+            "mm28" to " (20 points)",
+            //Click Number
+            "click_number_title" to "CLICK NUMBER",
+            "select_difficulty" to "Select Difficulty",
+            "start_game" to "Start Game",
+            "all_unlocked" to "All difficulties unlocked",
+            "neuron_unlock_medium" to "neurons to unlock MEDIUM",
+            "neuron_unlock_hard" to "neurons to unlock HARD",
+            "insCN1" to "👆 Click the number shown in the instruction as quickly as possible.",
+            "insCN2" to "⏱ You have a time limit depending on the chosen difficulty.",
+            "insCN3" to "✅ Each time you succeed, a new grid and target will appear.",
+            "insCN4" to "🏅 Earn ",
+            "insCN5" to "1 point",
+            "insCN6" to " for each correct answer.",
+            "insCN7" to "🎯 Available difficulties:",
+            "insCN8" to "EASY: 90 seconds",
+            "insCN9" to "MEDIUM: 60 seconds",
+            "insCN10" to "HARD: 30 seconds",
+            "insCN11" to "🔓 Difficulties unlock by accumulating neurons:",
+            "insCN12" to "- 50 neurons for MEDIUM",
+            "insCN13" to "- 150 neurons for HARD",
+            "insCN14" to "Good luck! 🧠",
+            "insCN15" to "Click number: ",
+            "insCN16" to "Correct!",
+            "insCN17" to "Incorrect, try again.",
+            "insCN18" to "!Time's Over!",
+            "insCN19" to "Sucesses: ",
 
 
 
