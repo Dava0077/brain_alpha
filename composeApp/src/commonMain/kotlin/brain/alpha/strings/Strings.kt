@@ -133,6 +133,11 @@ object Strings {
             "insOS1" to "Nivel: ",
             "insOS2" to "Errores: ",
             "insOS3" to "Puntuación: ",
+            "ins0S4" to "Odd Emoji",
+            "insOS5" to "Nivel: ",
+            "insOS6" to "Errores: ",
+            "insOS7" to "Tiempo: ",
+            "insOS8" to "Puntuación final: ",
             "insOE1" to "Debes encontrar el ",
             "insOE2" to "emoji que es diferente",
             "insOE3" to " al resto antes de que se acabe el tiempo. Por cada acierto ganas ",
@@ -166,9 +171,20 @@ object Strings {
             "mm12" to "Tu respuesta",
             "mm13" to "Enviar Respuesta",
             "mm14" to "Volver",
-            "mm15" to "Tiempo restante:",
+            "mm15" to "⏱\uFE0F Tiempo restante:",
             "mm16" to "Introduce un número válido",
-            "mm17" to "✅ Correcto. Puntuación: "
+            "mm17" to "✅ Correcto. Puntuación: ",
+            "mm18" to "Pregunta: ",
+            "mm19" to "Resuelve operaciones matemáticas lo más rápido posible.",
+            "mm20" to "Cada respuesta correcta te da puntos.",
+            "mm21" to "¡Cuanto más rápido respondas, más puntos obtendrás!",
+            "mm22" to "Tienes ",
+            "mm23" to "10 preguntas",
+            "mm24" to " por partida. Elige una dificultad para comenzar.",
+            "mm25" to "Dificultades disponibles:",
+            "mm26" to " (10 puntos)",
+            "mm27" to " (15 puntos)",
+            "mm28" to " (20 puntos)"
 
 
 
@@ -279,7 +295,7 @@ object Strings {
             "insW6" to "Focus, and good luck!",
             //STROOP SCREEN
             "title_stroop" to "STROOP",
-            "insST1" to "!Game finished!",
+            "insST1" to "Game finished!",
             "insST2" to "Final Score:",
             "insST3" to "points",
             "insST4" to "Play again",
@@ -305,6 +321,11 @@ object Strings {
             "insOS1" to "Level: ",
             "insOS2" to "Errors: ",
             "insOS3" to "Score: ",
+            "ins0S4" to "Odd Emoji",
+            "insOS5" to "Level: ",
+            "insOS6" to "Errors: ",
+            "insOS7" to "Time: ",
+            "insOS8" to "Final Score: ",
             "insOE1" to "You must find the ",
             "insOE2" to "emoji that is different",
             "insOE3" to " from the rest before time runs out. For each correct answer you get ",
@@ -326,12 +347,12 @@ object Strings {
 
             //Mental Math
             "mm1" to "Game Over!",
-            "mm2" to "Score:",
-            "mm3" to "Average Time:",
-            "mm4" to "Difficulty:",
+            "mm2" to "Score: ",
+            "mm3" to "Average Time: ",
+            "mm4" to "Difficulty: ",
             "mm5" to "Play Again",
             "mm6" to "Exit",
-            "mm7" to "Select Difficulty:",
+            "mm7" to "Select Difficulty: ",
             "mm8" to "neurons to unlock MEDIUM",
             "mm9" to "neurons to unlock HARD",
             "mm10" to "All difficulties unlocked",
@@ -339,9 +360,20 @@ object Strings {
             "mm12" to "Your answer",
             "mm13" to "Submit Answer",
             "mm14" to "Return",
-            "mm15" to "Time left:",
+            "mm15" to " ⏱\uFE0F Time left: ",
             "mm16" to "Enter a valid number",
-            "mm17" to "✅ Correct. Score: "
+            "mm17" to "✅ Correct. Score: ",
+            "mm18" to "Question ",
+            "mm19" to "Solve math operations as fast as possible.",
+            "mm20" to "Each correct answer gives you points.",
+            "mm21" to "The faster you answer, the more points you get!",
+            "mm22" to "You have ",
+            "mm23" to "10 questions",
+            "mm24" to " per game. Choose a difficulty to begin.",
+            "mm25" to "Available difficulties: ",
+            "mm26" to " (10 points)",
+            "mm27" to " (15 points)",
+            "mm28" to " (20 points)"
 
 
 
