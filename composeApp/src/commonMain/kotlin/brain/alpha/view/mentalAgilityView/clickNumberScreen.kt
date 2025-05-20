@@ -44,11 +44,13 @@ fun clickNumberScreen(
     onNavigateToHome: () -> Unit
 ) {
 
+    // Observe the instruction visibility state
     val showInstructions by controller.showInstructions
     var sessionSaved by remember { mutableStateOf(false) }
     val totalScore = remember { mutableStateOf(0) }
     val scope = rememberCoroutineScope()
 
+    // Load total user score once user ID is available
     LaunchedEffect(UserSession.userId.value) {
         val userId = UserSession.userId.value
         if (!UserSession.isGuest.value && userId != null) {
@@ -61,7 +63,7 @@ fun clickNumberScreen(
         }
     }
 
-    // Show instructions first
+    // Show instructions screen first if applicable
     if (showInstructions) {
         InstructionsClickNumber(
             onStart = { controller.showInstructions.value = false },
@@ -70,7 +72,10 @@ fun clickNumberScreen(
         return
     }
 
+
+    // Main game screen layout
     Box(modifier = Modifier.fillMaxSize()) {
+        // Background image
         Image(
             painter = painterResource(Res.drawable.fondoMental),
             contentDescription = null,
@@ -83,7 +88,7 @@ fun clickNumberScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            // Header
+            // Top bar with navigation icons
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -91,6 +96,7 @@ fun clickNumberScreen(
                     .background(Color(0xFF222937), shape = RoundedCornerShape(4.dp))
                     .border(BorderStroke(2.dp, Color(0xFF4CE3E8)))
             ) {
+
                 IconButton(
                     onClick = { LoginController.navigateTo("profile")},
                     modifier = Modifier
@@ -123,6 +129,7 @@ fun clickNumberScreen(
             Spacer(modifier = Modifier.height(5.dp))
             Spacer(modifier = Modifier.height(30.dp))
 
+            // Back button
             Button(
                 onClick = { controller.goHome() },
                 modifier = Modifier
@@ -138,6 +145,7 @@ fun clickNumberScreen(
 
             Spacer(modifier = Modifier.height(30.dp))
 
+            // Game title
             Text(
                 text = Strings.t("click_number"),
                 fontSize = 40.sp,
@@ -147,11 +155,12 @@ fun clickNumberScreen(
 
             Spacer(modifier = Modifier.height(30.dp))
 
-            // Contenido del juego o pantalla inicial
+            // Game setup view
             if (!clickNumberController.isGameStarted) {
                 Text(Strings.t("mm7"), fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(8.dp))
 
+                // Show score, difficulty buttons, unlock info, etc.
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
@@ -249,6 +258,7 @@ fun clickNumberScreen(
                     Text(Strings.t("instructions"))
                 }
             } else {
+                // Active game: show timer, instruction, result
                 val minutes = clickNumberController.timeLeft / 60
                 val seconds = clickNumberController.timeLeft % 60
                 Text(
@@ -269,6 +279,7 @@ fun clickNumberScreen(
                     modifier = Modifier.padding(bottom = 10.dp)
                 )
 
+                // Display clickable grid buttons
                 if (!clickNumberController.gameOver && clickNumberController.numbers.isNotEmpty()) {
                     for (row in 0 until 4) {
                         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -289,7 +300,7 @@ fun clickNumberScreen(
             }
         }
 
-        // Ventana emergente cuando el juego termina
+        // Show end-of-game dialog and optionally save session
         if (clickNumberController.showGameOverDialog) {
             AlertDialog(
                 onDismissRequest = {},
@@ -334,6 +345,7 @@ fun clickNumberScreen(
                 shape = RoundedCornerShape(16.dp)
             )
 
+            // Saves session into the database
             if (!sessionSaved) {
                 sessionSaved = true
                 scope.launch {
@@ -355,6 +367,7 @@ fun clickNumberScreen(
 
 @Composable
 fun InstructionsClickNumber(onStart: () -> Unit, controller: clickNumberController) {
+    // Fullscreen background
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(Res.drawable.fondoMental),
@@ -368,6 +381,7 @@ fun InstructionsClickNumber(onStart: () -> Unit, controller: clickNumberControll
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
+            // Top bar
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -407,6 +421,7 @@ fun InstructionsClickNumber(onStart: () -> Unit, controller: clickNumberControll
 
             Spacer(modifier = Modifier.height(5.dp))
 
+            // Navigation back button
             Button(
                 onClick = { clickNumberController.goHome() },
                 modifier = Modifier
@@ -422,6 +437,7 @@ fun InstructionsClickNumber(onStart: () -> Unit, controller: clickNumberControll
 
             Spacer(modifier = Modifier.height(80.dp))
 
+            // Instructions title
             Text(
                 Strings.t("instructions"),
                 fontSize = 28.sp,
@@ -431,6 +447,7 @@ fun InstructionsClickNumber(onStart: () -> Unit, controller: clickNumberControll
 
             Spacer(modifier = Modifier.height(30.dp))
 
+            // Main instructions content
             Box(
                 modifier = Modifier
                     .padding(horizontal = 32.dp)
@@ -439,6 +456,7 @@ fun InstructionsClickNumber(onStart: () -> Unit, controller: clickNumberControll
             ) {
                 Text(
                     buildAnnotatedString {
+                        // All instruction content styled and localized
                         append(Strings.t("insCN1") + "\n\n")
 
                         append(Strings.t("insCN2") + "\n\n")
@@ -480,6 +498,7 @@ fun InstructionsClickNumber(onStart: () -> Unit, controller: clickNumberControll
 
             Spacer(modifier = Modifier.height(40.dp))
 
+            // Start button
             Button(
                 onClick = onStart,
                 modifier = Modifier

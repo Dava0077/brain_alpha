@@ -11,6 +11,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.*
 import kotlinx.datetime.Clock
 
+// Data class representing a single leaderboard entry
 data class LeaderboardEntry(
     val username: String,
     val score: Long,
@@ -20,6 +21,7 @@ data class LeaderboardEntry(
     val playedAt: String
 )
 
+// Data class representing a user’s score per game
 data class UserProgressEntry(
     val gameName: String,
     val score: Long,
@@ -27,6 +29,7 @@ data class UserProgressEntry(
     val lastPlayed: String=""
 )
 
+// Data class grouping leaderboard entries by difficulty
 data class LeaderboardByDifficulty(
     val easy: List<LeaderboardEntry>,
     val medium: List<LeaderboardEntry>,
@@ -34,8 +37,10 @@ data class LeaderboardByDifficulty(
 )
 
 object GameSessionController {
-
-    // Registra una nueva partida y actualiza el progreso del usuario
+    /**
+     * Registers a completed game session to Supabase.
+     * Validates input and writes to both game_sessions and user_progress tables.
+     */
     suspend fun registerGameSession(
         gameId: String, // usa directamente el ID
         difficulty: String,
@@ -50,6 +55,7 @@ object GameSessionController {
 
             val userId = UserSession.userId.value ?: error("Usuario no autenticado")
 
+            // Insert session into game_sessions table
             SupabaseClientProvider.client.postgrest["game_sessions"].insert(
                 buildJsonObject {
                     put("user_id", userId)
@@ -60,13 +66,15 @@ object GameSessionController {
                     timeLeft?.let { put("time_left", it) }
                 }
             )
-
+            // Update user progress
             upsertUserProgress(userId, gameId, score)
         }
     }
 
 
-    // Consulta el leaderboard filtrado por juego, dificultad y orden
+    /**
+     * Fetch leaderboard entries for a game by difficulty and sorted field.
+     */
     suspend fun getLeaderboard(
         gameName: String,
         difficulty: String,
@@ -80,6 +88,7 @@ object GameSessionController {
 
             val order = if (ascending) "asc" else "desc"
 
+            // Query game_sessions with filters
             val response = SupabaseClientProvider.client.postgrest["game_sessions"]
                 .select {
                     filter {
@@ -92,6 +101,7 @@ object GameSessionController {
                     limit(limit.toLong())
                 }
 
+            // Map DB rows to LeaderboardEntry
             val sessions = response.decodeList<JsonObject>()
 
             sessions.mapNotNull { item ->
@@ -110,7 +120,7 @@ object GameSessionController {
         }
     }
 
-    // Consulta el ID del juego por su nombre
+    // Helper to get a game ID by name
     private suspend fun getGameIdByName(gameName: String): String? {
         val response = SupabaseClientProvider.client.postgrest["games"]
             .select {
@@ -122,7 +132,7 @@ object GameSessionController {
         return items.firstOrNull()?.get("id")?.jsonPrimitive?.contentOrNull
     }
 
-    // Obtiene el nombre del usuario (campo 'name') por user_id
+    // Helper to retrieve the username by userId
     private suspend fun getUsernameById(userId: String): String? {
         val response = SupabaseClientProvider.client.postgrest["users"]
             .select {
@@ -136,7 +146,9 @@ object GameSessionController {
 
 
 
-// Crea o actualiza la entrada de progreso del usuario
+    /**
+     * Inserts or updates the user's progress in user_progress table.
+     */
     private suspend fun upsertUserProgress(userId: String, gameId: String, score: Int) {
         // Supabase upsert emulado
         val existing = SupabaseClientProvider.client.postgrest["user_progress"]
@@ -178,6 +190,9 @@ object GameSessionController {
         }
     }
 
+    /**
+     * Retrieves a list of total scores by game for a specific user.
+     */
     suspend fun getAllTotalScores(userId: String): Result<List<UserProgressEntry>> = withContext(Dispatchers.Default) {
         runCatching {
             val response = SupabaseClientProvider.client.postgrest["game_sessions"]
@@ -212,7 +227,7 @@ object GameSessionController {
 
 
 
-    // Helper para obtener nombre de juego por ID
+    // Helper to get a game name by its ID
     private suspend fun getGameNameById(gameId: String): String? {
         val response = SupabaseClientProvider.client.postgrest["games"]
             .select {
@@ -225,6 +240,9 @@ object GameSessionController {
     }
 
 
+    /**
+     * Get leaderboard split by difficulty level.
+     */
     suspend fun getLeaderboardGroupedByDifficulty(
         gameName: String,
         orderBy: String = "score",
@@ -240,6 +258,9 @@ object GameSessionController {
     }
 
 
+    /**
+     * Calculates the total score across all sessions for a user in a game.
+     */
     suspend fun getTotalScore(userId: String, gameId: String, supabase: SupabaseClient): Int {
         return try {
             val response = supabase.postgrest["game_sessions"]
@@ -268,6 +289,9 @@ object GameSessionController {
 
 
 
+    /**
+     * Fetch grouped leaderboard by game ID and difficulty using Postgres RPC
+     */
     private suspend fun getLeaderboardById(
         gameId: String,
         difficulty: String,
@@ -307,14 +331,18 @@ object GameSessionController {
 
 
 
+    // Retrieves the global leaderboard for a specific game ID,
+    // grouped by difficulty (EASY, MEDIUM, HARD) using an RPC call
     suspend fun getGlobalLeaderboardByGameId(
         gameId: String,
         orderBy: String = "score",
         ascending: Boolean = false
     ): Result<LeaderboardByDifficulty> = withContext(Dispatchers.Default) {
         runCatching {
+            // Define the difficulties to group by
             val difficulties = listOf("EASY", "MEDIUM", "HARD")
 
+            // For each difficulty, call the Supabase RPC function `leaderboard_global`
             val leaderboardByDiff = difficulties.associate { difficulty ->
                 val response = SupabaseClientProvider.client
                     .postgrest.rpc(
@@ -327,6 +355,7 @@ object GameSessionController {
                         }
                     )
 
+                // Decode each row into a LeaderboardEntry object
                 val items = response.decodeList<JsonObject>()
 
                 val entries = items.mapNotNull { obj ->
@@ -348,6 +377,7 @@ object GameSessionController {
 
             }
 
+            // Wrap all results into a LeaderboardByDifficulty
             LeaderboardByDifficulty(
                 easy = leaderboardByDiff["EASY"] ?: emptyList(),
                 medium = leaderboardByDiff["MEDIUM"] ?: emptyList(),
@@ -356,6 +386,7 @@ object GameSessionController {
         }
     }
 
+    // Raw SQL query version for getting leaderboard data by difficulty
     private suspend fun getGlobalLeaderboardByDifficulty(
         gameId: String,
         difficulty: String,
@@ -363,6 +394,7 @@ object GameSessionController {
         ascending: Boolean
     ): Result<List<LeaderboardEntry>> = withContext(Dispatchers.Default) {
         runCatching {
+            // Build SQL query to aggregate scores and user info
             val query = """
             select 
                 user_id, 
@@ -397,16 +429,19 @@ object GameSessionController {
     }
 
 
+    // Groups leaderboard results by difficulty for a game ID using internal logic
     suspend fun getLeaderboardGroupedByDifficultyById(
         gameId: String,
         orderBy: String = "score",
         ascending: Boolean = false
     ): Result<LeaderboardByDifficulty> = withContext(Dispatchers.Default) {
         runCatching {
+            // Fetch leaderboard for each difficulty individually
             val easy = getLeaderboardById(gameId, "EASY", orderBy, ascending).getOrThrow()
             val medium = getLeaderboardById(gameId, "MEDIUM", orderBy, ascending).getOrThrow()
             val hard = getLeaderboardById(gameId, "HARD", orderBy, ascending).getOrThrow()
 
+            // Return grouped result
             LeaderboardByDifficulty(
                 easy = easy,
                 medium = medium,
