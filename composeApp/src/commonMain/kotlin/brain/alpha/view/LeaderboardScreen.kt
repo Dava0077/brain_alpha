@@ -28,19 +28,19 @@ import kotlinx.coroutines.launch
 import kotlin.math.round
 
 enum class SortOption(val label: String) {
-    SCORE(Strings.t("score")),
-    TIME_AVG(Strings.t("avg_time"))
+    SCORE("score"),
+    TIME_AVG("avg_time")
 }
 
 val displayNamesMap = mapOf(
-    "pairs_game" to "Juego de parejas",
-    "simon_game" to "Simón Dice",
-    "sudoku_game" to "Sudoku",
-    "wordSearch_game" to "Sopa de Letras",
-    "stroopTest_game" to "Stroop Game",
-    "oddEmoji_game" to "Odd Emoji",
-    "mental_math" to "Quick Maths",
-    "click_number" to "Click Number"
+    "pairs_game" to Strings.t("pairs_game"),
+    "simon_game" to Strings.t("simon_game"),
+    "sudoku_game" to Strings.t("sudoku_game"),
+    "wordSearch_game" to Strings.t("wordSearch_game"),
+    "stroopTest_game" to Strings.t("stroopTest_game"),
+    "oddEmoji_game" to Strings.t("oddEmoji_game"),
+    "mental_math" to Strings.t("mental_math"),
+    "click_number" to Strings.t("click_number")
 )
 val gamesWithDifficulty = setOf(
     "sudoku_game", "pairs_game", "simon_game", "wordSearch_game"
