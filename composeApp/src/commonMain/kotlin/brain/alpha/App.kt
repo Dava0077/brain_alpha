@@ -34,32 +34,22 @@ import io.github.jan.supabase.auth.auth
 import view.mentalMathView
 
 /**
- * App.kt
- *
- * This is the main Composable entry point of the application.
- * It controls navigation between screens using a simple state-based approach.
- * The screen displayed is determined by the value of `currentScreen`.
+ * Main entry point of the Compose UI.
+ * Controls routing using a central screen state variable.
  */
-
-
-
-
 
 @Composable
 fun App() {
     MaterialTheme {
-        // Stores the current screen route
+        // State that tracks the current screen by route name
         val currentScreenState = remember { mutableStateOf("login") }
         val currentScreen by currentScreenState
 
-
-
-
-        //LOGIN
+        // Set navigation callbacks for LoginController
         LoginController.navigateTo = { route -> currentScreenState.value = route }
 
 
-        //Persistent log session
+        // Automatically restore session if one exists (using Supabase)
         LaunchedEffect(Unit) {
             val session = SupabaseClientProvider.client.auth.sessionManager.loadSession()
             val user = SupabaseClientProvider.client.auth.currentUserOrNull()
@@ -81,11 +71,7 @@ fun App() {
             }
         }
 
-
-
-
-
-        // Assigns a navigation callback for use in controllers
+        // Inject navigation lambdas into each controller
 
         //SETTINGS
         SettingsController.navigateTo = { route -> currentScreenState.value = route }
@@ -114,10 +100,12 @@ fun App() {
         wordSearchController.navigateTo = { route -> currentScreenState.value = route }
 
 
-        // Controls which screen to display based on currentScreen
+        // Handle navigation and render the corresponding screen
         when (currentScreenState.value) {
+
+            // LOGIN & SIGNUP
             "login" -> {
-                LoginController.clear() // Clear fields on login screen load
+                LoginController.clear()
                 LoginScreen(
                     controller = LoginController,
                     onNavigateToSignUp = { currentScreenState.value = "signup" }
@@ -127,14 +115,14 @@ fun App() {
 
             "signup" -> SignUpScreen(
                 onSuccess = {
-                    LoginController.clear() // Clear fields on successful signup
+                    LoginController.clear()
                     currentScreenState.value = "login"
                 },
                 onFailure = { errorMessage ->
                     println("Error de registro: $errorMessage")
                 },
                 onGoToLogin = {
-                    LoginController.clear() // Clear fields if manually returning
+                    LoginController.clear()
                     currentScreenState.value = "login"
                 }
             )
@@ -147,18 +135,22 @@ fun App() {
                 onNavigateToConcentration = { currentScreenState.value = "concentration" },
                 onNavigateToAgility = { currentScreenState.value = "agility" }
             )
+
             //SETTINGS
             "settings" -> SettingsScreen(
                 controller = SettingsController
             )
+
             //PROFILE
             "profile" -> UserProfileScreen(
                 onBack = {currentScreenState.value = "home"}
             )
+
             //LEADERBOARD
             "leaderboard" -> LeaderboardScreen(
                 controller = LeaderboardController
             )
+
             //MEMORY
             "memory" -> memoryHomeScreen(
                 controller = memoryHomeController)
@@ -192,11 +184,9 @@ fun App() {
             "concentration" -> concentrationHomeScreen(
                 controller = concentrationHomeController
             )
-
             "stroop" -> StroopScreen(
                 controller = stroopController
             )
-
             "emoji" -> OddEmojiScreen(
                 controller = oddEmojiController
             )
