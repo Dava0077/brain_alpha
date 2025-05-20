@@ -26,29 +26,31 @@ import kotlinx.coroutines.launch
 
 object LoginController {
 
-    // Stores the current email input
+    // Stores the current email entered in the login form
     var email by mutableStateOf("")
 
-    // Stores the current password input
+    // Stores the current password entered in the login form
     var password by mutableStateOf("")
 
-    // Holds error message to be shown on screen (if any)
+    // Holds error messages to be shown in the UI
     var errorMessage by mutableStateOf<String?>(null)
 
-    // Indicates if the login operation is in progress
+    // Indicates whether login process is currently active
     var isLoading by mutableStateOf(false)
 
-    // Navigation lambda set in App.kt
+    // Navigation lambda, injected from App.kt, used for routing
     lateinit var navigateTo: (String) -> Unit
 
+    // Tracks if Google login succeeded
     val googleLoginSuccess = mutableStateOf(false)
 
 
     /**
-     * Called when the login button is clicked.
-     * Validates input, attempts login, updates state and navigates.
+     * Called when the login button is pressed.
+     * Validates form, attempts sign in, sets session and navigates on success.
      */
     fun onLoginClicked() {
+        // Basic validation
         if (email.isBlank() || password.isBlank()) {
             errorMessage = "Todos los campos son obligatorios."
             return
@@ -58,14 +60,17 @@ object LoginController {
         errorMessage = null
 
         CoroutineScope(Dispatchers.Default).launch {
+            // Try sign-in with Supabase
             val result = AuthController.signIn(email.trim(), password.trim())
             isLoading = false
             result.onSuccess {
                 clear()
+                // Retrieve current user from Supabase session
                 val user = SupabaseClientProvider.client.auth.currentUserOrNull()
                 if (user != null) {
                     UserSession.setUserId(user.id)
 
+                    // Query for user's profile
                     val profileList = SupabaseClientProvider.client
                         .postgrest["users"]
                         .select {
@@ -78,6 +83,7 @@ object LoginController {
                         return@launch
                     }
 
+                    // Update local session
                     val profile = profileList.first()
                     UserSession.setSession(
                         id = user.id,
@@ -87,8 +93,10 @@ object LoginController {
 
                 }
 
+                // Navigate to home screen
                 navigateTo("home")
             }.onFailure { error ->
+                // Handle common auth errors with user-friendly messages
                 val message = when {
                     error.message?.contains("Invalid login credentials", ignoreCase = true) == true -> {
                         "Email o contraseña incorrectos."
@@ -111,7 +119,7 @@ object LoginController {
     }
 
     /**
-     * Starts a guest session and navigates to home.
+     * Sets guest session and navigates to home.
      */
     fun loginAsGuest() {
         // Set guest session manually
@@ -119,13 +127,17 @@ object LoginController {
         clear()
         navigateTo("home")
     }
+
+    /**
+     * Clears form and navigates to leaderboard.
+     */
     fun goLeaderboard(){
         clear()
         navigateTo("leaderboard")
     }
 
     /**
-     * Navigates to sign-up screen and clears form state.
+     * Navigates to the sign-up screen.
      */
     fun onSignUpClick() {
         clear()
@@ -134,20 +146,20 @@ object LoginController {
 
 
     /**
-     * Sets navigation lambda from App.kt to decouple navigation logic.
+     * Injects navigation callback from App.kt
      */
     fun setNavigationCallback(callback: (String) -> Unit) {
         navigateTo = callback
     }
 
-    // Shortcut navigation helpers
+    // Quick navigation shortcuts for different game modules
     fun navigateMemory() = navigateTo("memory")
     fun navigateLogic() = navigateTo("logic")
     fun navigateConcentration() = navigateTo("concentration")
     fun navigateAgility() = navigateTo("agility")
 
     /**
-     * Clears login state and error messages.
+     * Clears email, password, loading and error states.
      */
     fun clear() {
         email = ""
@@ -156,7 +168,7 @@ object LoginController {
         isLoading = false
     }
 
-    // Reserved callbacks for user/settings buttons
+    // Navigation methods for settings and profile
     fun buttonSettings() {
         navigateTo("settings")
     }
@@ -164,9 +176,16 @@ object LoginController {
         navigateTo("profile")
     }
 
+    /**
+     * Resets the Google login success flag.
+     */
     fun resetGoogleFlag() {
         googleLoginSuccess.value = false
     }
+
+    /**
+     * Initializes the user session from a UserInfo object (used in OAuth flows).
+     */
     fun setUser(userInfo: UserInfo) {
         UserSession.setSession(
             id = userInfo.id,

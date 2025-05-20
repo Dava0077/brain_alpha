@@ -21,24 +21,26 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.json.*
 
 /**
- * AuthController.kt
- *
- * Handles authentication operations using Supabase, including:
- * - Signing in users with email and password.
- * - Registering new users and inserting them into a custom "users" table.
- * - Signing out and clearing user session.
- *
- * The session state is stored globally via the UserSession singleton.
- * All operations are suspend functions using Dispatchers.Default for async behavior.
+ * AuthController
+ * Handles authentication logic including:
+ * - User login
+ * - Registration
+ * - Email verification
+ * - Password reset
+ * - Session state updates
  */
-
-
 object AuthController {
 
+
+    /**
+     * Deletes a user from Supabase Auth and the public.users table.
+     */
     suspend fun deleteUserFromAuth(userId: String): Boolean = withContext(Dispatchers.Default) {
+        // Supabase admin API key and project URL
         val serviceRoleKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV6enV6amJhdnpudGRiYnJjemxhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MTg5MjUyOCwiZXhwIjoyMDU3NDY4NTI4fQ._ShBWX1s5yrBMtJztoy4mI02cgJzOZXZTgVHFv0ERMA"
         val projectUrl = "https://uzzuzjbavzntdbbrczla.supabase.co"
 
+        // Set up HTTP client with JSON support
         val client = HttpClient(CIO) {
             install(ContentNegotiation) {
                 json(Json {
@@ -49,6 +51,7 @@ object AuthController {
             }
         }
 
+        // Call Supabase Auth Admin API to delete the user
         val authResponse = client.delete("$projectUrl/auth/v1/admin/users/$userId") {
             headers {
                 append(HttpHeaders.Authorization, "Bearer $serviceRoleKey")
@@ -58,7 +61,7 @@ object AuthController {
 
         val authDeleted = authResponse.status.value in 200..299
 
-        // Solo intenta borrar de public.users si el auth se eliminó correctamente
+        // If user deletion succeeded, also delete from public.users
         if (authDeleted) {
             val clientSupabase = SupabaseClientProvider.client
             runCatching {
@@ -74,12 +77,11 @@ object AuthController {
         return@withContext authDeleted
     }
 
-    // Access Supabase Auth module
+    // Access to Supabase Auth instance
     private val auth get() = SupabaseClientProvider.client.auth
 
     /**
-     * Signs in a user using email and password.
-     * On success, updates the UserSession with retrieved user data.
+     * Signs in user via email/password. Updates session on success.
      */
     suspend fun signIn(email: String, password: String): Result<UserInfo> = withContext(Dispatchers.Default) {
         runCatching {
@@ -106,8 +108,7 @@ object AuthController {
     }
 
     /**
-     * Registers a new user with validation, authentication, and insertion into the custom "users" table.
-     * @throws IllegalArgumentException if inputs are invalid.
+     * Registers a new user and inserts them into custom 'users' table.
      */
     /*suspend fun signUp(
         email: String,
@@ -170,6 +171,10 @@ object AuthController {
             user
         }
     }*/
+
+    /**
+     * Registers a new user and inserts them into custom 'users' table.
+     */
     suspend fun signUp(
         email: String,
         username: String,
@@ -177,6 +182,7 @@ object AuthController {
         repeatPassword: String
     ): Result<UserInfo> = withContext(Dispatchers.Default) {
         runCatching {
+            // Input validation
             if (email.isBlank() || username.isBlank() || password.isBlank() || repeatPassword.isBlank()) {
                 throw IllegalArgumentException("Todos los campos son obligatorios.")
             }
@@ -193,6 +199,7 @@ object AuthController {
                 throw IllegalArgumentException("Las contraseñas no coinciden.")
             }
 
+            // Register user with metadata
             auth.signUpWith(Email) {
                 this.email = email
                 this.password = password
@@ -201,7 +208,7 @@ object AuthController {
                 }
             }
 
-            // Autenticamos inmediatamente después para obtener el ID de usuario
+            // Immediately log in to retrieve user info
             auth.signInWith(Email) {
                 this.email = email
                 this.password = password
@@ -210,7 +217,7 @@ object AuthController {
             val user = auth.currentUserOrNull()
                 ?: throw IllegalStateException("No se pudo obtener el usuario tras el registro.")
 
-            // Insertamos en la tabla 'users' con su ID real
+            // Insert into custom Supabase table
             SupabaseClientProvider.client.postgrest["users"].insert(
                 buildJsonObject {
                     put("id", user.id)
@@ -219,6 +226,7 @@ object AuthController {
                 }
             )
 
+            // Save session state
             UserSession.setSession(
                 id = user.id,
                 emailValue = user.email ?: "desconocido@correo.com",
@@ -233,7 +241,7 @@ object AuthController {
 
 
     /**
-     * Signs out the current user and clears session state.
+     * Signs out and clears session data.
      */
     suspend fun signOut() {
         auth.signOut()
@@ -242,13 +250,16 @@ object AuthController {
     }
 
     /**
-     * Validates basic email format with a regular expression.
+     * Validates email format with a regex pattern.
      */
     fun isValidEmail(email: String): Boolean {
         val regex = "^[A-Za-z](.*)([@]{1})(.{1,})(\\.)(.{1,})"
         return regex.toRegex().matches(email)
     }
 
+    /**
+     * Sends a password reset email via Supabase.
+     */
     suspend fun sendPasswordReset(email: String): Result<Unit> = withContext(Dispatchers.Default) {
         runCatching {
             if (!isValidEmail(email)) {
@@ -267,6 +278,9 @@ object AuthController {
 //        }
 //    }
 
+    /**
+     * Verifies user credentials by re-authenticating.
+     */
     suspend fun verifyCurrentPassword(email: String, password: String): Result<Unit> = withContext(Dispatchers.Default) {
         runCatching {
             SupabaseClientProvider.client.auth.signInWith(Email) {
@@ -276,6 +290,9 @@ object AuthController {
         }
     }
 
+    /**
+     * Resends email verification link.
+     */
     suspend fun resendVerification(email: String): Result<Unit> = withContext(Dispatchers.Default) {
         runCatching {
             SupabaseClientProvider.client.auth.resendEmail(
@@ -284,6 +301,10 @@ object AuthController {
             )
         }
     }
+
+    /**
+     * Loads the current user's profile from the 'users' table.
+     */
     suspend fun loadUserProfile(): UserModel? = withContext(Dispatchers.Default) {
         val client = SupabaseClientProvider.client
         val userId = client.auth.currentUserOrNull()?.id ?: return@withContext null
@@ -299,7 +320,9 @@ object AuthController {
     }
 
 
-
+    /**
+     * Inserts or updates user info to ensure presence in 'users' table.
+     */
     suspend fun ensureUserExists(userId: String, email: String?, username: String?) {
         SupabaseClientProvider.client.postgrest["users"].upsert(
             buildJsonObject {
@@ -309,6 +332,10 @@ object AuthController {
             }
         )
     }
+
+    /**
+     * Fetches a user profile using an email address.
+     */
     suspend fun loadUserProfileByEmail(email: String): UserModel? = withContext(Dispatchers.Default) {
         SupabaseClientProvider.client.postgrest["users"]
             .select {
