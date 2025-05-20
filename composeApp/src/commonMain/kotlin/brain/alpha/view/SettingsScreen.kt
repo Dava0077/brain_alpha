@@ -17,13 +17,15 @@ import androidx.compose.ui.unit.sp
 import brain.alpha.controller.SettingsController
 import brain.alpha.strings.Strings
 
+// Main settings screen composable
 @Composable
 fun SettingsScreen(controller: SettingsController) {
     Box(modifier = Modifier.fillMaxSize()
     ){
+        // Current language display
         val selectedLanguage = if (Strings.currentLanguage == "en") "English" else "Español"
 
-
+        // Top-level scaffold for toolbar and screen layout
         Scaffold(
             topBar = {
                 TopAppBar(
@@ -32,6 +34,7 @@ fun SettingsScreen(controller: SettingsController) {
                             modifier = Modifier.fillMaxWidth(),
                             contentAlignment = Alignment.Center
                         ) {
+                            // Settings screen title
                             Text(Strings.t("settings_title"), color = Color.White)
                         }
                     },
@@ -45,8 +48,9 @@ fun SettingsScreen(controller: SettingsController) {
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-                Spacer(modifier = Modifier.height(5.dp)) // Espacio tras el logo
+                Spacer(modifier = Modifier.height(5.dp))
 
+                // Back navigation button
                 Button(
                     onClick = {controller.goHome()},
                     modifier = Modifier
@@ -59,13 +63,14 @@ fun SettingsScreen(controller: SettingsController) {
                 ){
                     Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
                 }
-                // PREFERENCIAS
+                // Preferences section
                 Text(
                     text = Strings.t("preferences"),
                     style = MaterialTheme.typography.h6,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
+                // Language selector row
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(vertical = 8.dp)
@@ -78,13 +83,14 @@ fun SettingsScreen(controller: SettingsController) {
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // CUENTA Y PERFIL
+                // Account and profile section
                 Text(
                     text = Strings.t("account_profile"),
                     style = MaterialTheme.typography.h6,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
+                // Settings options (all navigate to same user screen)
                 settingsItem(Strings.t("change_name")) {
                     controller.goUserScreen()
                 }
@@ -100,6 +106,7 @@ fun SettingsScreen(controller: SettingsController) {
         }
     }
 }
+// Language dropdown component with 2 options
 @Composable
 fun dropdownMenuLanguage(current: String, onLanguageChange: (String) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
@@ -123,6 +130,7 @@ fun dropdownMenuLanguage(current: String, onLanguageChange: (String) -> Unit) {
     }
 }
 
+// Reusable settings list item with arrow icon
 @Composable
 fun settingsItem(title: String, onClick: () -> Unit) {
     Row(

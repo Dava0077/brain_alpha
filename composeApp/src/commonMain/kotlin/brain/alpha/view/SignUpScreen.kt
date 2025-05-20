@@ -22,13 +22,13 @@ import org.jetbrains.compose.resources.painterResource
 /**
  * SignUpScreen.kt
  *
- * This Composable handles user registration.
- * It provides a form to collect email, username, password, and confirmation.
- * Upon success, a dialog confirms the registration and navigates back to the login screen.
- * On failure, a snackbar shows the error.
+ * Handles user registration. Displays a form to enter email, username, password, and confirmation.
+ * On successful registration:
+ *   - Inserts the user into the DB (if needed),
+ *   - Stores the session locally,
+ *   - Shows a confirmation dialog.
+ * On failure, shows a snackbar with the error.
  */
-
-
 
 
 @Composable
@@ -37,7 +37,7 @@ fun SignUpScreen(
     onFailure: (String) -> Unit,
     onGoToLogin: () -> Unit
 ) {
-    // Input state variables
+    // Form field state
     var email by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -77,10 +77,11 @@ fun SignUpScreen(
                     )
                     Spacer(modifier = Modifier.height(40.dp))
 
+                    // Title
                     Text("SIGN UP", color = Color.Black, fontSize = 20.sp)
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Form fields
+                    // Email input
                     OutlinedTextField(
                         value = email,
                         onValueChange = { email = it },
@@ -96,6 +97,7 @@ fun SignUpScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
+                    // Username input
                     OutlinedTextField(
                         value = username,
                         onValueChange = { username = it },
@@ -111,6 +113,7 @@ fun SignUpScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
+                    // Password input
                     OutlinedTextField(
                         value = password,
                         onValueChange = { password = it },
@@ -128,6 +131,7 @@ fun SignUpScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
+                    // Confirm password input
                     OutlinedTextField(
                         value = repeatPassword,
                         onValueChange = { repeatPassword = it },
@@ -157,19 +161,21 @@ fun SignUpScreen(
                                     repeatPassword = repeatPassword
                                 )
                                 result.onSuccess { user ->
-                                    // Asegura que el usuario se inserta en la tabla "users"
+                                    // Insert into users table if needed
                                     AuthController.ensureUserExists(
                                         userId = user.id,
                                         email = user.email,
                                         username = username
                                     )
 
+                                    // Save session
                                     UserSession.setSession(
                                         id = user.id,
                                         emailValue = user.email ?: "desconocido@correo.com",
                                         usernameValue = username
                                     )
 
+                                    // Clear form and show confirmation
                                     showSuccessDialog = true
                                     email = ""
                                     username = ""
@@ -207,7 +213,7 @@ fun SignUpScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Link to login screen
+                    // Navigate to login screen
                     TextButton(onClick = {
                         email = ""
                         username = ""

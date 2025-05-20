@@ -39,10 +39,16 @@ import org.jetbrains.compose.resources.painterResource
 
 
 
-
+/**
+ * Serializable route object for home navigation.
+ */
 @Serializable
 object HomeRoute
 
+/**
+ * Main home screen after user login.
+ * Shows categories, user info, logout, and navigation buttons.
+ */
 @Composable
 fun HomeScreen(
     controller: LoginController,
@@ -51,6 +57,7 @@ fun HomeScreen(
     onNavigateToConcentration: () -> Unit,
     onNavigateToAgility: () -> Unit
 ) {
+    // Load session from Supabase if available
     LaunchedEffect(Unit) {
         val user = SupabaseClientProvider.client.auth.currentUserOrNull()
         if (user != null) {
@@ -60,13 +67,14 @@ fun HomeScreen(
             println("⚠ Usuario no logueado")
         }
     }
-    val displayName = UserSession.getDisplayName() // Show guest or username
-    val showConfirmDialog = remember { mutableStateOf(false) }
+    val displayName = UserSession.getDisplayName() // Get username or guest
+    val showConfirmDialog = remember { mutableStateOf(false) }  // Logout dialog state
 
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
 
+    // Scaffold provides snackbar handling
     Scaffold(
         scaffoldState = scaffoldState,
         snackbarHost = { SnackbarHost(scaffoldState.snackbarHostState) }
@@ -81,6 +89,7 @@ fun HomeScreen(
                 contentScale = ContentScale.Crop
             )
 
+            // Main content column with scroll
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -88,7 +97,7 @@ fun HomeScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) {
-                // Header bar
+                // Header with user, logout, settings
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -156,6 +165,7 @@ fun HomeScreen(
                 }
                 Spacer(modifier = Modifier.height(70.dp))
 
+                // Leaderboard button
                 Button(
                     onClick = {controller.goLeaderboard()},
                     modifier = Modifier
@@ -171,6 +181,7 @@ fun HomeScreen(
 
                 Spacer(modifier = Modifier.height(60.dp))
 
+                // Categories title
                 Text(
                     text = Strings.t("categories"),
                     fontSize = 40.sp,
@@ -271,7 +282,9 @@ fun HomeScreen(
     }
 }
 
-
+/**
+ * UI component to show a game category card (icon + title)
+ */
 @Composable
 fun CategoryItem(
     title: String,
@@ -289,7 +302,7 @@ fun CategoryItem(
             .background(Color.White, shape = RoundedCornerShape(8.dp)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Image block
+        // Game icon
         Box(
             modifier = Modifier
                 .fillMaxWidth()

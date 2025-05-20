@@ -48,6 +48,12 @@ import kotlinx.serialization.json.put
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
+/*
+ * UserProfileScreen.kt
+ *
+ * Esta pantalla permite al usuario ver su perfil (nombre, email), progreso en juegos,
+ * modificar sus datos (nombre, email, password), cerrar sesión y eliminar la cuenta.
+ */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun UserProfileScreen(onBack: () -> Unit) {
@@ -73,7 +79,7 @@ fun UserProfileScreen(onBack: () -> Unit) {
     val totalProgress = remember { mutableStateOf<List<UserProgressEntry>>(emptyList()) }
     val scrollState = rememberScrollState()
 
-
+    // Carga de progreso del usuario al iniciar
     LaunchedEffect(userId) {
         userId?.let {
             val result = GameSessionController.getAllTotalScores(it)
@@ -87,6 +93,7 @@ fun UserProfileScreen(onBack: () -> Unit) {
     }
 
 
+    // Outer container
     Box(modifier = Modifier.fillMaxSize()) {
         /*LaunchedEffect(userId) {
             userId?.let {
@@ -97,7 +104,7 @@ fun UserProfileScreen(onBack: () -> Unit) {
             }
         }*/
 
-
+        // Scaffold with top app bar
         Scaffold(
             scaffoldState = scaffoldState,
             topBar = {
@@ -114,6 +121,7 @@ fun UserProfileScreen(onBack: () -> Unit) {
                 )
             }
         ) { paddingValues ->
+            // Main vertical scrollable content
             Column(
                 modifier = Modifier
                     .padding(paddingValues)
