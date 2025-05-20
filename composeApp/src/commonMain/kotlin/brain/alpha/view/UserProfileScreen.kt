@@ -61,11 +61,12 @@ fun UserProfileScreen(onBack: () -> Unit) {
     val scaffoldState = rememberScaffoldState()
     var showLogoutConfirm by remember { mutableStateOf(false) }
 
-
+    // Session data
     val userId = UserSession.userId.value
     val username = UserSession.username.value ?: "Usuario"
     val email = UserSession.email.value ?: "Email desconocido"
 
+    // State variables
     var isEmailVerified by remember { mutableStateOf(true) }
     var progressList by remember { mutableStateOf<List<UserProgressEntry>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
@@ -79,7 +80,7 @@ fun UserProfileScreen(onBack: () -> Unit) {
     val totalProgress = remember { mutableStateOf<List<UserProgressEntry>>(emptyList()) }
     val scrollState = rememberScrollState()
 
-    // Carga de progreso del usuario al iniciar
+    // Load total game progress on launch
     LaunchedEffect(userId) {
         userId?.let {
             val result = GameSessionController.getAllTotalScores(it)
@@ -93,7 +94,7 @@ fun UserProfileScreen(onBack: () -> Unit) {
     }
 
 
-    // Outer container
+    // Main UI layout
     Box(modifier = Modifier.fillMaxSize()) {
         /*LaunchedEffect(userId) {
             userId?.let {
@@ -131,6 +132,7 @@ fun UserProfileScreen(onBack: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
+                // Profile image and email
                 Spacer(modifier = Modifier.height(10.dp))
 
                 Image(
@@ -147,6 +149,7 @@ fun UserProfileScreen(onBack: () -> Unit) {
                 Text(username, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 Text(email, fontSize = 14.sp, color = Color.Gray)
 
+                // Top action buttons: logout, delete account, back
                 FlowRow(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -225,6 +228,7 @@ fun UserProfileScreen(onBack: () -> Unit) {
                     }
                 }
 
+                // Email verification prompt
                 if (!isEmailVerified) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Button(
@@ -243,6 +247,7 @@ fun UserProfileScreen(onBack: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(24.dp))
 
+                // User data update actions
                 FlowRow(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
@@ -255,6 +260,7 @@ fun UserProfileScreen(onBack: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
+                // Progress section
                 Text(
                     text = Strings.t("your_progress"),
                     fontSize = 24.sp,
@@ -267,6 +273,7 @@ fun UserProfileScreen(onBack: () -> Unit) {
                 Box(
                     modifier = Modifier.fillMaxWidth()
                 ) {
+                    // Difficulty legend
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -280,11 +287,9 @@ fun UserProfileScreen(onBack: () -> Unit) {
                     }
                 }
 
-
-
-
                 Spacer(Modifier.height(10.dp))
 
+                // Progress headers
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -314,6 +319,7 @@ fun UserProfileScreen(onBack: () -> Unit) {
                     )
                 }
 
+                // Progress items
                 totalProgress.value.forEach { entry ->
                     Card(
                         modifier = Modifier
@@ -411,6 +417,7 @@ fun UserProfileScreen(onBack: () -> Unit) {
             }
         }
 
+        // Logout confirmation dialog
         if (showLogoutConfirm) {
             AlertDialog(
                 onDismissRequest = { showLogoutConfirm = false },
@@ -466,6 +473,7 @@ fun UserProfileScreen(onBack: () -> Unit) {
 //            )
 //        }
 
+        // Dialog to update name/email/password
         showDialog?.let { field ->
             AlertDialog(
                 onDismissRequest = {
@@ -539,6 +547,7 @@ fun UserProfileScreen(onBack: () -> Unit) {
     }
 }
 
+// Updates name/email/password in Supabase and local session
 suspend fun updateUserField(field: String, value: String) {
     val client = SupabaseClientProvider.client
     val userId = UserSession.userId.value ?: return
@@ -577,8 +586,7 @@ suspend fun updateUserField(field: String, value: String) {
 }
 
 
-
-
+// Verifies password for secure operations
 suspend fun verifyCurrentPassword(password: String): Boolean {
     val email = UserSession.email.value ?: return false
     return runCatching {
@@ -593,6 +601,7 @@ suspend fun verifyCurrentPassword(password: String): Boolean {
     return GameSessionController.getUserProgress(userId).getOrElse { emptyList() }
 }*/
 
+// Button wrapper used for field update actions
 @Composable
 fun ActionButton(text: String, onClick: () -> Unit) {
     OutlinedButton(
@@ -603,6 +612,7 @@ fun ActionButton(text: String, onClick: () -> Unit) {
     }
 }
 
+// Single progress card (unused in main screen)
 @Composable
 fun ProgressItem(progress: UserProgressEntry) {
     println("📄 Mostrando progreso: $progress")
@@ -621,6 +631,7 @@ fun ProgressItem(progress: UserProgressEntry) {
         }
     }
 }
+// Legend item for difficulty
 @Composable
 fun DifficultyLegendItem(image: DrawableResource, label: String, size: Dp) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
