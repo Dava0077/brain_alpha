@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import brain.alpha.controller.LoginController
 import brain.alpha.controller.logicController.logicHomeController
 import brain.alpha.model.UserSession
 import brain.alpha.strings.Strings
@@ -31,6 +32,8 @@ import brainalpha.composeapp.generated.resources.user
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
+// Main screen for the logic games category.
+// Displays top bar, back button, section title, and logic games (e.g., Sudoku, Word Search).
 @Composable
 fun logicHomeScreen(
     controller: logicHomeController,
@@ -38,9 +41,12 @@ fun logicHomeScreen(
     onNavigateToSudoku: () -> Unit,
     onNavigateToWordS: () -> Unit
     ) {
-    val displayName = UserSession.getDisplayName() // Show guest or username
+    // Get the display name of the user (or guest)
+    val displayName = UserSession.getDisplayName()
 
+    // Fullscreen container with background image
     Box(modifier = Modifier.fillMaxSize()) {
+        // Background image for the screen
         Image(
             painter = painterResource(Res.drawable.fondoLogic),
             contentDescription = null,
@@ -48,11 +54,13 @@ fun logicHomeScreen(
             contentScale = ContentScale.Crop
         )
 
+        // Main layout container
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
+            // Top bar with user icon, logo, and settings button
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -60,8 +68,9 @@ fun logicHomeScreen(
                     .background(Color(0xFF222937), shape = RoundedCornerShape(4.dp))
                     .border(BorderStroke(2.dp, Color(0xFF4CE3E8))))
              {
+                 // Left icon button (user/profile)
                 IconButton(
-                    onClick = { /* Dummy action */ },
+                    onClick = { LoginController.buttonUsername() },
                     modifier = Modifier
                         .align(Alignment.CenterStart)
                         .padding(start = 8.dp)
@@ -69,6 +78,7 @@ fun logicHomeScreen(
                 ) {
                     Image(painter = painterResource(Res.drawable.user), contentDescription = "User")
                 }
+                 // Center logo
                 Image(
                     painter = painterResource(Res.drawable.logo),
                     contentDescription = null,
@@ -77,6 +87,7 @@ fun logicHomeScreen(
                         .align(Alignment.Center)
                         .scale(1.5f)
                 )
+                 // Right icon button (settings)
                 IconButton(
                     onClick = { brain.alpha.controller.LoginController.buttonSettings() },
                     modifier = Modifier
@@ -95,8 +106,10 @@ fun logicHomeScreen(
                          .padding(start = 72.dp)
                  )
             }
-            Spacer(modifier = Modifier.height(5.dp)) // Espacio tras el logo
+            // Spacer after top bar
+            Spacer(modifier = Modifier.height(5.dp))
 
+            // Back button to go home
             Button(
                 onClick = { controller.goHome() },
                 modifier = Modifier
@@ -110,8 +123,10 @@ fun logicHomeScreen(
                 Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
             }
 
+            // Spacer before section title
             Spacer(modifier = Modifier.height(30.dp))
 
+            // Title: Logic
             Text(
                 text = Strings.t("logic"),
                 fontSize = 40.sp,
@@ -120,9 +135,10 @@ fun logicHomeScreen(
                 textAlign = TextAlign.Center
             )
 
+            // Spacer before game list
             Spacer(modifier = Modifier.height(30.dp))
 
-            // Category grid
+            // Logic game categories (Sudoku, Word Search)
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -145,50 +161,50 @@ fun logicHomeScreen(
         }
     }
 
-@Composable
-fun CategoryItem(
-    title: String,
-    image: DrawableResource,
-    borderColor: Color,
-    onClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .width(250.dp)
-            .height(270.dp)
-            .clickable { onClick() }
-            .background(borderColor, shape = RoundedCornerShape(8.dp))
-            .padding(4.dp)
-            .background(Color.White, shape = RoundedCornerShape(8.dp)),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Image block
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-
-        ) {
-            Image(
-                painter = painterResource(image),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-        }
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        // Category title
-        Text(
-            text = title,
-            fontSize = 14.sp,
-            color = Color.Black,
-            fontFamily = FontFamily.SansSerif,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-    }
-}
+//@Composable
+//fun CategoryItem(
+//    title: String,
+//    image: DrawableResource,
+//    borderColor: Color,
+//    onClick: () -> Unit
+//) {
+//    Column(
+//        modifier = Modifier
+//            .width(250.dp)
+//            .height(270.dp)
+//            .clickable { onClick() }
+//            .background(borderColor, shape = RoundedCornerShape(8.dp))
+//            .padding(4.dp)
+//            .background(Color.White, shape = RoundedCornerShape(8.dp)),
+//        horizontalAlignment = Alignment.CenterHorizontally
+//    ) {
+//        // Image block
+//        Box(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .weight(1f)
+//
+//        ) {
+//            Image(
+//                painter = painterResource(image),
+//                contentDescription = null,
+//                modifier = Modifier.fillMaxSize(),
+//                contentScale = ContentScale.Crop
+//            )
+//        }
+//
+//        Spacer(modifier = Modifier.height(4.dp))
+//
+//        // Category title
+//        Text(
+//            text = title,
+//            fontSize = 14.sp,
+//            color = Color.Black,
+//            fontFamily = FontFamily.SansSerif,
+//            textAlign = TextAlign.Center,
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(vertical = 4.dp)
+//        )
+//    }
+//}

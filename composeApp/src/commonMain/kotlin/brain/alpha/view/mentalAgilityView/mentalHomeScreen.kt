@@ -19,12 +19,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import brain.alpha.controller.LoginController
 import brain.alpha.controller.memoryController.memoryHomeController
 import brain.alpha.controller.mentalAgilityController.mentalHomeController
 import brainalpha.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
+// Home screen for the Mental Agility section.
+// Displays a top bar, back button, title, and two games: Mental Math and Click Number.
 @Composable
 fun mentalHomeScreen(
     controller: mentalHomeController,
@@ -32,7 +35,9 @@ fun mentalHomeScreen(
     onNavigateToMath: () -> Unit,
     onNavigateToClick: () -> Unit
 ) {
+    // Fullscreen container with background image
     Box(modifier = Modifier.fillMaxSize()) {
+        // Background image for the screen
         Image(
             painter = painterResource(Res.drawable.fondoMental),
             contentDescription = null,
@@ -40,11 +45,13 @@ fun mentalHomeScreen(
             contentScale = ContentScale.Crop
         )
 
+        // Main layout container
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
+            // Top bar with user icon, logo, and settings button
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -52,8 +59,9 @@ fun mentalHomeScreen(
                     .background(Color(0xFF222937), shape = RoundedCornerShape(4.dp))
                     .border(BorderStroke(2.dp, Color(0xFF4CE3E8))))
             {
+                // Left icon button (user/profile)
                 IconButton(
-                    onClick = { /* Dummy action */ },
+                    onClick = { LoginController.buttonUsername() },
                     modifier = Modifier
                         .align(Alignment.CenterStart)
                         .padding(start = 8.dp)
@@ -61,6 +69,7 @@ fun mentalHomeScreen(
                 ) {
                     Image(painter = painterResource(Res.drawable.user), contentDescription = "User")
                 }
+                // Center logo
                 Image(
                     painter = painterResource(Res.drawable.logo),
                     contentDescription = null,
@@ -69,8 +78,9 @@ fun mentalHomeScreen(
                         .align(Alignment.Center)
                         .scale(1.5f)
                 )
+                // Right icon button (settings)
                 IconButton(
-                    onClick = { /* Dummy action */ },
+                    onClick = { LoginController.buttonSettings() },
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .padding(end = 8.dp)
@@ -79,8 +89,10 @@ fun mentalHomeScreen(
                     Image(painter = painterResource(Res.drawable.ajustes), contentDescription = "Settings")
                 }
             }
-            Spacer(modifier = Modifier.height(5.dp)) // Espacio tras el logo
+            // Spacer after top bar
+            Spacer(modifier = Modifier.height(5.dp))
 
+            // Button to return to the main menu
             Button(
                 onClick = {controller.goHome()},
                 modifier = Modifier
@@ -94,8 +106,10 @@ fun mentalHomeScreen(
                 Text("⬅ Volver", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
             }
 
+            // Spacer before section title
             Spacer(modifier = Modifier.height(30.dp))
 
+            // Section title
             Text(
                 text = "MEMORIA",
                 fontSize = 40.sp,
@@ -104,9 +118,10 @@ fun mentalHomeScreen(
                 textAlign = TextAlign.Center
             )
 
+            // Spacer before game buttons
             Spacer(modifier = Modifier.height(30.dp))
 
-            // Category grid
+            // Category grid with mental games
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -129,57 +144,57 @@ fun mentalHomeScreen(
     }
 }
 
-@Composable
-fun CategoryItem(
-    title: String,
-    image: DrawableResource,
-    borderColor: Color,
-    onClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .width(250.dp)
-            .height(270.dp)
-            .clickable { onClick() }
-            .background(borderColor, shape = RoundedCornerShape(12.dp))
-            .padding(4.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .clip(RoundedCornerShape(8.dp))
-                .background(borderColor)
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                // Image block
-                Image(
-                    painter = painterResource(image),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .padding(10.dp),
-                    contentScale = ContentScale.Crop
-                )
-
-                // Category title fully inside blue box
-                Text(
-                    text = title,
-                    fontSize = 14.sp,
-                    color = Color.White,
-                    fontFamily = FontFamily.SansSerif,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(borderColor)
-                        .padding(vertical = 8.dp)
-                )
-            }
-        }
-    }
-}
+//@Composable
+//fun CategoryItem(
+//    title: String,
+//    image: DrawableResource,
+//    borderColor: Color,
+//    onClick: () -> Unit
+//) {
+//    Column(
+//        modifier = Modifier
+//            .width(250.dp)
+//            .height(270.dp)
+//            .clickable { onClick() }
+//            .background(borderColor, shape = RoundedCornerShape(12.dp))
+//            .padding(4.dp),
+//        horizontalAlignment = Alignment.CenterHorizontally
+//    ) {
+//        Box(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .clip(RoundedCornerShape(8.dp))
+//                .background(borderColor)
+//        ) {
+//            Column(
+//                modifier = Modifier.fillMaxSize(),
+//                horizontalAlignment = Alignment.CenterHorizontally,
+//                verticalArrangement = Arrangement.SpaceBetween
+//            ) {
+//                // Image block
+//                Image(
+//                    painter = painterResource(image),
+//                    contentDescription = null,
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .weight(1f)
+//                        .padding(10.dp),
+//                    contentScale = ContentScale.Crop
+//                )
+//
+//                // Category title fully inside blue box
+//                Text(
+//                    text = title,
+//                    fontSize = 14.sp,
+//                    color = Color.White,
+//                    fontFamily = FontFamily.SansSerif,
+//                    textAlign = TextAlign.Center,
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .background(borderColor)
+//                        .padding(vertical = 8.dp)
+//                )
+//            }
+//        }
+//    }
+//}
