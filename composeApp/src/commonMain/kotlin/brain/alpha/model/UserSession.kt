@@ -7,16 +7,7 @@ import kotlinx.serialization.Serializable
 
 
 /**
- * UserSession.kt
- *
- * This singleton object manages the global session state of the current user.
- * It provides observable state values using Compose's `mutableStateOf`,
- * which makes it reactive and automatically updates the UI when the session changes.
- *
- * Responsibilities:
- * - Track login status, guest mode, user ID, email, and username.
- * - Provide helpers to set/reset session data.
- * - Offer derived states like authentication status and display name.
+ * UserModel represents the user data structure stored in the 'users' table.
  */
 @Serializable
 data class UserModel(
@@ -25,28 +16,34 @@ data class UserModel(
     val email: String
 )
 
+/**
+ * UserSession is a singleton responsible for managing the current user's session state.
+ *
+ * Features:
+ * - Holds login status (authenticated or guest)
+ * - Exposes reactive values via mutableStateOf for use in Compose UI
+ * - Stores user ID, email, and display name
+ * - Provides helpers to set, clear, and check session state
+ */
 object UserSession {
-    // Indicates whether a user is logged in
+    // Whether a user is logged in
     val isLoggedIn = mutableStateOf(false)
 
-    // Indicates whether the session is for a guest user
+    // Whether the current session is for a guest user
     val isGuest = mutableStateOf(false)
 
-    // Stores Supabase user ID
+    // Supabase user ID for the current session (nullable)
     val userId = mutableStateOf<String?>(null)
 
-    // Stores user's email
+    // Email address of the user (nullable)
     val email = mutableStateOf<String?>(null)
 
-    // Stores user's display name or username
+    // Display name or username (nullable)
     val username = mutableStateOf<String?>(null)
 
 
     /**
-     * Sets the session state for an authenticated user.
-     * @param id Supabase user ID
-     * @param emailValue User's email
-     * @param usernameValue User's display name
+     * Sets session state for a logged-in user (not a guest).
      */
     fun setSession(id: String, emailValue: String, usernameValue: String) {
         isLoggedIn.value = true
@@ -58,8 +55,8 @@ object UserSession {
 
 
     /**
-     * Sets the session state for a guest user.
-     * @param guestName Optional guest name (default: "Invitado")
+     * Sets session state for a guest user.
+     * Uses a default name like "Invitado".
      */
     fun setGuestSession(guestName: String = "Invitado") {
         isLoggedIn.value = true
@@ -71,8 +68,7 @@ object UserSession {
 
 
     /**
-     * Clears all session data.
-     * Effectively logs the user out.
+     * Clears all session information (logs the user out).
      */
     fun clear() {
         isLoggedIn.value = false
@@ -83,26 +79,32 @@ object UserSession {
     }
 
     /**
-     * Checks whether the user is logged in and is not a guest.
-     * @return true if authenticated session
+     * Returns true if user is logged in and not a guest.
      */
     fun isAuthenticated(): Boolean {
         return isLoggedIn.value && !isGuest.value
     }
 
     /**
-     * Returns a friendly display name for the current session.
-     * Defaults to "Usuario" if username is null.
-     */
+    * Returns the username or defaults to "Usuario".
+    */
     fun getDisplayName(): String {
         return username.value ?: "Usuario"
     }
+
+    // Internal fallback user ID cache
     private var currentUserId: String? = null
 
+    /**
+     * Sets user ID manually (used for caching outside Compose state)
+     */
     fun setUserId(id: String) {
         currentUserId = id
     }
 
+    /**
+     * Returns the current user ID from local cache or from Supabase client session.
+     */
     fun getUserId(): String? {
         return currentUserId
             ?: SupabaseClientProvider.client.auth.currentUserOrNull()?.id

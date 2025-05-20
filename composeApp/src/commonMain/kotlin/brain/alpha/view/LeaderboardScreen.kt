@@ -27,11 +27,20 @@ import brain.alpha.utils.isCompactScreen
 import kotlinx.coroutines.launch
 import kotlin.math.round
 
+/*
+ * LeaderboardScreen.kt
+ *
+ * This file defines the composable LeaderboardScreen and supporting UI elements
+ * to show categorized and expandable leaderboards with sorting and difficulty logic.
+ */
+
+// Sort criteria options
 enum class SortOption(val label: String) {
     SCORE("score"),
     TIME_AVG("avg_time")
 }
 
+// Maps internal game keys to display labels
 val displayNamesMap = mapOf(
     "pairs_game" to Strings.t("pairs_game"),
     "simon_game" to Strings.t("simon_game"),
@@ -42,15 +51,11 @@ val displayNamesMap = mapOf(
     "mental_math" to Strings.t("mental_math"),
     "click_number" to Strings.t("click_number")
 )
+// Identifies games with multiple difficulty levels
 val gamesWithDifficulty = setOf(
     "sudoku_game", "pairs_game", "simon_game", "wordSearch_game"
 )
-
-
-
-
-
-
+// Sorts leaderboard entries based on selected criteria
 fun sort(entries: List<LeaderboardEntry>, sortBy: SortOption, ascending: Boolean): List<LeaderboardEntry> {
     val sorted = when (sortBy) {
         SortOption.SCORE -> entries.sortedBy { it.score }
@@ -60,13 +65,11 @@ fun sort(entries: List<LeaderboardEntry>, sortBy: SortOption, ascending: Boolean
 }
 
 @OptIn(ExperimentalLayoutApi::class)
-
 @Composable
 fun LeaderboardScreen(controller: LeaderboardController) {
     val isCompact = isCompactScreen()
-
-
     val displayName = UserSession.getDisplayName()
+    // Game categories grouped by type
     val categories = mapOf(
         Strings.t("memory") to listOf("pairs_game", "simon_game"),
         Strings.t("logic") to listOf("sudoku_game", "wordSearch_game"),
@@ -75,22 +78,15 @@ fun LeaderboardScreen(controller: LeaderboardController) {
     )
 
     val sortOption = remember { mutableStateOf(SortOption.SCORE) }
-
     val sortBy = sortOption.value
-
     val ascending = remember { mutableStateOf(false) }
     val expandedCategory = remember { mutableStateOf<String?>(null) }
     val expandedGame = remember { mutableStateOf<String?>(null) }
     val leaderboardMap = remember { mutableStateMapOf<String, LeaderboardByDifficulty>() }
-
-
     val reloadTrigger = remember { mutableStateOf(0) }
-
     val coroutineScope = rememberCoroutineScope()
 
-
-
-
+    // Game IDs used to query data
     val gameIdMap = mapOf(
         "pairs_game" to "24bc262b-ab64-4c71-9c45-8d4fa04a549e",
         "simon_game" to "2927d18f-b1ab-4376-990e-1275e5ba181e",
@@ -121,6 +117,7 @@ fun LeaderboardScreen(controller: LeaderboardController) {
                     }
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Back button
         Button(
             onClick = { controller.goHome() },
             modifier = Modifier.align(Alignment.End),
@@ -132,6 +129,7 @@ fun LeaderboardScreen(controller: LeaderboardController) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        // Leaderboard section title
         Text(
             Strings.t("leaderboard_bygame"),
             fontSize = if (isCompact) 22.sp else 28.sp,
@@ -153,6 +151,7 @@ fun LeaderboardScreen(controller: LeaderboardController) {
 //        }
 
         Spacer(modifier = Modifier.height(12.dp))
+        // Sorting and ordering controls
         FlowRow(
             modifier = Modifier
                 .fillMaxWidth()
@@ -192,6 +191,7 @@ fun LeaderboardScreen(controller: LeaderboardController) {
                 )
             }
         }
+        // Legend of difficulty icons
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -204,7 +204,7 @@ fun LeaderboardScreen(controller: LeaderboardController) {
             DifficultyLegendItem(Res.drawable.hard, Strings.t("hard"), size = 48.dp)
         }
 
-
+        // For each category, show expandable list of games
         categories.forEach { (category, games) ->
             ExpandableCategory(
                 title = category,
@@ -280,6 +280,8 @@ fun LeaderboardScreen(controller: LeaderboardController) {
     }
 }
 
+// Expandable category block for game types
+// Shows or hides the inner content when clicked
 @Composable
 fun ExpandableCategory(
     title: String,
@@ -307,7 +309,7 @@ fun ExpandableCategory(
         }
     }
 }
-
+// Expandable UI per game. Displays leaderboard grouped by difficulty or merged by username.
 @Composable
 fun ExpandableGame(
     gameName: String,
@@ -320,6 +322,7 @@ fun ExpandableGame(
     ascending: Boolean
 ) {
     Column(modifier = Modifier.fillMaxWidth().padding(start = 12.dp)) {
+        // Game title with expandable toggle button
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(gameName, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
             Button(
@@ -343,6 +346,7 @@ fun ExpandableGame(
 //                }
 //            }
 //        }
+        // When expanded, shows leaderboard or loading spinner
         AnimatedVisibility(visible = isExpanded, enter = fadeIn(), exit = fadeOut()) {
             Column {
                 if (leaderboard != null) {
@@ -369,6 +373,7 @@ fun ExpandableGame(
     }
 }
 
+// Represents a full leaderboard section with header and list of entries
 @Composable
 fun LeaderboardSection(title: String, entries: List<LeaderboardEntry>, showDifficulty: Boolean) {
     val headerColor = when (title.lowercase()) {
@@ -407,6 +412,7 @@ fun LeaderboardSection(title: String, entries: List<LeaderboardEntry>, showDiffi
     }
 }
 
+// Header for the leaderboard table
 @Composable
 fun HeaderRow(bgColor: Color, showDifficulty: Boolean) {
     Row(
@@ -428,6 +434,7 @@ fun HeaderRow(bgColor: Color, showDifficulty: Boolean) {
     }
 }
 
+// Row for each leaderboard entry: shows position, name, score, difficulty or time, and date
 @Composable
 fun EntryRow(index: Int, entry: LeaderboardEntry, showDifficulty: Boolean) {
     val bgColor = if (index % 2 == 0) Color.White else Color(0xFFF5FAFF)
@@ -463,6 +470,9 @@ fun EntryRow(index: Int, entry: LeaderboardEntry, showDifficulty: Boolean) {
         Text(entry.playedAt.take(10), fontSize = 13.sp, modifier = Modifier.width(80.dp), textAlign = TextAlign.Center)
     }
 }
+
+// Merges entries of the same user across difficulties to one row
+// Used for difficulty-merged leaderboards
 fun mergeEntriesByUsername(entries: List<LeaderboardEntry>): List<LeaderboardEntry> {
     return entries
         .groupBy { it.username }

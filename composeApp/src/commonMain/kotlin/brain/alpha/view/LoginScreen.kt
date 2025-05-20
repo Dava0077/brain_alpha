@@ -33,18 +33,16 @@ import kotlinx.coroutines.*
 /**
  * LoginScreen.kt
  *
- * This composable is the login UI for the app. It provides input fields for
- * email and password, error handling, and navigation options for sign-up
- * and guest access. A snackbar shows confirmation when logging in as guest.
+ * Provides login UI with email/password, Google OAuth, and guest login support.
+ * Includes password reset dialog, and uses Supabase for authentication.
  */
-
-
 
 @Composable
 fun LoginScreen(
     controller: LoginController,
     onNavigateToSignUp: () -> Unit
 ) {
+    // UI + coroutine state
     val scaffoldState = rememberScaffoldState()
     val googleLoginSuccess by LoginController.googleLoginSuccess
 
@@ -55,6 +53,7 @@ fun LoginScreen(
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
 
+    // Google login launcher
     val googleSignIn = GoogleAuthController.googleSignInAction(
         scope = coroutineScope,
         onSuccess = {}, // no usamos el callback directamente, sino via LaunchedEffect
@@ -63,6 +62,7 @@ fun LoginScreen(
 
     val alreadyHandled = remember { mutableStateOf(false) }
 
+    // Polls user session every 250ms and proceeds if logged in
     LaunchedEffect(Unit) {
         while (true) {
             delay(250)
@@ -73,6 +73,7 @@ fun LoginScreen(
 
                 SupabaseClientProvider.client.auth.sessionManager.loadSession()
 
+                // Load profile, fallback to email name
                 val userProfile = withContext(Dispatchers.Default) {
                     AuthController.loadUserProfile()
                 }
@@ -80,6 +81,7 @@ fun LoginScreen(
                 val fallbackName = user.email?.substringBefore('@')?.replaceFirstChar { it.uppercase() } ?: "Usuario"
                 val username = userProfile?.name?.takeIf { it.isNotBlank() } ?: fallbackName
 
+                // Save session info
                 UserSession.setSession(
                     id = user.id,
                     emailValue = user.email ?: "desconocido@correo.com",
@@ -97,11 +99,6 @@ fun LoginScreen(
             }
         }
     }
-
-
-
-
-
     /*val googleSignIn = GoogleAuthController.googleSignInAction(
         scope = coroutineScope,
         onSuccess = { userInfo ->
@@ -157,6 +154,7 @@ fun LoginScreen(
         }
     }*/
 
+    // UI scaffold
     Scaffold(scaffoldState = scaffoldState) {
         Box {
             // Background image
@@ -167,6 +165,7 @@ fun LoginScreen(
                 contentScale = ContentScale.Crop
             )
 
+            // Main login content
             Column(
                 modifier = Modifier
                     .fillMaxSize()
