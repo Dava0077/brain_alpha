@@ -19,19 +19,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import brain.alpha.controller.LoginController
 import brain.alpha.strings.Strings
 import brainalpha.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import brain.alpha.controller.concentrationController.concentrationHomeController
 
+// Concentration game home screen. Displays category options and navigation UI.
 @Composable
 fun concentrationHomeScreen(
     controller: concentrationHomeController,
-
-
     ) {
+    // Fullscreen container with background image
     Box(modifier = Modifier.fillMaxSize()) {
+        // Background image for the screen
         Image(
             painter = painterResource(Res.drawable.fondoConcentracion),
             contentDescription = null,
@@ -39,11 +41,13 @@ fun concentrationHomeScreen(
             contentScale = ContentScale.Crop
         )
 
+        // Main layout container
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
+            // Top bar with user icon, logo, and settings button
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -52,8 +56,9 @@ fun concentrationHomeScreen(
                     .border(BorderStroke(2.dp, Color(0xFFB0BEC5)))
             ) {
 
+                // Left icon button (user/profile)
                 IconButton(
-                    onClick = { /* future user action */ },
+                    onClick = { LoginController.buttonUsername() },
                     modifier = Modifier
                         .align(Alignment.CenterStart)
                         .padding(start = 8.dp)
@@ -64,6 +69,7 @@ fun concentrationHomeScreen(
                         contentDescription = "Usuario"
                     )
                 }
+                // Center logo
                 Image(
                     painter = painterResource(Res.drawable.logo),
                     contentDescription = null,
@@ -72,8 +78,9 @@ fun concentrationHomeScreen(
                         .align(Alignment.Center)
                         .scale(1.2f)
                 )
+                // Right icon button (settings)
                 IconButton(
-                    onClick = { /* future settings action */ },
+                    onClick = { LoginController.buttonSettings() },
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .padding(end = 8.dp)
@@ -86,10 +93,11 @@ fun concentrationHomeScreen(
                 }
 
             }
-            Spacer(modifier = Modifier.height(5.dp)) // Espacio tras el logo
-
+            // Spacer after top bar
+            Spacer(modifier = Modifier.height(5.dp))
             Spacer (modifier = Modifier.height(30.dp))
 
+            // Button to go back to the home screen
             Button(
                 onClick = {controller.goHome()},
                 modifier = Modifier
@@ -107,8 +115,10 @@ fun concentrationHomeScreen(
                 Text(Strings.t("back"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
             }
 
+            // Spacer before section title
             Spacer(modifier = Modifier.height(30.dp))
 
+            // Section title for concentration
             Text(
                 text = Strings.t("concentration"),
                 fontSize = 40.sp,
@@ -117,9 +127,10 @@ fun concentrationHomeScreen(
                 textAlign = TextAlign.Center
             )
 
+            // Spacer before game categories
             Spacer(modifier = Modifier.height(30.dp))
 
-            // Category grid
+            // Display the game categories (Stroop and Odd Emoji)
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -142,60 +153,60 @@ fun concentrationHomeScreen(
     }
 }
 
-@Composable
-fun CategoryItem(
-    title: String,
-    image: DrawableResource,
-    borderColor: Color,
-    onClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .width(250.dp)
-            .height(270.dp)
-            .clickable { onClick() }
-            .background(borderColor, shape = RoundedCornerShape(12.dp))
-            .padding(4.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .clip(RoundedCornerShape(8.dp))
-                .background(borderColor)
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                // Image block
-                Image(
-                    painter = painterResource(image),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .padding(10.dp),
-                    contentScale = ContentScale.Crop
-                )
-
-                // Category title fully inside blue box
-                Text(
-                    text = title,
-                    fontSize = 14.sp,
-                    color = Color.White,
-                    fontFamily = FontFamily.SansSerif,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(borderColor)
-                        .padding(vertical = 8.dp)
-                )
-            }
-        }
-    }
-}
+//@Composable
+//fun CategoryItem(
+//    title: String,
+//    image: DrawableResource,
+//    borderColor: Color,
+//    onClick: () -> Unit
+//) {
+//    Column(
+//        modifier = Modifier
+//            .width(250.dp)
+//            .height(270.dp)
+//            .clickable { onClick() }
+//            .background(borderColor, shape = RoundedCornerShape(12.dp))
+//            .padding(4.dp),
+//        horizontalAlignment = Alignment.CenterHorizontally
+//    ) {
+//        Box(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .clip(RoundedCornerShape(8.dp))
+//                .background(borderColor)
+//        ) {
+//            Column(
+//                modifier = Modifier.fillMaxSize(),
+//                horizontalAlignment = Alignment.CenterHorizontally,
+//                verticalArrangement = Arrangement.SpaceBetween
+//            ) {
+//                // Image block
+//                Image(
+//                    painter = painterResource(image),
+//                    contentDescription = null,
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .weight(1f)
+//                        .padding(10.dp),
+//                    contentScale = ContentScale.Crop
+//                )
+//
+//                // Category title fully inside blue box
+//                Text(
+//                    text = title,
+//                    fontSize = 14.sp,
+//                    color = Color.White,
+//                    fontFamily = FontFamily.SansSerif,
+//                    textAlign = TextAlign.Center,
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .background(borderColor)
+//                        .padding(vertical = 8.dp)
+//                )
+//            }
+//        }
+//    }
+//}
 
 
 
