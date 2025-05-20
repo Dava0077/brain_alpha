@@ -2,10 +2,14 @@ package brain.alpha.strings
 
 import brain.alpha.model.shared.Difficulty
 
+// Singleton object for managing localized strings and translation logic.
 object Strings {
 
+    // Translation map holding all keys and their translations for supported languages.
+    // Keys are used in the UI, mapped to Spanish ("es") and English ("en") values.
     private val translations = mapOf(
         "es" to mapOf(
+            // ⬅ Spanish translations for UI strings (grouped by screen or context)
             //GENERAL
             "play" to "JUGAR",
             "leaderboard" to "CLASSIFICACIÓN",
@@ -224,6 +228,7 @@ object Strings {
 
             ),
         "en" to mapOf(
+            // ⬅ English translations for all the same keys used in the Spanish version.
             //GENERAL
             "play" to "PLAY",
             "leaderboard" to "LEADERBOARD",
@@ -443,14 +448,17 @@ object Strings {
         )
     )
 
-
+    // Translation function used in the UI. Looks up the current language,
+    // retrieves the value for the given key, or returns the key itself if not found.
     fun t(key: String): String {
         return translations[LanguageState.current.value]?.get(key) ?: key
     }
 
+    // Allows setting the active language by modifying the shared state.
     fun setLanguage(lang: String) {
         LanguageState.current.value = lang
     }
+    // Converts an enum Difficulty value (EASY, MEDIUM, HARD) into the translated label.
     fun translateDifficulty(diff: Difficulty): String {
         return when (diff) {
             Difficulty.EASY -> t("easy")
@@ -459,5 +467,6 @@ object Strings {
         }
     }
 
+    // Provides access to the currently selected language from LanguageState.
     val currentLanguage get() = LanguageState.current.value
 }
