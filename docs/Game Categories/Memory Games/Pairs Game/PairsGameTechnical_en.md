@@ -1,8 +1,8 @@
-# 🧠 Memory Match Game — Technical Documentation
+# 🧠 Pairs Game — Technical Documentation
 
 ## Overview
 
-The Memory Match Game is a **visual memory-based minigame** where players must uncover and match pairs of hidden cards. It challenges players' **concentration**, **attention span**, and **pattern recognition** skills.
+The Pairs Game is a **visual memory-based minigame** where players must uncover and match pairs of hidden cards. It challenges players' **concentration**, **attention span**, and **pattern recognition** skills.
 
 The game is implemented using **Jetpack Compose Multiplatform** with a clean **Model–View–Controller (MVC)** architecture for separation of concerns and testability.
 
