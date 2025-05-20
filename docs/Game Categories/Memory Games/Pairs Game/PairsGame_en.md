@@ -1,7 +1,7 @@
 # 🧠 Pairs Game - Player Guide
 
 ## 🎯 Objective
-The **Memory Match** game tests your **concentration** and **visual memory**.
+The **Pairs Game** game tests your **concentration** and **visual memory**.
 
 Your goal is to **find and match all pairs of cards** in the shortest time possible.
 
