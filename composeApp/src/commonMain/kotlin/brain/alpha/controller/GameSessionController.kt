@@ -66,7 +66,7 @@ object GameSessionController {
                     timeLeft?.let { put("time_left", it) }
                 }
             )
-            // Update user progress
+            //Update user progress
             upsertUserProgress(userId, gameId, score)
         }
     }
