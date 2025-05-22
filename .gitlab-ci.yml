@@ -27,7 +27,7 @@ web:
   stage: build
   image: eclipse-temurin:21
   rules:
-    - if: $CI_COMMIT_MESSAGE =~ /@build|@web/
+    - if: $CI_COMMIT_MESSAGE =~ /@web/
   script:
     - chmod u+x gradlew
     - ./gradlew wasmJsBrowserDistribution
