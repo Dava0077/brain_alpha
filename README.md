@@ -3,18 +3,20 @@
 
 <img src="logo.PNG" width="400">
 
-<https://play.google.com/store/apps/details?id=brain.alpha&hl=es_419>
+## 🟦 Android Download
 
-## Development
+👉 **You can download the latest version of BrainAlpha on Android here:
+<https://play.google.com/store/apps/details?id=brain.alpha&hl=es_419>**
 
-scoop install nodejs
+---
 
-```pwsh
-cd site
-npm start
-```
+## 🟦 Desktop Download
 
-para ci   commit con @pages
+👉 **You can download the latest version of BrainAlpha on Desktop here:
+<https://gitlab.com/provencat/dam/brain-alpha/-/packages>**
+
+
+---
 
 ## 🟦 Project Overview
 
