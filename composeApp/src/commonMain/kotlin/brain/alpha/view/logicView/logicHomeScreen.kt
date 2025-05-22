@@ -146,13 +146,13 @@ fun logicHomeScreen(
             ) {
                     CategoryItem(
                         "SUDOKU",
-                        Res.drawable.logica,
+                        Res.drawable.sudoku2,
                         Color.Gray,
                         onNavigateToSudoku
                     )
                     CategoryItem(
                         Strings.t("title_wordSearch"),
-                        Res.drawable.sopaLetras,
+                        Res.drawable.sopa,
                         Color.Gray,
                         onNavigateToWordS
                     )

@@ -163,7 +163,7 @@ object Strings {
             "stroopTest_game" to "Test de Stroop",
             "mental_math" to "Cálculo mental",
             "oddEmoji_game" to "Emoji raro",
-            "click_number" to "Haz clic en el número",
+            "click_number" to "Click Number",
 
             //Mental Math
             "mm1" to "¡Juego Terminado!",

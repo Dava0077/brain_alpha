@@ -143,7 +143,7 @@ fun memoryHomeScreen(
                 )
                 brain.alpha.view.CategoryItem(
                     Strings.t("title_simon"),
-                    Res.drawable.simon,
+                    Res.drawable.img,
                     Color(0xFF0647D7),
                     {controller.goSimon()}
                 )
