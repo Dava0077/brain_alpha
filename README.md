@@ -3,10 +3,16 @@
 
 <img src="logo.PNG" width="400">
 
-## Android Download
+## 🟦 Android Download
 
-You can download the lastest version of BrainAlpha on Android here:
+You can download the latest version of BrainAlpha on Android here:
 <https://play.google.com/store/apps/details?id=brain.alpha&hl=es_419>
+
+
+## 🟦 Desktop Download
+
+You can download the latest version of BrainAlpha on Desktop here:
+<https://gitlab.com/provencat/dam/brain-alpha/-/packages>
 
 
 ## 🟦 Project Overview
