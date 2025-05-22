@@ -1,4 +1,4 @@
-# 🧠 Click Number - Player Guide
+# 🔢 Click Number - Player Guide
 
 ## 🎯 Objective
 
