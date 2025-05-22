@@ -3,18 +3,11 @@
 
 <img src="logo.PNG" width="400">
 
+## Android Download
+
+You can download the lastest version of BrainAlpha on Android here:
 <https://play.google.com/store/apps/details?id=brain.alpha&hl=es_419>
 
-## Development
-
-scoop install nodejs
-
-```pwsh
-cd site
-npm start
-```
-
-para ci   commit con @pages
 
 ## 🟦 Project Overview
 
