@@ -101,3 +101,4 @@ graph TD
   I --> J{Game over? (10 questions or time = 0)}
   J -- No --> F
   J -- Yes --> K[Show final score and save session]
+  ```
