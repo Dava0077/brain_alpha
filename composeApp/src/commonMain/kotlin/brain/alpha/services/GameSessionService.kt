@@ -5,7 +5,7 @@ import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.serialization.Serializable
 
-// Data class representing a single game session row to be saved in Supabase.
+// Data class representing a single game session row to be saved in Supabase
 @Serializable
 data class GameSession(
     val user_id: String,

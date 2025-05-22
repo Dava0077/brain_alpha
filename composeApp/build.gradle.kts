@@ -29,25 +29,25 @@ kotlin {
     
     jvm("desktop")
     
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
-        moduleName = "composeApp"
-        browser {
-            val rootDirPath = project.rootDir.path
-            val projectDirPath = project.projectDir.path
-            commonWebpackConfig {
-                outputFileName = "composeApp.js"
-                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-                    static = (static ?: mutableListOf()).apply {
-                        // Serve sources to debug inside browser
-                        add(rootDirPath)
-                        add(projectDirPath)
-                    }
-                }
-            }
-        }
-        binaries.executable()
-    }
+//    @OptIn(ExperimentalWasmDsl::class)
+//    wasmJs {
+//        moduleName = "composeApp"
+//        browser {
+//            val rootDirPath = project.rootDir.path
+//            val projectDirPath = project.projectDir.path
+//            commonWebpackConfig {
+//                outputFileName = "composeApp.js"
+//                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
+//                    static = (static ?: mutableListOf()).apply {
+//                        // Serve sources to debug inside browser
+//                        add(rootDirPath)
+//                        add(projectDirPath)
+//                    }
+//                }
+//            }
+//        }
+//        binaries.executable()
+//    }
     
     sourceSets {
         val desktopMain by getting
@@ -85,10 +85,10 @@ kotlin {
             implementation(libs.kotlinx.coroutines.swing)
             implementation("io.ktor:ktor-client-cio:3.0.3")
         }
-        val wasmJsMain by getting
-        wasmJsMain.dependencies {
-            implementation("io.ktor:ktor-client-js:3.0.3") // compatible con wasm
-        }
+//        val wasmJsMain by getting
+//        wasmJsMain.dependencies {
+//            implementation("io.ktor:ktor-client-js:3.0.3") // compatible con wasm
+//        }
     }
 }
 
@@ -100,8 +100,8 @@ android {
         applicationId = "brain.alpha"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 5
-        versionName = "1.5"
+        versionCode = 6
+        versionName = "1.6"
     }
     packaging {
         resources {
@@ -138,7 +138,6 @@ compose.desktop {
                 perUserInstall = true
                 menuGroup = "start-menu-group"
             }
-
         }
     }
 }

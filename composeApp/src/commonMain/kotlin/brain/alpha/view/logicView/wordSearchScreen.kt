@@ -1,3 +1,4 @@
+// Composable function for the word search game screen UI
 package brain.alpha.view.logicView
 
 import androidx.compose.foundation.*
@@ -38,29 +39,66 @@ import kotlin.math.abs
 
 @Composable
 fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> Unit) {
+
+    // Get the current game grid and list of words to find from the controller
     val grid = controller.getGrid()
     val words = controller.getWordsToFind()
+
+    // Track selected grid cells by the user
     val selectedCells = remember { mutableStateListOf<Pair<Int, Int>>() }
+
+    // Track direction of selection (horizontal, vertical, diagonal)
     var selectionDirection by remember { mutableStateOf<Pair<Int, Int>?>(null) }
+
+    // Game state flags
     var gameStarted by remember { mutableStateOf(false) }
     var gameFinished by remember { mutableStateOf(false) }
+
+    // Cells that were validated (correct selections)
     val validatedCells = remember { mutableStateListOf<Pair<Int, Int>>() }
+
+    // Timer variables
     var timeLeft by remember { mutableStateOf(60) }
     var showDialog by remember { mutableStateOf<String?>(null) }
+
+    // Track loading status
     var isLoading by remember { mutableStateOf(false) }
+
+    // Coroutine scope for launching background jobs
     val scope = rememberCoroutineScope()
+
+    // Observe instruction screen visibility from controller
     val showInstructions by controller.showInstructions
+
+    // Track elapsed time
     var elapsedTime by remember { mutableStateOf(0) }
+
+    // Trigger to reset timer
     var timerTrigger by remember { mutableStateOf(0) }
+
+    // Format time as MM:SS
     val min = (elapsedTime / 60).toString().padStart(2, '0')
     val sec = (elapsedTime % 60).toString().padStart(2, '0')
+
+    // Currently selected difficulty
     var selectedDifficulty by remember { mutableStateOf(Difficulty.EASY) }
+
+    // Get the current username or guest label
     val displayName = UserSession.getDisplayName() // Show guest or username
+
+    // Flag to check if game session was already saved
     var sessionSaved by remember { mutableStateOf(false) }
+
+    // Get the logged-in user ID (or null if guest)
     val userId = runCatching { UserSession.getUserId() }.getOrNull()
+
+    // Total score loaded from server
     val totalScore = remember { mutableStateOf(0) }
+
+    // Scroll state for vertical scrolling
     val scrollState = rememberScrollState()
 
+    // Load user score from server on first render if user ID is available
     LaunchedEffect(userId) {
         if (userId != null) {
             val total = GameSessionController.getTotalScore(
@@ -72,6 +110,8 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
             totalScore.value = total
         }
     }
+
+    // Assign difficulty level based on total score and configure game accordingly
     LaunchedEffect(totalScore.value) {
         if (!UserSession.isGuest.value) {
             selectedDifficulty = when (totalScore.value) {
@@ -84,8 +124,7 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
         }
     }
 
-
-
+    // Show instructions screen if flag is set
     if (showInstructions) {
         InstructionsWordSearch(
             onStart = { controller.beginGame() },
@@ -94,6 +133,7 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
         return
     }
 
+    // Timer logic that tracks elapsed time while game is running
     LaunchedEffect(timerTrigger) {
         if (gameStarted) {
             elapsedTime = 0
@@ -103,6 +143,8 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
             }
         }
     }
+
+    // Check if the game is completed and show win dialog
     LaunchedEffect(validatedCells.size) {
         if (gameStarted && controller.isGameFinished()) {
             gameFinished = true
@@ -110,6 +152,7 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
         }
     }
 
+    // Main container with full screen size
    Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(Res.drawable.fondoLogic),
@@ -124,6 +167,7 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
             verticalArrangement = Arrangement.Top
         ) {
 
+            // Top bar with user, logo, and settings
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -159,10 +203,12 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
             }
             Spacer(modifier = Modifier.height(5.dp))
 
+            // Row of controls: Instructions, Score, Back button
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
+                // Instructions button
                 Button(
                     onClick = { controller.toggleInstructions(true) },
                     modifier = Modifier.height(46.dp),
@@ -174,6 +220,7 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                     Text(Strings.t("instructions"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
                 }
 
+                // Display total neurons (score)
                 Text(
                     text = "${totalScore.value} " + Strings.t("neurons"),
                     fontSize = 20.sp,
@@ -184,6 +231,7 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                 )
 
+                // Back to logic menu button
                 Button(
                     onClick = { controller.goHomeLogic() },
                     modifier = Modifier.height(46.dp),
@@ -196,6 +244,7 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                 }
             }
 
+            // Game not started: show difficulty selection and unlock info
             if (!gameStarted) {
                 val diffColors = mapOf(
                     Difficulty.EASY to Color(0xFF81C784),
@@ -203,12 +252,14 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                     Difficulty.HARD to Color(0xFFE57373)
                 )
 
+                // Determine which difficulties are unlocked based on score
                 val unlockedDifficulty = when {
                     totalScore.value >= 150 -> Difficulty.HARD
                     totalScore.value >= 75 -> Difficulty.MEDIUM
                     else -> Difficulty.EASY
                 }
 
+                // Render buttons for each difficulty level
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Difficulty.values().forEach { diff ->
                         val isUnlocked = diff.ordinal <= unlockedDifficulty.ordinal
@@ -237,8 +288,10 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                     }
                 }
 
+                // Spacer after difficulty selection
                 Spacer(modifier = Modifier.height(8.dp))
 
+                // Display unlock progress message with icon
                 val (icon, color, msg) = when {
                     totalScore.value < 50 -> Triple("🔒", Color.Red, "${50 - totalScore.value}" + Strings.t("mm8"))
                     totalScore.value < 150 -> Triple("🔒", Color.Red, "${150 - totalScore.value}"+ Strings.t("mm9"))
@@ -266,13 +319,22 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                 }
             }
 
-
+            // Add vertical spacing before title
             Spacer(modifier = Modifier.height(30.dp))
+
+            // Title of the word search game
             Text(Strings.t("title_wordSearch"), fontSize = 40.sp, color = Color.Black, fontFamily = FontFamily.SansSerif, textAlign = TextAlign.Center)
+
+            // Spacer between title and timer
             Spacer(modifier = Modifier.height(15.dp))
+
+            // Display timer in MM:SS format
             Text("${Strings.t("time")} $min:$sec", fontSize = 20.sp, color = Color.Black, fontFamily = FontFamily.SansSerif, textAlign = TextAlign.Center)
+
+            // Spacer before the play button
             Spacer(modifier = Modifier.height(10.dp))
 
+            // Show the "Play" button only if the game has not started
             if (!gameStarted) {
                 Button(
                     onClick = {
@@ -295,20 +357,26 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                     enabled = !isLoading,
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
                 ) {
+                    // Display loading or play text based on state
                     Text(if (isLoading) Strings.t("charging") else Strings.t("play"), color = Color.Black)
                 }
             }
 
+            // Main game logic when the game has started
             if (gameStarted) {
 
+                // Spacer before grid
                 Spacer(modifier = Modifier.height(10.dp))
 
+                // Grid display using nested columns and rows
                 Column {
                     for (i in grid.indices) {
                         Row {
                             for (j in grid[i].indices) {
                                 val isSelected = selectedCells.contains(Pair(i, j))
                                 val isValidated = validatedCells.contains(Pair(i, j))
+
+                                // Box representing each cell
                                 Box(
                                     modifier = Modifier
                                         .size(36.dp)
@@ -342,6 +410,7 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                                         },
                                     contentAlignment = Alignment.Center
                                 ) {
+                                    // Display the letter inside the cell
                                     Text(grid[i][j].toString(), fontSize = 16.sp, fontWeight = FontWeight.Bold)
                                 }
                             }
@@ -349,12 +418,17 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                     }
                 }
 
+                // Spacer before word list
                 Spacer(modifier = Modifier.height(20.dp))
+
+                // Title for word list
                 Text(Strings.t("words_find"), fontSize = 20.sp, color = Color.Black)
 
+                // Split word list into rows
                 val wordsPerLine = 5
                 val wordGroups = controller.getWordsToFind().chunked(wordsPerLine)
 
+                // Render each row of words
                 wordGroups.forEach { group ->
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -374,6 +448,8 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                         }
                     }
                 }
+
+                // Display score and save game when finished
                 if (gameFinished) {
                     val score = controller.calculateScore(elapsedTime)
 
@@ -412,8 +488,10 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
                     }
                 }
 
-
+                // Spacer before bottom buttons
                 Spacer(modifier = Modifier.height(20.dp))
+
+                // Bottom row with "Restart" and "Validate" buttons
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     Button(
                         onClick = {
@@ -462,10 +540,14 @@ fun wordSearchScreen(controller: wordSearchController, onNavigateToHome: () -> U
     }
 }
 
+// Composable function for the word search instructions screen
 @Composable
 fun InstructionsWordSearch(onStart: () -> Unit, controller: wordSearchController) {
+
+    // Get current user's display name (or guest)
     val displayName = UserSession.getDisplayName() // Show guest or username
 
+    // Main container that fills the screen
     Box(modifier = Modifier.fillMaxSize()) {
 
         // Background image
@@ -476,6 +558,7 @@ fun InstructionsWordSearch(onStart: () -> Unit, controller: wordSearchController
             contentScale = ContentScale.Crop
         )
 
+        // Layout the content in a vertical column
         Column(
             modifier = Modifier
                 .fillMaxSize(),
@@ -491,6 +574,7 @@ fun InstructionsWordSearch(onStart: () -> Unit, controller: wordSearchController
                     .border(BorderStroke(2.dp, Color(0xFF4CE3E8)))
             )
             {
+                // User icon button on the left
                 IconButton(
                     onClick = { /* Dummy user action */ },
                     modifier = Modifier
@@ -504,6 +588,7 @@ fun InstructionsWordSearch(onStart: () -> Unit, controller: wordSearchController
                     )
                 }
 
+                // Logo centered in the header
                 Image(
                     painter = painterResource(Res.drawable.logo),
                     contentDescription = null,
@@ -513,6 +598,7 @@ fun InstructionsWordSearch(onStart: () -> Unit, controller: wordSearchController
                         .scale(1.2f)
                 )
 
+                // Settings button on the right
                 IconButton(
                     onClick = { brain.alpha.controller.LoginController.buttonSettings() },
                     modifier = Modifier
@@ -525,6 +611,8 @@ fun InstructionsWordSearch(onStart: () -> Unit, controller: wordSearchController
                         contentDescription = "Ajustes"
                     )
                 }
+
+                // Display user name (or guest)
                 Text(
                     text = "$displayName",
                     color = Color.White,
@@ -535,14 +623,13 @@ fun InstructionsWordSearch(onStart: () -> Unit, controller: wordSearchController
                 )
             }
 
+            // Small spacer after the header
             Spacer(modifier = Modifier.height(5.dp))
-            // Back Button (same design as in game)
 
-
-
+            // Additional vertical space before title
             Spacer(modifier = Modifier.height(100.dp))
 
-            // Title of instruction section
+            // Title text for the instructions section
             Text(
                 Strings.t("instructions"),
                 fontSize = 28.sp,
@@ -550,6 +637,7 @@ fun InstructionsWordSearch(onStart: () -> Unit, controller: wordSearchController
                 color = Color(0xFF212121)
             )
 
+            // Spacer below the title
             Spacer(modifier = Modifier.height(30.dp))
 
             // Game explanation using styled text
@@ -559,6 +647,7 @@ fun InstructionsWordSearch(onStart: () -> Unit, controller: wordSearchController
                     .background(Color.White, shape = RoundedCornerShape(16.dp))
                     .padding(16.dp) // Padding interno
             ) {
+                // Render multi-part rich text explanation
                 Text(
                     buildAnnotatedString {
                         append(Strings.t("insW1"))
@@ -582,10 +671,10 @@ fun InstructionsWordSearch(onStart: () -> Unit, controller: wordSearchController
                 )
             }
 
-
+            // Spacer before the start button
             Spacer(modifier = Modifier.height(40.dp))
 
-            // Start game button
+            // Start game button that triggers the onStart lambda
             Button(
                 onClick = onStart,
                 modifier = Modifier

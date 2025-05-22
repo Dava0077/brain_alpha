@@ -21,9 +21,14 @@ The following diagram represents the **main classes and relationships** in the s
   - `name: String`
   - `createdAt: Date`
 - **Methods:**
-  - `register()`
-  - `login()`
-  - `logout()`
+  - `signUp()`
+  - `signIn()`
+  - `signOut()`
+  - `loadUserProfile()`
+  - `ensureUserExists()`
+  - `deleteUserFromAuth()`
+  - `sendPasswordReset()`
+  - `resendVerification()`
 
 ---
 
@@ -34,9 +39,8 @@ The following diagram represents the **main classes and relationships** in the s
   - `description: String`
   - `category: String`
 - **Methods:**
-  - `startGame()`
-  - `endGame()`
-  - `getGameInfo()`
+  - `getGameIdByName()`
+  - `getGameById()`
 
 ---
 
@@ -48,8 +52,8 @@ The following diagram represents the **main classes and relationships** in the s
   - `score: Int`
   - `lastPlayed: Date`
 - **Methods:**
-  - `saveProgress()`
-  - `getProgress()`
+  - `upsertUserProgress()`
+  - `getAllTotalScores()`
 
 ---
 
@@ -59,58 +63,15 @@ The following diagram represents the **main classes and relationships** in the s
   - `userId: UUID`
   - `gameId: UUID`
   - `score: Int`
-  - `duration: Int`
+  - `difficulty: String`
+  - `timeAvg: Double?`
+  - `timeLeft: Double?`
   - `playedAt: Date`
 - **Methods:**
-  - `startSession()`
-  - `endSession()`
-  - `saveSession()`
-  - `pauseSession()`
-
----
-
-### **Achievement & UserAchievements**
-- **Achievement Attributes:**
-  - `id: UUID`
-  - `name: String`
-  - `description: String`
-  - `gameId: UUID`
-- **Achievement Methods:**
-  - `unlock()`
-  - `getAchievement()`
-- **UserAchievements Attributes:**
-  - `id: UUID`
-  - `userId: UUID`
-  - `achievementId: UUID`
-  - `unlockedAt: Date`
-- **UserAchievements Methods:**
-  - `unlockAchievement()`
-  - `getUserAchievements()`
-
----
-
-### **Leaderboard (Game Ranking)**
-- **Attributes:**
-  - `id: UUID`
-  - `userId: UUID`
-  - `gameId: UUID`
-  - `score: Int`
-  - `rank: Int`
-- **Methods:**
-  - `updateRank()`
+  - `registerGameSession()`
   - `getLeaderboard()`
-  - `getUserRank()`
-
----
-
-### **Settings (User Preferences)**
-- **Attributes:**
-  - `id: UUID`
-  - `userId: UUID`
-  - `darkMode: Bool`
-  - `language: String`
-- **Methods:**
-  - `changeSettings()`
-  - `getSettings()`
+  - `getLeaderboardGroupedByDifficulty()`
+  - `getGlobalLeaderboardByGameId()`
+  - `getTotalScore()`
 
 ---
