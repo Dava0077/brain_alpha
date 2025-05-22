@@ -91,14 +91,14 @@ Pantalla de instrucciones inicial.
 ```mermaid
 graph TD
     A[El usuario abre la pantalla de Mental Math] --> B[Pantalla de instrucciones o juego]
-    B --> C[¿El juego ha comenzado?]
+    B --> C[Comprobación de inicio del juego]
     C -->|No| D[Seleccionar dificultad]
     D --> E[Pulsar "Iniciar"]
     E --> F[Generar pregunta aleatoria]
     C -->|Sí| F
     F --> G[Mostrar pregunta actual]
     G --> H[Jugador envía respuesta]
-    H --> I[Validar respuesta y calcular puntos]
-    I --> J[¿Fin del juego?]
+    H --> I[Validar respuesta y sumar puntos]
+    I --> J[Comprobación de fin de juego]
     J -->|No| F
     J -->|Sí| K[Mostrar puntaje final y guardar sesión]
