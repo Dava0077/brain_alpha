@@ -102,4 +102,4 @@ graph TD
   J --> K{All words found?}
   K -- Yes --> L[Game won]
   K -- No --> G
-```
+
