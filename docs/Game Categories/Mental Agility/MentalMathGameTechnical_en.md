@@ -90,14 +90,15 @@ Initial instructions screen.
 
 ```mermaid
 graph TD
-    A[User opens the Mental Math screen] --> B[Instructions screen or game]
-    B --> C{Has the game started?}
-    C -- No --> D[Select difficulty]
-    D --> E[Press "Start"]
-    C -- Yes --> F[Generate random question]
-    F --> G[Display current question]
-    G --> H[Player enters answer]
+    A[User opens the Mental Math screen] --> B[Instructions screen or Game]
+    B --> C[Game started?]
+    C -->|No| D[Select difficulty]
+    D --> E[Press Start]
+    E --> F[Generate random question]
+    C -->|Yes| F
+    F --> G[Display question]
+    G --> H[Player submits answer]
     H --> I[Validate answer and calculate score]
-    I --> J{Game over? (10 questions or time = 0)}
-    J -- No --> F
-    J -- Yes --> K[Show final score and save session]
+    I --> J[Is game over?]
+    J -->|No| F
+    J -->|Yes| K[Show final score and save session]
