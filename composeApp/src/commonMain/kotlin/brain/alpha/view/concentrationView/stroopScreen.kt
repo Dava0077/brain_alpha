@@ -429,7 +429,7 @@ fun StroopScreen(controller: stroopController = stroopController) {
                 }
 
                 // Display the game title text
-                Text(Strings.t("insST7"), fontSize = 24.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Cursive)
+                Text(Strings.t("insST7"), fontSize = 24.sp, fontWeight = FontWeight.Bold)
                 // Show remaining time in seconds
                 Text(Strings.t("insST8") + "$timeLeft" + Strings.t("insST9"), fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
