@@ -390,7 +390,7 @@ object Strings {
             //Mental Math
             "mm1" to "Game Over!",
             "mm2" to "Score: ",
-            "mm3" to "Average Time: ",
+            "mm3" to "Average Time: " ,
             "mm4" to "Difficulty: ",
             "mm5" to "Play Again",
             "mm6" to "Exit",
