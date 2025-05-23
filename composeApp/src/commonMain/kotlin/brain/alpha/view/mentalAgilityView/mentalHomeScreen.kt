@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import brain.alpha.controller.LoginController
 import brain.alpha.controller.memoryController.memoryHomeController
 import brain.alpha.controller.mentalAgilityController.mentalHomeController
+import brain.alpha.strings.Strings
 import brainalpha.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -111,7 +112,7 @@ fun mentalHomeScreen(
 
             // Section title
             Text(
-                text = "MEMORIA",
+                text = Strings.t("mental_agility"),
                 fontSize = 40.sp,
                 color = Color.Black,
                 fontFamily = FontFamily.SansSerif,

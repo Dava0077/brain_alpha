@@ -4,9 +4,5 @@ const title = "Desktop"
 
 <h2>Download Multiplatform</h2>
 
-<p><a href="https://gitlab.com/xtec/kotlin/compose/multiplatform/-/packages">Packages</a></p>
+<p><a href="https://gitlab.com/provencat/dam/brain-alpha/-/packages">Packages</a></p>
 
-
-
-<h5>TODO</h5>
-<p>Make similar to <a href="https://code.visualstudio.com/download">VSCode Download</a></p>
