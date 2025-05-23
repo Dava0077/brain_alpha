@@ -106,10 +106,10 @@ fun logicHomeScreen(
                          .padding(start = 72.dp)
                  )
             }
-            // Spacer after top bar
+            //Spacer after top bar
             Spacer(modifier = Modifier.height(5.dp))
 
-            // Back button to go home
+            //Back button to go home
             Button(
                 onClick = { controller.goHome() },
                 modifier = Modifier
