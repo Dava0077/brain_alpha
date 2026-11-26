@@ -35,7 +35,7 @@ All project documentation is available in the ▶ [`docs/`](docs/) folder.
 - Develop a **cross-platform** application with cognitive training games.
 - Enable users to **track their progress** with detailed statistics.
 - Provide **personalized training** based on user performance.
-- Maintain an **open-source** model under the **GPL license**.
+- Maintain an **open-source** model under the **AGPL-3.0 license**.
 
 ---
 
