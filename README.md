@@ -21,12 +21,11 @@ All project documentation is available in the ▶ [`docs/`](docs/) folder.
 
 ## 🟦 Project Status
 
-- **Current Version:** `v0.1`
-- **Latest Update:** `March 2025`
-- **Development Stage:** `MVP - First iteration completed`
-- **Demo Available:** The **initial APK** and **Desktop version** are ready for testing.
-
-For upcoming features, check ▶ [Development Roadmap](docs/roadmap.md).
+- **Version:** `v0.1`
+- **Last update:** `March 2025`
+- **Stage:** `MVP – first iteration completed`
+- **Context:** Final course project (DAM), developed by a team of 3.
+- **Availability:** The Android app is no longer published on Google Play. The source code and builds are available in this repository.
 
 ---
 
